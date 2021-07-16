@@ -1,4 +1,4 @@
-let newGameName; //not sure if this is actually used yet
+let newGameName; //not sure if this is actually used yet. Maybe it can be used when making creating several games more dynamic
 
 /**
  * Creates game-JSON with all players that were added in createGameModal.
