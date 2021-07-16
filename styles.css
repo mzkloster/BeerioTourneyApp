@@ -1,0 +1,18 @@
+body {
+    text-align: center;
+}
+h1 {
+    color: green;
+}
+h2,h3,h4{
+    color:green;
+    padding-top: 40px;
+}
+
+.center {
+    margin: auto;
+}
+
+.fas, .fa, .far {
+    cursor: pointer;
+}
