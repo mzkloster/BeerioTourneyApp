@@ -274,19 +274,42 @@ function updateMatchResult(ev) {
  * @param {string[]} result 
  */
 function setMatchResult(matchId, result) {
-        //get data from localstorage
-        let matchesObj = localStorage.getItem('Beerio 2021-matches'); //change to work dynamically!!
-        let parsedMatchesObj = JSON.parse(matchesObj);        
-    
-        for (let i=0; i<parsedMatchesObj.length; i++) {
-            if (parsedMatchesObj[i].matchId === matchId) {
-                parsedMatchesObj[i].result = result;
-               break;
-            }
+    //get data from localstorage
+    let matchesObj = localStorage.getItem('Beerio 2021-matches'); //change to work dynamically!!
+    let parsedMatchesObj = JSON.parse(matchesObj);        
+
+    for (let i=0; i<parsedMatchesObj.length; i++) {
+        if (parsedMatchesObj[i].matchId === matchId) {
+            parsedMatchesObj[i].result = result;
+            break;
         }
+    }
+
+    //Update localstorage with results
+    localStorage.setItem('Beerio 2021-matches', JSON.stringify(parsedMatchesObj)); //change to work dynamically!!
+}
+
+
+/**
+ * Checks if match is played. Returns boolean.
+ * @param {number} matchId 
+ * @returns boolean
+ */
+function isMatchPlayed(matchId) {
+    let matchesObj = localStorage.getItem('Beerio 2021-matches'); //change to work dynamically!!
+    let parsedMatchesObj = JSON.parse(matchesObj); 
     
-        //Update localstorage with results
-        localStorage.setItem('Beerio 2021-matches', JSON.stringify(parsedMatchesObj)); //change to work dynamically!!
+    let isMatchPlayed = false;
+
+    for (let i=0; i<parsedMatchesObj.length; i++) {
+        if (parsedMatchesObj[i].matchId === matchId) {
+            if (parsedMatchesObj[i].result.length > 0){
+                isMatchPlayed = true;
+            }            
+        }
+    }
+
+    return isMatchPlayed;
 }
 
 /**
