@@ -293,12 +293,23 @@ function updateMatchResultModal(ev, buttonClicked){
     let player3 = $(buttonClicked).parent().find('.match-player-3').text();
     let player4 = $(buttonClicked).parent().find('.match-player-4').text();
 
-
-    $('#updateMatchResultModal').find('.modal-title-matchId').text(matchId);
+    $('#updateMatchResultModal').find('.modal-title-matchId').text(matchId + ' - Result');
     $('#updateMatchResultModal').find('label[for="player1Placement"]').text(player1);
     $('#updateMatchResultModal').find('label[for="player2Placement"]').text(player2);
     $('#updateMatchResultModal').find('label[for="player3Placement"]').text(player3);
     $('#updateMatchResultModal').find('label[for="player4Placement"]').text(player4);
+
+    if (isMatchPlayed(parseInt(matchId))){
+        $('#updateMatchResultModal').find('input[id="player1Placement"]').val(getPlayerPlacementInMatch(player1, parseInt(matchId)));
+        $('#updateMatchResultModal').find('input[id="player2Placement"]').val(getPlayerPlacementInMatch(player2, parseInt(matchId)));
+        $('#updateMatchResultModal').find('input[id="player3Placement"]').val(getPlayerPlacementInMatch(player3, parseInt(matchId)));
+        $('#updateMatchResultModal').find('input[id="player4Placement"]').val(getPlayerPlacementInMatch(player4, parseInt(matchId)));
+    }else {
+        $('#updateMatchResultModal').find('input[id="player1Placement"]').val('');
+        $('#updateMatchResultModal').find('input[id="player2Placement"]').val('');
+        $('#updateMatchResultModal').find('input[id="player3Placement"]').val('');
+        $('#updateMatchResultModal').find('input[id="player4Placement"]').val('');
+    }
 }
 
 
