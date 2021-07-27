@@ -32,6 +32,7 @@ function generateGame(ev){
     console.log("game created!");
 }
 
+
 /**
  * Creates a new inputField for adding player to createGameModal
  * @param {event} ev 
@@ -45,6 +46,7 @@ function addPlayerInputField(ev) {
         $(this).parent('div').remove();
     })
 }
+
 
 /**
  * Updates/displays gameTable based on values in game-JSON.
@@ -128,12 +130,13 @@ function generateMatches(ev) {
     updateMatchesList();
 }
 
+
 /**
  * Updates/displays list with all matches, by adding list items that include matchId and match players.
  * Removes all "old" match list items, and adds new updated match list items.
  */
 function updateMatchesList() {
-    //removes "old" match list item
+    //removes "old" match list items
     $('.matches-list').empty();
 
     //loop through matches JSON and create new updated match list items
@@ -141,20 +144,56 @@ function updateMatchesList() {
     parsedMatchesObj = JSON.parse(matchesObj);
 
     for (let i=0; i<parsedMatchesObj.length; i++){
+        player1BagdeValue = "";
+        player2BagdeValue = "";
+        player3BagdeValue = "";
+        player4BagdeValue = "";
+        
+        //if match is played: loop through players in that match, find player placement, and set bagdeValue
+        if (isMatchPlayed(parsedMatchesObj[i]['matchId'])){            
+            for (let j=0; j<4; j++){
+                let playerName = parsedMatchesObj[i]['players'][j];   
+                let playerPlacementIndex = parsedMatchesObj[i]['result'].indexOf(playerName);
+                let playerPlacementInt = 1 + parseInt(playerPlacementIndex);
+                let playerPlacement = playerPlacementInt.toString();
+
+                switch(j) {
+                    case 0:
+                        player1BagdeValue = playerPlacement;
+                        break;
+                    case 1:
+                        player2BagdeValue = playerPlacement;
+                        break;
+                    case 2:
+                        player3BagdeValue = playerPlacement;
+                        break;
+                    case 3:
+                        player4BagdeValue = playerPlacement;
+                        break;                      
+                }
+            }
+        }
+        
         newListRow = 
             '<li class="list-group-item">' +
                 '<div class="match-info">' + 
-                    'Match <span class="match-id">' + parsedMatchesObj[i]['matchId'] + '</span>: ' + 
-                    '<span class="match-player-1">' + parsedMatchesObj[i]['players'][0] + '</span>, ' + 
-                    '<span class="match-player-2">' + parsedMatchesObj[i]['players'][1] + '</span>, ' + 
-                    '<span class="match-player-3">' + parsedMatchesObj[i]['players'][2] + '</span>, ' + 
-                    '<span class="match-player-4">' + parsedMatchesObj[i]['players'][3] + '</span> ' + 
-                    '<button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#updateMatchResultModal"><i class="fas fa-edit"></i></button>' + 
+                    '<b>Match <span class="match-id">' + parsedMatchesObj[i]['matchId'] + '</span>: &nbsp;&nbsp;&nbsp;</b>' + 
+                    '<span class="match-player-1">' + parsedMatchesObj[i]['players'][0] + '</span> <span class="match-player-1-bagde badge bg-secondary">' + player1BagdeValue + '</span> &nbsp;|&nbsp; ' + 
+                    '<span class="match-player-2">' + parsedMatchesObj[i]['players'][1] + '</span> <span class="match-player-2-bagde badge bg-secondary">' + player2BagdeValue + '</span> &nbsp;|&nbsp; ' + 
+                    '<span class="match-player-3">' + parsedMatchesObj[i]['players'][2] + '</span> <span class="match-player-3-bagde badge bg-secondary">' + player3BagdeValue + '</span> &nbsp;|&nbsp; ' + 
+                    '<span class="match-player-4">' + parsedMatchesObj[i]['players'][3] + '</span> <span class="match-player-4-bagde badge bg-secondary">' + player4BagdeValue + '</span> ' + 
+                    '&nbsp;&nbsp;&nbsp;<button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#updateMatchResultModal"><i class="fas fa-edit"></i></button>' + 
                 '</div>' +
             '</li>'
         $('.list-group').append(newListRow);
     }
+
+    //adds onClick event on edit buttons again (since all "old" match list items are removed in the beginning of this function)
+    $('.match-info button').on('click',function(event) {
+        updateMatchResultModal(event, this);
+    })
 }
+
 
 /**
  * THIS FUNCTION SHOULD NOT BE USED
@@ -177,6 +216,7 @@ function updatePlayerPoints(playerName, placement) {
     localStorage.setItem('Beerio 2021', JSON.stringify(parsedGameObj)); //change to work dynamically!!
 }
 
+
 /**
  * Sets paramter playerPoints for given player.
  * @param {string} playerName 
@@ -194,6 +234,7 @@ function setPlayerPoints(playerName, points) {
     }
     localStorage.setItem('Beerio 2021', JSON.stringify(parsedGameObj)); //change to work dynamically!!
 }
+
 
 /**
  * Sets parameter gamesPlayed for given player.
@@ -213,6 +254,7 @@ function setPlayerGamesPlayed(playerName, gamesPlayed) {
     localStorage.setItem('Beerio 2021', JSON.stringify(parsedGameObj)); //change to work dynamically!!
 }
 
+
 /**
  * Updates values in matchResultModal (matchId, playerNames) that is about to be shown when this button is clicked
  * @param {event} ev 
@@ -220,8 +262,7 @@ function setPlayerGamesPlayed(playerName, gamesPlayed) {
  */
 function updateMatchResultModal(ev, buttonClicked){
     ev.preventDefault();
-
-    //craete if statement checking if match is playes (result is not empty). If match is not played input value should be null
+    //create if statement checking if match is played (result is not empty). If match is not played input value should be null. If match is played, placement values should be default
 
     //update modal title with matchId, and labels with players
     let matchId = $(buttonClicked).parent().find('.match-id').text();    
@@ -263,9 +304,10 @@ function updateMatchResult(ev) {
     matchResult[player3Placement-1] = player3;
     matchResult[player4Placement-1] = player4;
 
-    setMatchResult(parseInt(matchId), matchResult);
+    setMatchResult(parseInt(matchId), matchResult);     
     updatePlayerPointsAndGamesPlayedFromAllMatchResults()
     updateGameTableDisplay();
+    updateMatchesList();
 }
 
 /**
@@ -353,12 +395,6 @@ function updatePlayerPointsAndGamesPlayedFromAllMatchResults() {
 
 
 $(document).ready(function(){
-
-    //running functions when page is entered/refreshed
-    updatePlayerPointsAndGamesPlayedFromAllMatchResults()
-    updateGameTableDisplay();
-    updateMatchesList();
-
     
     //adding onClick-functions to buttons
     $('#generateGameButton').on('click', function(event) {
@@ -376,13 +412,21 @@ $(document).ready(function(){
     $('#generateMatchesButton').on('click',function(event) {
         generateMatches(event);
     })
-
-    $('button[data-bs-target="#updateMatchResultModal"]').on('click',function(event) {
-        updateMatchResultModal(event, this);
-    })
-
+    
     $('#updateMatchResultbutton').on('click',function(event) {
         updateMatchResult(event);
     })
+
+    //Commented out because this onClick event is added in updateMatchList()
+    // $('.match-info button').on('click',function(event) {
+    //     updateMatchResultModal(event, this);
+    // })
+
+
+    //running functions when page is entered/refreshed. (Make checks here so we avoid error in console)
+    updatePlayerPointsAndGamesPlayedFromAllMatchResults()
+    updateGameTableDisplay();
+    updateMatchesList();
+    
 });
 
