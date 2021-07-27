@@ -152,10 +152,8 @@ function updateMatchesList() {
         //if match is played: loop through players in that match, find player placement, and set bagdeValue
         if (isMatchPlayed(parsedMatchesObj[i]['matchId'])){            
             for (let j=0; j<4; j++){
-                let playerName = parsedMatchesObj[i]['players'][j];   
-                let playerPlacementIndex = parsedMatchesObj[i]['result'].indexOf(playerName);
-                let playerPlacementInt = 1 + parseInt(playerPlacementIndex);
-                let playerPlacement = playerPlacementInt.toString();
+                let playerName = parsedMatchesObj[i]['players'][j];
+                let playerPlacement = getPlayerPlacementInMatch(playerName, parsedMatchesObj[i]['matchId'])
 
                 switch(j) {
                     case 0:
@@ -254,6 +252,7 @@ function setPlayerGamesPlayed(playerName, gamesPlayed) {
     localStorage.setItem('Beerio 2021', JSON.stringify(parsedGameObj)); //change to work dynamically!!
 }
 
+
 /**
  * Returns placement, string value between 1 and 4, for a player in a match.
  * @param {string} playerName 
@@ -276,6 +275,7 @@ function getPlayerPlacementInMatch(playerName, matchId){
         }
     }
 }
+
 
 /**
  * Updates values in matchResultModal (matchId, playerNames) that is about to be shown when this button is clicked
