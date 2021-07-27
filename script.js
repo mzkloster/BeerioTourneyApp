@@ -254,6 +254,28 @@ function setPlayerGamesPlayed(playerName, gamesPlayed) {
     localStorage.setItem('Beerio 2021', JSON.stringify(parsedGameObj)); //change to work dynamically!!
 }
 
+/**
+ * Returns placement, string value between 1 and 4, for a player in a match.
+ * @param {string} playerName 
+ * @param {number} matchId 
+ */
+function getPlayerPlacementInMatch(playerName, matchId){
+    let matchesObj = localStorage.getItem('Beerio 2021-matches'); //change to work dynamically!!
+    let parsedMatchesObj = JSON.parse(matchesObj);
+
+    if (isMatchPlayed(matchId)){
+        for (let i=0; i<parsedMatchesObj.length; i++) {
+            if (parsedMatchesObj[i].matchId === matchId) { 
+                if (parsedMatchesObj[i]['result'].includes(playerName)){
+                    let playerPlacementIndex = parsedMatchesObj[i]['result'].indexOf(playerName);
+                    let playerPlacementInt = 1 + parseInt(playerPlacementIndex);
+                    let playerPlacement = playerPlacementInt.toString();
+                    return playerPlacement;
+                }
+            }
+        }
+    }
+}
 
 /**
  * Updates values in matchResultModal (matchId, playerNames) that is about to be shown when this button is clicked
