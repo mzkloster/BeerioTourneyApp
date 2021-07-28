@@ -29,7 +29,6 @@ function generateGame(ev){
     localStorage.setItem(newGameName + '-matches', JSON.stringify(matches));
 
     $('#newGameForm')[0].reset();
-    console.log("game created!");
 }
 
 
@@ -180,7 +179,7 @@ function updateMatchesList() {
                     '<span class="match-player-2">' + parsedMatchesObj[i]['players'][1] + '</span> <span class="match-player-2-bagde badge bg-secondary">' + player2BagdeValue + '</span> &nbsp;|&nbsp; ' + 
                     '<span class="match-player-3">' + parsedMatchesObj[i]['players'][2] + '</span> <span class="match-player-3-bagde badge bg-secondary">' + player3BagdeValue + '</span> &nbsp;|&nbsp; ' + 
                     '<span class="match-player-4">' + parsedMatchesObj[i]['players'][3] + '</span> <span class="match-player-4-bagde badge bg-secondary">' + player4BagdeValue + '</span> ' + 
-                    '<button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#updateMatchResultModal"><i class="fas fa-edit"></i></button>' + 
+                    '<button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#matchResultModal"><i class="fas fa-edit"></i></button>' + 
                 '</div>' +
             '</li>'
         $('.list-group').append(newListRow);
@@ -293,43 +292,43 @@ function updateMatchResultModal(ev, buttonClicked){
     let player3 = $(buttonClicked).parent().find('.match-player-3').text();
     let player4 = $(buttonClicked).parent().find('.match-player-4').text();
 
-    $('#updateMatchResultModal').find('.modal-title-matchId').text(matchId + ' - Result');
-    $('#updateMatchResultModal').find('label[for="player1Placement"]').text(player1);
-    $('#updateMatchResultModal').find('label[for="player2Placement"]').text(player2);
-    $('#updateMatchResultModal').find('label[for="player3Placement"]').text(player3);
-    $('#updateMatchResultModal').find('label[for="player4Placement"]').text(player4);
+    $('#matchResultModal').find('.modal-title-matchId').text(matchId + ' - Result');
+    $('#matchResultModal').find('label[for="player1Placement"]').text(player1);
+    $('#matchResultModal').find('label[for="player2Placement"]').text(player2);
+    $('#matchResultModal').find('label[for="player3Placement"]').text(player3);
+    $('#matchResultModal').find('label[for="player4Placement"]').text(player4);
 
     if (isMatchPlayed(parseInt(matchId))){
-        $('#updateMatchResultModal').find('input[id="player1Placement"]').val(getPlayerPlacementInMatch(player1, parseInt(matchId)));
-        $('#updateMatchResultModal').find('input[id="player2Placement"]').val(getPlayerPlacementInMatch(player2, parseInt(matchId)));
-        $('#updateMatchResultModal').find('input[id="player3Placement"]').val(getPlayerPlacementInMatch(player3, parseInt(matchId)));
-        $('#updateMatchResultModal').find('input[id="player4Placement"]').val(getPlayerPlacementInMatch(player4, parseInt(matchId)));
+        $('#matchResultModal').find('input[id="player1Placement"]').val(getPlayerPlacementInMatch(player1, parseInt(matchId)));
+        $('#matchResultModal').find('input[id="player2Placement"]').val(getPlayerPlacementInMatch(player2, parseInt(matchId)));
+        $('#matchResultModal').find('input[id="player3Placement"]').val(getPlayerPlacementInMatch(player3, parseInt(matchId)));
+        $('#matchResultModal').find('input[id="player4Placement"]').val(getPlayerPlacementInMatch(player4, parseInt(matchId)));
     }else {
-        $('#updateMatchResultModal').find('input[id="player1Placement"]').val('');
-        $('#updateMatchResultModal').find('input[id="player2Placement"]').val('');
-        $('#updateMatchResultModal').find('input[id="player3Placement"]').val('');
-        $('#updateMatchResultModal').find('input[id="player4Placement"]').val('');
+        $('#matchResultModal').find('input[id="player1Placement"]').val('');
+        $('#matchResultModal').find('input[id="player2Placement"]').val('');
+        $('#matchResultModal').find('input[id="player3Placement"]').val('');
+        $('#matchResultModal').find('input[id="player4Placement"]').val('');
     }
 }
 
 
 /**
- * Saves/Updates match result. Triggered after hitting save-button on updateMatchResultModal
+ * Saves match result to matches-json. Triggered after hitting save-button on matchResultModal
  * @param {event} ev 
  */
-function updateMatchResult(ev) {
+function saveMatchResult(ev) {
     ev.preventDefault();
 
-    let matchId = $('#updateMatchResultModal').find('.modal-title-matchId').text(); //matchId as string
-    let player1 = $('#updateMatchResultModal').find('label[for="player1Placement"]').text();
-    let player2 = $('#updateMatchResultModal').find('label[for="player2Placement"]').text();
-    let player3 = $('#updateMatchResultModal').find('label[for="player3Placement"]').text();
-    let player4 = $('#updateMatchResultModal').find('label[for="player4Placement"]').text();
+    let matchId = $('#matchResultModal').find('.modal-title-matchId').text(); //matchId as string
+    let player1 = $('#matchResultModal').find('label[for="player1Placement"]').text();
+    let player2 = $('#matchResultModal').find('label[for="player2Placement"]').text();
+    let player3 = $('#matchResultModal').find('label[for="player3Placement"]').text();
+    let player4 = $('#matchResultModal').find('label[for="player4Placement"]').text();
 
-    let player1Placement = $('#updateMatchResultModal').find('#player1Placement').val();
-    let player2Placement = $('#updateMatchResultModal').find('#player2Placement').val();
-    let player3Placement = $('#updateMatchResultModal').find('#player3Placement').val();
-    let player4Placement = $('#updateMatchResultModal').find('#player4Placement').val();
+    let player1Placement = $('#matchResultModal').find('#player1Placement').val();
+    let player2Placement = $('#matchResultModal').find('#player2Placement').val();
+    let player3Placement = $('#matchResultModal').find('#player3Placement').val();
+    let player4Placement = $('#matchResultModal').find('#player4Placement').val();
 
     let matchResult = [];
     matchResult[player1Placement-1] = player1;
@@ -388,7 +387,10 @@ function isMatchPlayed(matchId) {
 }
 
 
-function isUpdateMatchResultFormValid(){
+/**
+ * TODE: check if matchResultForm in matchResultModal is valid. No duplicates values. Either all or none of input should have values.
+ */
+function isSaveMatchResultFormValid(){
     let result = false;
 }
 
@@ -452,8 +454,8 @@ $(document).ready(function(){
         generateMatches(event);
     })
     
-    $('#updateMatchResultbutton').on('click',function(event) {
-        updateMatchResult(event);
+    $('#saveMatchResultbutton').on('click',function(event) {
+        saveMatchResult(event);
     })
 
     //Commented out because this onClick event is added in updateMatchList()
