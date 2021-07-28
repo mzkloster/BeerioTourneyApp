@@ -330,17 +330,39 @@ function saveMatchResult(ev) {
     let player3Placement = $('#matchResultModal').find('#player3Placement').val();
     let player4Placement = $('#matchResultModal').find('#player4Placement').val();
 
-    let matchResult = [];
-    matchResult[player1Placement-1] = player1;
-    matchResult[player2Placement-1] = player2;
-    matchResult[player3Placement-1] = player3;
-    matchResult[player4Placement-1] = player4;
 
-    setMatchResult(parseInt(matchId), matchResult);     
-    updatePlayerPointsAndGamesPlayedFromAllMatchResults()
-    updateGameTableDisplay();
-    updateMatchesList();
+    // Create list with player placements that will be used for validation. Filter elemtents with value ""
+    let playerPlacements = [];
+    playerPlacements.push(player1Placement);
+    playerPlacements.push(player2Placement);
+    playerPlacements.push(player3Placement);
+    playerPlacements.push(player4Placement);
+
+    let filteredPlayerPlacements = playerPlacements.filter(function(x) {
+        return x !== "";
+    });
+
+
+    // Checks that player placements/match result form is valid before updating match results
+    if (isPlayerPlacementsValid(filteredPlayerPlacements)){
+        // sets match result
+        let matchResult = [];    
+        matchResult[player1Placement-1] = player1;
+        matchResult[player2Placement-1] = player2;
+        matchResult[player3Placement-1] = player3;
+        matchResult[player4Placement-1] = player4;        
+    
+        setMatchResult(parseInt(matchId), matchResult);     
+        updatePlayerPointsAndGamesPlayedFromAllMatchResults()
+        updateGameTableDisplay();
+        updateMatchesList();
+
+    } else {
+        // Match result is not saved. Show alert saying match result not saved.
+        alert('Invalid match result form. Match result was not saved!')        
+    }
 }
+
 
 /**
  * 
@@ -388,10 +410,25 @@ function isMatchPlayed(matchId) {
 
 
 /**
- * TODE: check if matchResultForm in matchResultModal is valid. No duplicates values. Either all or none of input should have values.
+ * Checks if playerPlacements in matchResultModal is valid. Used in saveMatchResult(). No duplicates values. Either all(4) or none(0) of input should have values.
+ * @param {string[]} playerPlacements
+ * @returns boolean
  */
-function isSaveMatchResultFormValid(){
-    let result = false;
+function isPlayerPlacementsValid(playerPlacements){
+        
+    // matchResult length should be either 4, or 0. (4: placements for all players. 0: Match is not played)
+    if (!(playerPlacements.length === 0 || playerPlacements.length === 4)) {
+        console.log("Match result form not valid: must fill out all or none of the placements!")
+        return false;
+    } 
+
+    // all elements in matchResult should be unique. 2 players can't get 1st place etc.
+    if (new Set(playerPlacements).size !== playerPlacements.length){
+        console.log("Match result form not valid: match result contains duplicates placement values!");
+        return false;
+    }
+
+    return true;
 }
 
 
