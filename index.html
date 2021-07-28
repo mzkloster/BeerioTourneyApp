@@ -12,99 +12,101 @@
     <title>Beerio</title>
 </head>
 <body>
-    <h1>Welcome to Beerio Kart!</h1>
+    <div class="container">        
+        <h1>Welcome to Beerio Kart!</h1>
 
-    <!-- Button trigger crete game modal -->
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#craeteGameModal">
-        Start new tourney!
-    </button>
-  
-    <!-- Modal for creating game -->
-    <div class="modal fade" id="craeteGameModal" data-bs-backdrop="static" tabindex="-1" aria-labelledby="createGameModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-scrollable">
+        <!-- Button trigger crete game modal -->
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#craeteGameModal">
+            Start new tourney!
+        </button>
+    
+        <!-- Modal for creating game -->
+        <div class="modal fade" id="craeteGameModal" data-bs-backdrop="static" tabindex="-1" aria-labelledby="createGameModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="createGameModalLabel">Create new Beerio Tourney</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="newGameForm">
+                            <label for="tourneyName">Tournement name: </label>
+                            <input type="text" id="newTournementName" name="tourneyName"><br><br>
+                            <hr>
+                            <div class="add-players">
+                                <div class="new-player">
+                                    <label for="lname">Player name: </label>
+                                    <input type="text" id="playerName" name="playerName"><i class="far fa-times-circle delete-player"></i><br><br>
+                                </div>
+                            </div>
+                            <button class="btn btn-success" id="addPlayerInput">Add player</button>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" id="generateGameButton" data-bs-dismiss="modal">Create tourney!</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <h3>Game table:</h3>
+        <table class="center">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>&nbsp; Games played &nbsp;</th> 
+                    <th>Points</th>
+                </tr>
+            </thead>
+            <tbody class="game-table-body">
+                <!-- table rows are generated here -->
+            </tbody>
+        </table>
+
+        <h3>Game matches:</h3>
+        <button class="btn btn-primary" id="generateMatchesButton">Generate matches!</button>
+        <ul class="list-group list-group-flush matches-list">
+            <!-- list rows with matches are generated here. Example: -->
+        </ul>
+
+    
+        <!-- Modal for updating match result -->
+        <div class="modal fade" id="updateMatchResultModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="createGameModalLabel">Create new Beerio Tourney</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title" id="exampleModalLabel">Match <span class="modal-title-matchId"></span></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="newGameForm">
-                        <label for="tourneyName">Tournement name: </label>
-                        <input type="text" id="newTournementName" name="tourneyName"><br><br>
-                        <hr>
-                        <div class="add-players">
-                            <div class="new-player">
-                                <label for="lname">Player name: </label>
-                                <input type="text" id="playerName" name="playerName"><i class="far fa-times-circle delete-player"></i><br><br>
-                            </div>
-                        </div>
-                        <button class="btn btn-success" id="addPlayerInput">Add player</button>
-                    </form>
+                    <div class="player-1-imput">
+                        <label for="player1Placement"></label>
+                        <input type="number" id="player1Placement" min="1" max="4" style="width: 2.5em"> <!-- when match is played, input value should be preset according to match result-->
+                    </div>
+                    <div class="player-2-imput">
+                        <label for="player2Placement"></label>
+                        <input type="number" id="player2Placement" min="1" max="4" style="width: 2.5em">
+                    </div>
+                    <div class="player-3-imput">
+                        <label for="player3Placement"></label>
+                        <input type="number" id="player3Placement" min="1" max="4" style="width: 2.5em">
+                    </div>
+                    <div class="player-4-imput">
+                        <label for="player4Placement"></label>
+                        <input type="number" id="player4Placement" min="1" max="4" style="width: 2.5em">
+                    </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" id="generateGameButton" data-bs-dismiss="modal">Create tourney!</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="updateMatchResultbutton" data-bs-dismiss="modal">Save changes</button>
                 </div>
             </div>
+            </div>
         </div>
+
     </div>
-
-
-    <h3>Game table:</h3>
-    <table class="center">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>&nbsp; Games played &nbsp;</th> 
-                <th>Points</th>
-            </tr>
-        </thead>
-        <tbody class="game-table-body">
-            <!-- table rows are generated here -->
-        </tbody>
-    </table>
-
-    <h3>Game matches:</h3>
-    <button class="btn btn-primary" id="generateMatchesButton">Generate matches!</button>
-    <ul class="list-group matches-list">
-        <!-- list rows with matches are generated here. Example: -->        
-    </ul>
-
-  
-    <!-- Modal for updating match result -->
-    <div class="modal fade" id="updateMatchResultModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Match <span class="modal-title-matchId"></span></h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="player-1-imput">
-                    <label for="player1Placement"></label>
-                    <input type="number" id="player1Placement" min="1" max="4" style="width: 2.5em"> <!-- when match is played, input value should be preset according to match result-->
-                </div>
-                <div class="player-2-imput">
-                    <label for="player2Placement"></label>
-                    <input type="number" id="player2Placement" min="1" max="4" style="width: 2.5em">
-                </div>
-                <div class="player-3-imput">
-                    <label for="player3Placement"></label>
-                    <input type="number" id="player3Placement" min="1" max="4" style="width: 2.5em">
-                </div>
-                <div class="player-4-imput">
-                    <label for="player4Placement"></label>
-                    <input type="number" id="player4Placement" min="1" max="4" style="width: 2.5em">
-                </div>
-            </div>
-            <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary" id="updateMatchResultbutton" data-bs-dismiss="modal">Save changes</button>
-            </div>
-        </div>
-        </div>
-    </div>
-
 
     <script src="script.js"></script>
 </body>

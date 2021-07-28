@@ -16,3 +16,15 @@ h2,h3,h4{
 .fas, .fa, .far {
     cursor: pointer;
 }
+
+/* styling for matches list */
+.matches-list {
+    max-width: 780px;
+    margin: auto;
+}
+.match-info .match-number {
+    float: left;
+}
+.match-info button {
+    float: right;
+}

@@ -175,12 +175,12 @@ function updateMatchesList() {
         newListRow = 
             '<li class="list-group-item">' +
                 '<div class="match-info">' + 
-                    '<b>Match <span class="match-id">' + parsedMatchesObj[i]['matchId'] + '</span>: &nbsp;&nbsp;&nbsp;</b>' + 
+                    '<b class="match-number">Match <span class="match-id">' + parsedMatchesObj[i]['matchId'] + '</span></b>' + 
                     '<span class="match-player-1">' + parsedMatchesObj[i]['players'][0] + '</span> <span class="match-player-1-bagde badge bg-secondary">' + player1BagdeValue + '</span> &nbsp;|&nbsp; ' + 
                     '<span class="match-player-2">' + parsedMatchesObj[i]['players'][1] + '</span> <span class="match-player-2-bagde badge bg-secondary">' + player2BagdeValue + '</span> &nbsp;|&nbsp; ' + 
                     '<span class="match-player-3">' + parsedMatchesObj[i]['players'][2] + '</span> <span class="match-player-3-bagde badge bg-secondary">' + player3BagdeValue + '</span> &nbsp;|&nbsp; ' + 
                     '<span class="match-player-4">' + parsedMatchesObj[i]['players'][3] + '</span> <span class="match-player-4-bagde badge bg-secondary">' + player4BagdeValue + '</span> ' + 
-                    '&nbsp;&nbsp;&nbsp;<button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#updateMatchResultModal"><i class="fas fa-edit"></i></button>' + 
+                    '<button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#updateMatchResultModal"><i class="fas fa-edit"></i></button>' + 
                 '</div>' +
             '</li>'
         $('.list-group').append(newListRow);
