@@ -81,22 +81,24 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="player-1-imput">
-                        <label for="player1Placement"></label>
-                        <input type="number" id="player1Placement" min="1" max="4" style="width: 2.5em"> <!-- when match is played, input value should be preset according to match result-->
-                    </div>
-                    <div class="player-2-imput">
-                        <label for="player2Placement"></label>
-                        <input type="number" id="player2Placement" min="1" max="4" style="width: 2.5em">
-                    </div>
-                    <div class="player-3-imput">
-                        <label for="player3Placement"></label>
-                        <input type="number" id="player3Placement" min="1" max="4" style="width: 2.5em">
-                    </div>
-                    <div class="player-4-imput">
-                        <label for="player4Placement"></label>
-                        <input type="number" id="player4Placement" min="1" max="4" style="width: 2.5em">
-                    </div>
+                    <form id="updateGameResultForm">
+                        <div class="player-1-input">
+                            <label for="player1Placement"></label>
+                            <input type="number" id="player1Placement" min="1" max="4" style="width: 2.5em"> <!-- when match is played, input value should be preset according to match result-->
+                        </div>
+                        <div class="player-2-input">
+                            <label for="player2Placement"></label>
+                            <input type="number" id="player2Placement" min="1" max="4" style="width: 2.5em">
+                        </div>
+                        <div class="player-3-input">
+                            <label for="player3Placement"></label>
+                            <input type="number" id="player3Placement" min="1" max="4" style="width: 2.5em">
+                        </div>
+                        <div class="player-4-input">
+                            <label for="player4Placement"></label>
+                            <input type="number" id="player4Placement" min="1" max="4" style="width: 2.5em">
+                        </div>
+                    </form>
                 </div>
                 <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

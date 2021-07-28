@@ -387,6 +387,12 @@ function isMatchPlayed(matchId) {
     return isMatchPlayed;
 }
 
+
+function isUpdateMatchResultFormValid(){
+    let result = false;
+}
+
+
 /**
  * Updates player points and gamesPlayed for all players in game-JSON based on match results in matches-JSON
  */
