@@ -28,14 +28,14 @@ input[id="newTournementName"]{
 
 
 /* styling matchResutModal */
-#saveMatchResultForm {
+#matchResultForm {
     max-width: 180px;
     margin: auto;
 }
-#saveMatchResultForm label{
+#matchResultForm label{
     float: left;
 }
-#saveMatchResultForm input{ 
+#matchResultForm input{ 
     float:right;
     width: 2.5em;
 } 

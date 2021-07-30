@@ -51,6 +51,9 @@ function addPlayerInputField(ev) {
 }
 
 
+/**
+ * update the number displayed as number of players in createGameModal
+ */
 function updateNumberOfPlayersInCreateGameModal() {
     let numberOfPlayers = $('.new-player').length
     $('#numberOfPlayersForNewGame').text(numberOfPlayers.toString());
