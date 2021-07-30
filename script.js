@@ -38,12 +38,22 @@ function generateGame(ev){
  */
 function addPlayerInputField(ev) {
     ev.preventDefault();
-    $('.add-players').append('<div class="new-player"><label for="lname">Player name: </label><input type="text" id="playerName" name="playerName"><i class="far fa-times-circle delete-player"></i><br><br></div>');
+    $('.add-players').append('<div class="new-player"><label for="">Player name: </label> <input type="text" id="playerName" name="playerName" maxlength="20"> <i class="far fa-times-circle delete-player"></i><br><br></div>');
 
     //add eventListener for new delete icon
     $('.delete-player').on('click', function(event) {
         $(this).parent('div').remove();
+        updateNumberOfPlayersInCreateGameModal();
     })
+
+    //update number of players shown 
+    updateNumberOfPlayersInCreateGameModal();
+}
+
+
+function updateNumberOfPlayersInCreateGameModal() {
+    let numberOfPlayers = $('.new-player').length
+    $('#numberOfPlayersForNewGame').text(numberOfPlayers.toString());
 }
 
 

@@ -18,6 +18,15 @@ h2,h3,h4{
 }
 
 
+/* styling for createGameModal */
+input[id="newTournementName"]{
+    width: 242px;
+}
+.new-player input {
+    width: 180px;
+}
+
+
 /* styling matchResutModal */
 #saveMatchResultForm {
     max-width: 180px;
