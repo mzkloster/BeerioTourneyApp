@@ -357,7 +357,7 @@ function saveMatchResult(ev) {
 
 
     // Checks that player placements/match result form is valid before updating match results
-    if (isPlayerPlacementsValid(filteredPlayerPlacements)){
+    if (isMatchResultFormValid(filteredPlayerPlacements)){
         // sets match result
         let matchResult = [];    
         matchResult[player1Placement-1] = player1;
@@ -423,12 +423,11 @@ function isMatchPlayed(matchId) {
 
 
 /**
- * Checks if playerPlacements in matchResultModal is valid. Used in saveMatchResult(). No duplicates values. Either all(4) or none(0) of input should have values.
+ * Checks if matchResultForm in matchResultModal is valid. Used in saveMatchResult(). No duplicates values. Either all(4) or none(0) of input should have values.
  * @param {string[]} playerPlacements
  * @returns boolean
  */
-function isPlayerPlacementsValid(playerPlacements){
-        
+function isMatchResultFormValid(playerPlacements){        
     // matchResult length should be either 4, or 0. (4: placements for all players. 0: Match is not played)
     if (!(playerPlacements.length === 0 || playerPlacements.length === 4)) {
         console.log("Match result form not valid: must fill out all or none of the placements!")
