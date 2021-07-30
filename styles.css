@@ -17,6 +17,21 @@ h2,h3,h4{
     cursor: pointer;
 }
 
+
+/* styling matchResutModal */
+#saveMatchResultForm {
+    max-width: 180px;
+    margin: auto;
+}
+#saveMatchResultForm label{
+    float: left;
+}
+#saveMatchResultForm input{ 
+    float:right;
+    width: 2.5em;
+} 
+
+
 /* styling for matches list */
 .matches-list {
     max-width: 780px;
