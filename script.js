@@ -553,6 +553,7 @@ $(document).ready(function(){
 
     $('.delete-player').on('click', function(event) {
         $(this).parent('div').remove();
+        updateNumberOfPlayersInCreateGameModal();
     })
 
     $('#generateMatchesButton').on('click',function(event) {
