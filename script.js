@@ -1,4 +1,5 @@
 let newGameName; //not sure if this is actually used yet. Maybe it can be used when making creating several games more dynamic
+let formErrorMessage = "";
 
 /**
  * Creates game-JSON with all players that were added in createGameModal.
@@ -7,24 +8,36 @@ let newGameName; //not sure if this is actually used yet. Maybe it can be used w
  */
 function generateGame(ev){
     ev.preventDefault();
-    game = [];
-    matches = [];
+    let game = [];
+    let matches = [];
     let numberOfPlayers = $('.new-player').length
-    console.log("Number of players:");
-    console.log(numberOfPlayers);
+    let newGameName = $('#newTournementName').val();
+    let playerNamesForValidation = [];
 
-    $('.new-player').each(function(index) {        
+    
+    $('.new-player').each(function(index) {
+        //for game-json
         let player = {
-            playerId: index+1,
+            playerId: index+1, //can probably remove this, it is not used. Player names are unique, and is used as id.
             playerName: $(this).find('input').val(),
             gamesPlayed: 0,
             points: 0
         }
         game.push(player);
-      });
 
-    //save to localStorage: both json for players and score(game) and matches(list of all matches for this game)
-    newGameName = $('#newTournementName').val();
+        //for newGameFormValidation
+        playerNamesForValidation.push($(this).find('input').val());
+    });
+
+    //validate if newGameForm is valid
+    if (!(isNewGameFormValid(playerNamesForValidation, numberOfPlayers, newGameName))){
+        alert("New game form is invalid, new game was not created!\nError message: " + formErrorMessage);
+        //Resetting formErrorMessage after displaying it in alert.
+        formErrorMessage = "";
+        return;
+    }
+
+    //save to localStorage: both json for players and score(game) and matches(list of all matches for this game)    
     localStorage.setItem(newGameName, JSON.stringify(game));
     localStorage.setItem(newGameName + '-matches', JSON.stringify(matches));
 
@@ -355,25 +368,25 @@ function saveMatchResult(ev) {
         return x !== "";
     });
 
-
     // Checks that player placements/match result form is valid before updating match results
-    if (isMatchResultFormValid(filteredPlayerPlacements)){
-        // sets match result
-        let matchResult = [];    
-        matchResult[player1Placement-1] = player1;
-        matchResult[player2Placement-1] = player2;
-        matchResult[player3Placement-1] = player3;
-        matchResult[player4Placement-1] = player4;        
-    
-        setMatchResult(parseInt(matchId), matchResult);     
-        updatePlayerPointsAndGamesPlayedFromAllMatchResults()
-        updateGameTableDisplay();
-        updateMatchesList();
-
-    } else {
-        // Match result is not saved. Show alert saying match result not saved.
-        alert('Invalid match result form. Match result was not saved!')        
+    if (!(isMatchResultFormValid(filteredPlayerPlacements))){
+        alert('Match result form is invalid, match result was not saved!\nError message: ' + formErrorMessage);
+        //Resetting formErrorMessage after displaying it in alert.
+        formErrorMessage = "";
+        return;
     }
+
+    // sets match result
+    let matchResult = [];    
+    matchResult[player1Placement-1] = player1;
+    matchResult[player2Placement-1] = player2;
+    matchResult[player3Placement-1] = player3;
+    matchResult[player4Placement-1] = player4;        
+
+    setMatchResult(parseInt(matchId), matchResult);     
+    updatePlayerPointsAndGamesPlayedFromAllMatchResults()
+    updateGameTableDisplay();
+    updateMatchesList();
 }
 
 
@@ -430,13 +443,56 @@ function isMatchPlayed(matchId) {
 function isMatchResultFormValid(playerPlacements){        
     // matchResult length should be either 4, or 0. (4: placements for all players. 0: Match is not played)
     if (!(playerPlacements.length === 0 || playerPlacements.length === 4)) {
-        console.log("Match result form not valid: must fill out all or none of the placements!")
+        console.log("Match result form not valid: must fill out all or none of the placements!");
+        formErrorMessage = "All or none of the placements must have values.";
         return false;
     } 
 
     // all elements in matchResult should be unique. 2 players can't get 1st place etc.
     if (new Set(playerPlacements).size !== playerPlacements.length){
         console.log("Match result form not valid: match result contains duplicates placement values!");
+        formErrorMessage = "All placement values must be unique. Two players can't place 1st, for example.";
+        return false;
+    }
+
+    return true;
+}
+
+
+/**
+ * TODO!! Check is form is valid. No empty input fields. No duplicate names. For later: tournementname should not be equal to an existing tournement
+ * @param {string[]} playerNameList 
+ * @param {number} numberOfNewPlayerInputFields 
+ * @param {string} newGameName 
+ * @returns 
+ */
+function isNewGameFormValid(playerNameList, numberOfNewPlayerInputFields, newGameName){
+    //create a new playerNameList and filter empty("") elements    
+    let filteredPlayerNameList = playerNameList.filter(function(x) {
+        return x !== "";
+    });
+
+    //Check: Tournement input field should not be empty.
+    if (newGameName.length === 0){
+        console.log("New game form is invalid: Tournement name can not be empty");
+        formErrorMessage = "Tournement name can not be empty.";
+        return false;
+    }
+
+    //TODO: check if newGameName is the same as an existing game name. Return false if so (should not be possible to overwrite)
+
+
+    //Check: None of the player input fields should be empty
+    if (filteredPlayerNameList.length !== numberOfNewPlayerInputFields){
+        console.log("New game form is invalid: none of the player name input fields can be empty");
+        formErrorMessage = "None of the player input fields can be empty.";
+        return false;
+    }
+
+    //Check: all names should be unique
+    if (new Set(filteredPlayerNameList).size !== filteredPlayerNameList.length){
+        console.log("New game form is invalid: all names must be unique!");
+        formErrorMessage = "All player names must be unique";
         return false;
     }
 
