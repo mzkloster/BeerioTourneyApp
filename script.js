@@ -111,7 +111,6 @@ function generateMatches() {
     numberOfMatches = (numberOfPlayers*8)/4; //each player will have 8 matches. Number of matches is therefor numberOfPlayers*8/4 since 4 players play pr match
 
     let playerOverviewObj = {};
-    let matchesObj = {};
 
     //adding playerName[key] and playerNumberOfAssignedMatches[value] to playersObj
     for (let i=0; i<numberOfPlayers; i++){        
@@ -119,7 +118,6 @@ function generateMatches() {
         playerOverviewObj[playerName] = 0;
     }
 
-    let playerNamesList = Object.keys(playerOverviewObj);
     let potentialPlayersForNextMatchList = Object.keys(playerOverviewObj);
 
     for (let i=0; i<numberOfMatches; i++){
