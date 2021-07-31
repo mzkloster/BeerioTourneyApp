@@ -41,6 +41,11 @@ function generateGame(ev){
     localStorage.setItem(newGameName, JSON.stringify(game));
     localStorage.setItem(newGameName + '-matches', JSON.stringify(matches));
 
+    updateGameTableDisplay();
+    
+    //generate matches
+    generateMatches();
+
     $('#newGameForm')[0].reset();
 }
 
@@ -98,8 +103,7 @@ function updateGameTableDisplay(){
  * Updates matches-JSON.
  * @param {event} ev 
  */
-function generateMatches(ev) {
-    ev.preventDefault();
+function generateMatches() {
     let gameObj = localStorage.getItem('Beerio 2021'); //change to work dynamically!!
     parsedGameObj = JSON.parse(gameObj);
 
@@ -108,8 +112,6 @@ function generateMatches(ev) {
 
     let playerOverviewObj = {};
     let matchesObj = {};
-    
-    console.log('numberOfmatches: ' + numberOfMatches);
 
     //adding playerName[key] and playerNumberOfAssignedMatches[value] to playersObj
     for (let i=0; i<numberOfPlayers; i++){        
@@ -554,10 +556,6 @@ $(document).ready(function(){
     $('.delete-player').on('click', function(event) {
         $(this).parent('div').remove();
         updateNumberOfPlayersInCreateGameModal();
-    })
-
-    $('#generateMatchesButton').on('click',function(event) {
-        generateMatches(event);
     })
     
     $('#saveMatchResultbutton').on('click',function(event) {
