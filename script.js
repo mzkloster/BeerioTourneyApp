@@ -489,6 +489,13 @@ function isNewGameFormValid(playerNameList, numberOfNewPlayerInputFields, newGam
         return false;
     }
 
+    //Check: number of players should be at least 4
+    if (filteredPlayerNameList.length < 4){
+        console.log("New game form is invalid: minimum 4 players are needed to play Beerio Kart.");
+        formErrorMessage = "Minimum 4 players are needed to play Beerio Kart.";
+        return false;
+    }
+
     //Check: all names should be unique
     if (new Set(filteredPlayerNameList).size !== filteredPlayerNameList.length){
         console.log("New game form is invalid: all names must be unique!");
