@@ -1,6 +1,7 @@
 let newGameName; //not sure if this is actually used yet. Maybe it can be used when making creating several games more dynamic
 let formErrorMessage = "";
 
+
 /**
  * Creates game-JSON with all players that were added in createGameModal.
  * Also creates a match-JSON with an empty [] as value. This [] will be populated with generateMatches().
@@ -47,6 +48,64 @@ function generateGame(ev){
     generateMatches();
 
     $('#newGameForm')[0].reset();
+}
+
+
+/**
+ * Generates all matches consisting off random players selected in each match. Each player will play 8 matches. 
+ * Updates matches-JSON.
+ * @param {event} ev 
+ */
+ function generateMatches() {
+    let gameObj = localStorage.getItem('Beerio 2021'); //change to work dynamically!!
+    parsedGameObj = JSON.parse(gameObj);
+
+    let numberOfPlayers = parsedGameObj.length;
+    numberOfMatches = (numberOfPlayers*8)/4; //each player will have 8 matches. Number of matches is therefor numberOfPlayers*8/4 since 4 players play pr match
+
+    let playerOverviewObj = {};
+
+    //adding playerName[key] and playerNumberOfAssignedMatches[value] to playersObj
+    for (let i=0; i<numberOfPlayers; i++){        
+        let playerName = parsedGameObj[i]['playerName'];
+        playerOverviewObj[playerName] = 0;
+    }
+
+    let potentialPlayersForNextMatchList = Object.keys(playerOverviewObj);
+
+    for (let i=0; i<numberOfMatches; i++){
+        let matchNumber = i + 1;
+        let matchPlayersList = [];
+        while (matchPlayersList.length<4){
+            //If there are no potential players for next match left, refill list with all player names
+            if (potentialPlayersForNextMatchList.length === 0){
+                potentialPlayersForNextMatchList = Object.keys(playerOverviewObj);
+            }
+
+            let randomInt = Math.floor(Math.random() * potentialPlayersForNextMatchList.length);
+            let randomlySelctedplayerName = potentialPlayersForNextMatchList[randomInt];
+            if ( playerOverviewObj[randomlySelctedplayerName]<8) { //checks that player is assigned to less than 8 matches
+                if (!(matchPlayersList.includes(randomlySelctedplayerName))){ //checks that player is not already ssigned to this match
+                    matchPlayersList.push(randomlySelctedplayerName);
+                    playerOverviewObj[randomlySelctedplayerName] += 1;
+                    potentialPlayersForNextMatchList.splice(randomInt,1);
+                }
+            }            
+        }
+
+        //update matches in localstorage
+        let matchesObj = localStorage.getItem('Beerio 2021-matches'); //change to work dynamically!!
+        parsedMatchesObj = JSON.parse(matchesObj);
+        let newlyGeneratedMatch = {
+            matchId: matchNumber,
+            players: matchPlayersList,
+            result: []
+        }
+        parsedMatchesObj.push(newlyGeneratedMatch);
+        localStorage.setItem('Beerio 2021-matches', JSON.stringify(parsedMatchesObj)); //change to work dynamically!!
+    }
+
+    updateMatchesList();
 }
 
 
@@ -98,60 +157,42 @@ function updateGameTableDisplay(){
 
 
 /**
- * Generates all matches consisting off random players selected in each match. Each player will play 8 matches. 
- * Updates matches-JSON.
- * @param {event} ev 
+ * Updates player points and gamesPlayed for all players in game-JSON based on match results in matches-JSON
  */
-function generateMatches() {
+ function updatePlayerPointsAndGamesPlayedFromAllMatchResults() {
     let gameObj = localStorage.getItem('Beerio 2021'); //change to work dynamically!!
-    parsedGameObj = JSON.parse(gameObj);
+    let parsedGameObj = JSON.parse(gameObj);
 
-    let numberOfPlayers = parsedGameObj.length;
-    numberOfMatches = (numberOfPlayers*8)/4; //each player will have 8 matches. Number of matches is therefor numberOfPlayers*8/4 since 4 players play pr match
+    let matchesObj = localStorage.getItem('Beerio 2021-matches'); //change to work dynamically!!
+    let parsedMatchesObj = JSON.parse(matchesObj);
 
-    let playerOverviewObj = {};
+    //loop though all players
+    for (let i=0; i<parsedGameObj.length; i++){
+        let playerName = parsedGameObj[i].playerName;
+        let playerPoints = 0;
+        let playerPlayedGames = 0;
 
-    //adding playerName[key] and playerNumberOfAssignedMatches[value] to playersObj
-    for (let i=0; i<numberOfPlayers; i++){        
-        let playerName = parsedGameObj[i]['playerName'];
-        playerOverviewObj[playerName] = 0;
-    }
+        //loop though all games
+        for (let j=0; j<parsedMatchesObj.length; j++){
+            if (parsedMatchesObj[j].result.length > 0){ //check that match has been played (then the result list is not empty)
+                if (parsedMatchesObj[j].players.includes(playerName)){ //check if player played in this match
+                    playerPlayedGames += 1;
 
-    let potentialPlayersForNextMatchList = Object.keys(playerOverviewObj);
-
-    for (let i=0; i<numberOfMatches; i++){
-        let matchNumber = i + 1;
-        let matchPlayersList = [];
-        while (matchPlayersList.length<4){
-            //If there are no potential players for next match left, refill list with all player names
-            if (potentialPlayersForNextMatchList.length === 0){
-                potentialPlayersForNextMatchList = Object.keys(playerOverviewObj);
+                    //checking placement, and adding points
+                    for (let k=0; k<4; k++) {
+                        if (parsedMatchesObj[j].result[k] === playerName){
+                            playerPoints += (3-k);
+                            break;
+                        }
+                    }
+                } 
             }
-
-            let randomInt = Math.floor(Math.random() * potentialPlayersForNextMatchList.length);
-            let randomlySelctedplayerName = potentialPlayersForNextMatchList[randomInt];
-            if ( playerOverviewObj[randomlySelctedplayerName]<8) { //checks that player is assigned to less than 8 matches
-                if (!(matchPlayersList.includes(randomlySelctedplayerName))){ //checks that player is not already ssigned to this match
-                    matchPlayersList.push(randomlySelctedplayerName);
-                    playerOverviewObj[randomlySelctedplayerName] += 1;
-                    potentialPlayersForNextMatchList.splice(randomInt,1);
-                }
-            }            
-        }
-
-        //update matches in localstorage
-        let matchesObj = localStorage.getItem('Beerio 2021-matches'); //change to work dynamically!!
-        parsedMatchesObj = JSON.parse(matchesObj);
-        let newlyGeneratedMatch = {
-            matchId: matchNumber,
-            players: matchPlayersList,
-            result: []
-        }
-        parsedMatchesObj.push(newlyGeneratedMatch);
-        localStorage.setItem('Beerio 2021-matches', JSON.stringify(parsedMatchesObj)); //change to work dynamically!!
+        } 
+        //after looping through all games for this player, we set points and gamesPlayed
+        setPlayerGamesPlayed(playerName, playerPlayedGames);
+        setPlayerPoints(playerName, playerPoints);
+        
     }
-
-    updateMatchesList();
 }
 
 
@@ -218,6 +259,95 @@ function updateMatchesList() {
 
 
 /**
+ * Updates values in matchResultModal (matchId, playerNames) that is about to be shown when this button is clicked
+ * @param {event} ev 
+ * @param {html-element} buttonClicked button from matches list from html
+ */
+ function updateMatchResultModal(ev, buttonClicked){
+    ev.preventDefault();
+    //create if statement checking if match is played (result is not empty). If match is not played input value should be null. If match is played, placement values should be default
+
+    //update modal title with matchId, and labels with players
+    let matchId = $(buttonClicked).parent().find('.match-id').text();    
+    let player1 = $(buttonClicked).parent().find('.match-player-1').text();
+    let player2 = $(buttonClicked).parent().find('.match-player-2').text();
+    let player3 = $(buttonClicked).parent().find('.match-player-3').text();
+    let player4 = $(buttonClicked).parent().find('.match-player-4').text();
+
+    $('#matchResultModal').find('.modal-title-matchId').text(matchId + ' - Result');
+    $('#matchResultModal').find('label[for="player1Placement"]').text(player1);
+    $('#matchResultModal').find('label[for="player2Placement"]').text(player2);
+    $('#matchResultModal').find('label[for="player3Placement"]').text(player3);
+    $('#matchResultModal').find('label[for="player4Placement"]').text(player4);
+
+    if (isMatchPlayed(parseInt(matchId))){
+        $('#matchResultModal').find('input[id="player1Placement"]').val(getPlayerPlacementInMatch(player1, parseInt(matchId)));
+        $('#matchResultModal').find('input[id="player2Placement"]').val(getPlayerPlacementInMatch(player2, parseInt(matchId)));
+        $('#matchResultModal').find('input[id="player3Placement"]').val(getPlayerPlacementInMatch(player3, parseInt(matchId)));
+        $('#matchResultModal').find('input[id="player4Placement"]').val(getPlayerPlacementInMatch(player4, parseInt(matchId)));
+    }else {
+        $('#matchResultModal').find('input[id="player1Placement"]').val('');
+        $('#matchResultModal').find('input[id="player2Placement"]').val('');
+        $('#matchResultModal').find('input[id="player3Placement"]').val('');
+        $('#matchResultModal').find('input[id="player4Placement"]').val('');
+    }
+}
+
+
+/**
+ * Saves match result to matches-json. Triggered after hitting save-button on matchResultModal
+ * @param {event} ev 
+ */
+function saveMatchResult(ev) {
+    ev.preventDefault();
+
+    let matchId = $('#matchResultModal').find('.modal-title-matchId').text(); //matchId as string
+    let player1 = $('#matchResultModal').find('label[for="player1Placement"]').text();
+    let player2 = $('#matchResultModal').find('label[for="player2Placement"]').text();
+    let player3 = $('#matchResultModal').find('label[for="player3Placement"]').text();
+    let player4 = $('#matchResultModal').find('label[for="player4Placement"]').text();
+
+    let player1Placement = $('#matchResultModal').find('#player1Placement').val();
+    let player2Placement = $('#matchResultModal').find('#player2Placement').val();
+    let player3Placement = $('#matchResultModal').find('#player3Placement').val();
+    let player4Placement = $('#matchResultModal').find('#player4Placement').val();
+
+
+    // Create list with player placements that will be used for validation. Filter elemtents with value ""
+    let playerPlacements = [];
+    playerPlacements.push(player1Placement);
+    playerPlacements.push(player2Placement);
+    playerPlacements.push(player3Placement);
+    playerPlacements.push(player4Placement);
+
+    let filteredPlayerPlacements = playerPlacements.filter(function(x) {
+        return x !== "";
+    });
+
+    // Checks that player placements/match result form is valid before updating match results
+    if (!(isMatchResultFormValid(filteredPlayerPlacements))){
+        alert('Match result form is invalid, match result was not saved!\nError message: ' + formErrorMessage);
+        //Resetting formErrorMessage after displaying it in alert.
+        formErrorMessage = "";
+        return;
+    }
+
+    // sets match result
+    let matchResult = [];    
+    matchResult[player1Placement-1] = player1;
+    matchResult[player2Placement-1] = player2;
+    matchResult[player3Placement-1] = player3;
+    matchResult[player4Placement-1] = player4;        
+
+    setMatchResult(parseInt(matchId), matchResult);     
+    updatePlayerPointsAndGamesPlayedFromAllMatchResults()
+    updateGameTableDisplay();
+    updateMatchesList();
+}
+
+
+
+/**
  * THIS FUNCTION SHOULD NOT BE USED
  * @param {string} playerName name of the player
  * @param {number} placement placement in a match
@@ -238,6 +368,8 @@ function updatePlayerPoints(playerName, placement) {
     localStorage.setItem('Beerio 2021', JSON.stringify(parsedGameObj)); //change to work dynamically!!
 }
 
+
+/////////////////////////////////// Getters and setters ////////////////////////////////////////////////////////////////////////////
 
 /**
  * Returns points for player
@@ -339,99 +471,11 @@ function getPlayerPlacementInMatch(playerName, matchId){
 
 
 /**
- * Updates values in matchResultModal (matchId, playerNames) that is about to be shown when this button is clicked
- * @param {event} ev 
- * @param {html-element} buttonClicked button from matches list from html
- */
-function updateMatchResultModal(ev, buttonClicked){
-    ev.preventDefault();
-    //create if statement checking if match is played (result is not empty). If match is not played input value should be null. If match is played, placement values should be default
-
-    //update modal title with matchId, and labels with players
-    let matchId = $(buttonClicked).parent().find('.match-id').text();    
-    let player1 = $(buttonClicked).parent().find('.match-player-1').text();
-    let player2 = $(buttonClicked).parent().find('.match-player-2').text();
-    let player3 = $(buttonClicked).parent().find('.match-player-3').text();
-    let player4 = $(buttonClicked).parent().find('.match-player-4').text();
-
-    $('#matchResultModal').find('.modal-title-matchId').text(matchId + ' - Result');
-    $('#matchResultModal').find('label[for="player1Placement"]').text(player1);
-    $('#matchResultModal').find('label[for="player2Placement"]').text(player2);
-    $('#matchResultModal').find('label[for="player3Placement"]').text(player3);
-    $('#matchResultModal').find('label[for="player4Placement"]').text(player4);
-
-    if (isMatchPlayed(parseInt(matchId))){
-        $('#matchResultModal').find('input[id="player1Placement"]').val(getPlayerPlacementInMatch(player1, parseInt(matchId)));
-        $('#matchResultModal').find('input[id="player2Placement"]').val(getPlayerPlacementInMatch(player2, parseInt(matchId)));
-        $('#matchResultModal').find('input[id="player3Placement"]').val(getPlayerPlacementInMatch(player3, parseInt(matchId)));
-        $('#matchResultModal').find('input[id="player4Placement"]').val(getPlayerPlacementInMatch(player4, parseInt(matchId)));
-    }else {
-        $('#matchResultModal').find('input[id="player1Placement"]').val('');
-        $('#matchResultModal').find('input[id="player2Placement"]').val('');
-        $('#matchResultModal').find('input[id="player3Placement"]').val('');
-        $('#matchResultModal').find('input[id="player4Placement"]').val('');
-    }
-}
-
-
-/**
- * Saves match result to matches-json. Triggered after hitting save-button on matchResultModal
- * @param {event} ev 
- */
-function saveMatchResult(ev) {
-    ev.preventDefault();
-
-    let matchId = $('#matchResultModal').find('.modal-title-matchId').text(); //matchId as string
-    let player1 = $('#matchResultModal').find('label[for="player1Placement"]').text();
-    let player2 = $('#matchResultModal').find('label[for="player2Placement"]').text();
-    let player3 = $('#matchResultModal').find('label[for="player3Placement"]').text();
-    let player4 = $('#matchResultModal').find('label[for="player4Placement"]').text();
-
-    let player1Placement = $('#matchResultModal').find('#player1Placement').val();
-    let player2Placement = $('#matchResultModal').find('#player2Placement').val();
-    let player3Placement = $('#matchResultModal').find('#player3Placement').val();
-    let player4Placement = $('#matchResultModal').find('#player4Placement').val();
-
-
-    // Create list with player placements that will be used for validation. Filter elemtents with value ""
-    let playerPlacements = [];
-    playerPlacements.push(player1Placement);
-    playerPlacements.push(player2Placement);
-    playerPlacements.push(player3Placement);
-    playerPlacements.push(player4Placement);
-
-    let filteredPlayerPlacements = playerPlacements.filter(function(x) {
-        return x !== "";
-    });
-
-    // Checks that player placements/match result form is valid before updating match results
-    if (!(isMatchResultFormValid(filteredPlayerPlacements))){
-        alert('Match result form is invalid, match result was not saved!\nError message: ' + formErrorMessage);
-        //Resetting formErrorMessage after displaying it in alert.
-        formErrorMessage = "";
-        return;
-    }
-
-    // sets match result
-    let matchResult = [];    
-    matchResult[player1Placement-1] = player1;
-    matchResult[player2Placement-1] = player2;
-    matchResult[player3Placement-1] = player3;
-    matchResult[player4Placement-1] = player4;        
-
-    setMatchResult(parseInt(matchId), matchResult);     
-    updatePlayerPointsAndGamesPlayedFromAllMatchResults()
-    updateGameTableDisplay();
-    updateMatchesList();
-}
-
-
-/**
  * 
  * @param {number} matchId 
  * @param {string[]} result 
  */
-function setMatchResult(matchId, result) {
+ function setMatchResult(matchId, result) {
     //get data from localstorage
     let matchesObj = localStorage.getItem('Beerio 2021-matches'); //change to work dynamically!!
     let parsedMatchesObj = JSON.parse(matchesObj);        
@@ -447,6 +491,68 @@ function setMatchResult(matchId, result) {
     localStorage.setItem('Beerio 2021-matches', JSON.stringify(parsedMatchesObj)); //change to work dynamically!!
 }
 
+
+/**
+ * Returns a sorted list of playerNames base on points
+ * @returns string[]
+ */
+ function getSortedPlayerList(){
+    let gameObj = localStorage.getItem('Beerio 2021'); //change to work dynamically!!
+    let parsedGameObj = JSON.parse(gameObj);
+
+    let sortedPlayerList = [];
+
+    for (let j=0; j<parsedGameObj.length; j++){
+        sortedPlayerList.push(parsedGameObj[j]['playerName']);
+    }
+
+    //sort list of players
+    let switching, i, firstPlayerName, secondPlayerName, shouldSwitch;
+    switching = true;
+    /*Make a loop that will continue until
+    no switching has been done:*/
+    while (switching) {
+        //start by saying: no switching is done:
+        switching = false;
+        /*Loop through all table rows (except the
+        first, which contains table headers):*/
+        for (i = 0; i <(sortedPlayerList.length-1); i++) {
+            //start by saying there should be no switching:
+            shouldSwitch = false;
+            /*Get the two elements you want to compare,
+            one from current row and one from the next:*/
+            firstPlayerName = sortedPlayerList[i];
+            secondPlayerName = sortedPlayerList[i+1]
+            //check if the two rows should switch place:
+            if (getPlayerPoints(firstPlayerName) < getPlayerPoints(secondPlayerName)) {
+            //if so, mark as a switch and break the loop:
+            shouldSwitch = true;
+            break;
+            }else if((getPlayerPoints(firstPlayerName) === getPlayerPoints(secondPlayerName)) && (getPlayerGamesPlayed(firstPlayerName) > getPlayerGamesPlayed(secondPlayerName)) ){
+                //if so, mark as a switch and break the loop:
+                shouldSwitch = true;
+                break;
+            }
+        }
+        if (shouldSwitch) {
+        /*If a switch has been marked, make the switch
+        and mark that a switch has been done:*/
+        sortedPlayerList[i] = secondPlayerName;
+        sortedPlayerList[i+1] = firstPlayerName;
+
+        switching = true;
+        }
+    }
+    
+    return sortedPlayerList;
+}
+
+
+
+
+
+
+//////////////////////////////////////////////// Checks //////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Checks if match is played. Returns boolean.
@@ -543,100 +649,8 @@ function isNewGameFormValid(playerNameList, numberOfNewPlayerInputFields, newGam
 }
 
 
-/**
- * Updates player points and gamesPlayed for all players in game-JSON based on match results in matches-JSON
- */
-function updatePlayerPointsAndGamesPlayedFromAllMatchResults() {
-    let gameObj = localStorage.getItem('Beerio 2021'); //change to work dynamically!!
-    let parsedGameObj = JSON.parse(gameObj);
-
-    let matchesObj = localStorage.getItem('Beerio 2021-matches'); //change to work dynamically!!
-    let parsedMatchesObj = JSON.parse(matchesObj);
-
-    //loop though all players
-    for (let i=0; i<parsedGameObj.length; i++){
-        let playerName = parsedGameObj[i].playerName;
-        let playerPoints = 0;
-        let playerPlayedGames = 0;
-
-        //loop though all games
-        for (let j=0; j<parsedMatchesObj.length; j++){
-            if (parsedMatchesObj[j].result.length > 0){ //check that match has been played (then the result list is not empty)
-                if (parsedMatchesObj[j].players.includes(playerName)){ //check if player played in this match
-                    playerPlayedGames += 1;
-
-                    //checking placement, and adding points
-                    for (let k=0; k<4; k++) {
-                        if (parsedMatchesObj[j].result[k] === playerName){
-                            playerPoints += (3-k);
-                            break;
-                        }
-                    }
-                } 
-            }
-        } 
-        //after looping through all games for this player, we set points and gamesPlayed
-        setPlayerGamesPlayed(playerName, playerPlayedGames);
-        setPlayerPoints(playerName, playerPoints);
-        
-    }
-}
 
 
-/**
- * Returns a sorted list of playerNames base on points
- * @returns string[]
- */
-function getSortedPlayerList(){
-    let gameObj = localStorage.getItem('Beerio 2021'); //change to work dynamically!!
-    let parsedGameObj = JSON.parse(gameObj);
-
-    let sortedPlayerList = [];
-
-    for (let j=0; j<parsedGameObj.length; j++){
-        sortedPlayerList.push(parsedGameObj[j]['playerName']);
-    }
-
-    //sort list of players
-    let switching, i, firstPlayerName, secondPlayerName, shouldSwitch;
-    switching = true;
-    /*Make a loop that will continue until
-    no switching has been done:*/
-    while (switching) {
-        //start by saying: no switching is done:
-        switching = false;
-        /*Loop through all table rows (except the
-        first, which contains table headers):*/
-        for (i = 0; i <(sortedPlayerList.length-1); i++) {
-            //start by saying there should be no switching:
-            shouldSwitch = false;
-            /*Get the two elements you want to compare,
-            one from current row and one from the next:*/
-            firstPlayerName = sortedPlayerList[i];
-            secondPlayerName = sortedPlayerList[i+1]
-            //check if the two rows should switch place:
-            if (getPlayerPoints(firstPlayerName) < getPlayerPoints(secondPlayerName)) {
-            //if so, mark as a switch and break the loop:
-            shouldSwitch = true;
-            break;
-            }else if((getPlayerPoints(firstPlayerName) === getPlayerPoints(secondPlayerName)) && (getPlayerGamesPlayed(firstPlayerName) > getPlayerGamesPlayed(secondPlayerName)) ){
-                //if so, mark as a switch and break the loop:
-                shouldSwitch = true;
-                break;
-            }
-        }
-        if (shouldSwitch) {
-        /*If a switch has been marked, make the switch
-        and mark that a switch has been done:*/
-        sortedPlayerList[i] = secondPlayerName;
-        sortedPlayerList[i+1] = firstPlayerName;
-
-        switching = true;
-        }
-    }
-    
-    return sortedPlayerList;
-}
 
 
 
