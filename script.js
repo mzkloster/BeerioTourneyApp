@@ -155,7 +155,7 @@ function updateGameTableDisplay(){
     } 
 }
 
-
+////////////// PUT updatePlayerPointsAndGamesPlayedFromAllMatchResults() inside (in the beginning) of updateGameTableDisplay() (so that before updating gameTable points and gamesPlayed are updated)
 /**
  * Updates player points and gamesPlayed for all players in game-JSON based on match results in matches-JSON
  */
@@ -347,28 +347,6 @@ function saveMatchResult(ev) {
 
 
 
-/**
- * THIS FUNCTION SHOULD NOT BE USED
- * @param {string} playerName name of the player
- * @param {number} placement placement in a match
- */
-function updatePlayerPoints(playerName, placement) {
-    //update players points based on placement, and increases playedGames with 1
-    let gameObj = localStorage.getItem('Beerio 2021'); //change to work dynamically!!
-    let parsedGameObj = JSON.parse(gameObj);
-    let newPoints = 4-placement;
-
-    for (let i=0; i<parsedGameObj.length; i++) {
-        if (parsedGameObj[i].playerName === playerName) {
-            parsedGameObj[i].points += newPoints;
-            parsedGameObj[i].gamesPlayed += 1;
-           break;
-        }
-    }
-    localStorage.setItem('Beerio 2021', JSON.stringify(parsedGameObj)); //change to work dynamically!!
-}
-
-
 /////////////////////////////////// Getters and setters ////////////////////////////////////////////////////////////////////////////
 
 /**
@@ -549,9 +527,6 @@ function getPlayerPlacementInMatch(playerName, matchId){
 
 
 
-
-
-
 //////////////////////////////////////////////// Checks //////////////////////////////////////////////////////////////////////////////////
 
 /**
@@ -649,11 +624,7 @@ function isNewGameFormValid(playerNameList, numberOfNewPlayerInputFields, newGam
 }
 
 
-
-
-
-
-
+//////////////////////////////////////////////////// When page is loaded/refreshed //////////////////////////////////////////////////////
 $(document).ready(function(){
     
     //adding onClick-functions to buttons
