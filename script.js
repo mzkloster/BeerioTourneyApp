@@ -86,17 +86,16 @@ function updateGameTableDisplay(){
     //removes "old" table rows
     $('tbody').empty();
 
-    //adds new and updated table rows 
-    let gameObj = localStorage.getItem('Beerio 2021'); //change to work dynamically!!
-    parsedGameObj = JSON.parse(gameObj);
-    for (let i=0; i<parsedGameObj.length; i++){
-        playerNameValue = parsedGameObj[i]['playerName'];
-        gamesPlayedValue = parsedGameObj[i]['gamesPlayed'];
-        playerPointsValue = parsedGameObj[i]['points'];
+    let sortedPlayerList = getSortedPlayerList();
+    for (let i=0; i<sortedPlayerList.length; i++){
+        playerNameValue = sortedPlayerList[i];
+        gamesPlayedValue = getPlayerGamesPlayed(playerNameValue);
+        playerPointsValue = getPlayerPoints(playerNameValue);
         newTableRow = '<tr><td>' + playerNameValue + '</td><td>' + gamesPlayedValue + '</td><td>' + playerPointsValue + '</td></tr>';
         $('tbody').append(newTableRow);
-    }    
+    } 
 }
+
 
 /**
  * Generates all matches consisting off random players selected in each match. Each player will play 8 matches. 
@@ -241,6 +240,24 @@ function updatePlayerPoints(playerName, placement) {
 
 
 /**
+ * Returns points for player
+ * @param {string} playerName 
+ * @returns number, playerPoints
+ */
+function getPlayerPoints(playerName) {
+    let gameObj = localStorage.getItem('Beerio 2021'); //change to work dynamically!!
+    let parsedGameObj = JSON.parse(gameObj);
+
+    for (let i=0; i<parsedGameObj.length; i++) {
+        if (parsedGameObj[i].playerName === playerName) {
+            let playerPoints = parsedGameObj[i].points;
+            return playerPoints;           
+        }
+    }    
+}
+
+
+/**
  * Sets paramter playerPoints for given player.
  * @param {string} playerName 
  * @param {number} points 
@@ -252,10 +269,28 @@ function setPlayerPoints(playerName, points) {
     for (let i=0; i<parsedGameObj.length; i++) {
         if (parsedGameObj[i].playerName === playerName) {
             parsedGameObj[i].points = points;
-           break;
+            break;
         }
     }
     localStorage.setItem('Beerio 2021', JSON.stringify(parsedGameObj)); //change to work dynamically!!
+}
+
+
+/**
+ * Return gamesPlayed for player
+ * @param {string} playerName 
+ * @returns number
+ */
+function getPlayerGamesPlayed(playerName) {
+    let gameObj = localStorage.getItem('Beerio 2021'); //change to work dynamically!!
+    let parsedGameObj = JSON.parse(gameObj);
+
+    for (let i=0; i<parsedGameObj.length; i++) {
+        if (parsedGameObj[i].playerName === playerName) {
+            let gamesPlayed = parsedGameObj[i].gamesPlayed;
+            return gamesPlayed;
+        }
+    }
 }
 
 
@@ -271,7 +306,7 @@ function setPlayerGamesPlayed(playerName, gamesPlayed) {
     for (let i=0; i<parsedGameObj.length; i++) {
         if (parsedGameObj[i].playerName === playerName) {
             parsedGameObj[i].gamesPlayed = gamesPlayed;
-           break;
+            break;
         }
     }
     localStorage.setItem('Beerio 2021', JSON.stringify(parsedGameObj)); //change to work dynamically!!
@@ -282,6 +317,7 @@ function setPlayerGamesPlayed(playerName, gamesPlayed) {
  * Returns placement, string value between 1 and 4, for a player in a match.
  * @param {string} playerName 
  * @param {number} matchId 
+ * @returns Player placement
  */
 function getPlayerPlacementInMatch(playerName, matchId){
     let matchesObj = localStorage.getItem('Beerio 2021-matches'); //change to work dynamically!!
@@ -545,6 +581,63 @@ function updatePlayerPointsAndGamesPlayedFromAllMatchResults() {
         
     }
 }
+
+
+/**
+ * Returns a sorted list of playerNames base on points
+ * @returns string[]
+ */
+function getSortedPlayerList(){
+    let gameObj = localStorage.getItem('Beerio 2021'); //change to work dynamically!!
+    let parsedGameObj = JSON.parse(gameObj);
+
+    let sortedPlayerList = [];
+
+    for (let j=0; j<parsedGameObj.length; j++){
+        sortedPlayerList.push(parsedGameObj[j]['playerName']);
+    }
+
+    //sort list of players
+    let switching, i, firstPlayerName, secondPlayerName, shouldSwitch;
+    switching = true;
+    /*Make a loop that will continue until
+    no switching has been done:*/
+    while (switching) {
+        //start by saying: no switching is done:
+        switching = false;
+        /*Loop through all table rows (except the
+        first, which contains table headers):*/
+        for (i = 0; i <(sortedPlayerList.length-1); i++) {
+            //start by saying there should be no switching:
+            shouldSwitch = false;
+            /*Get the two elements you want to compare,
+            one from current row and one from the next:*/
+            firstPlayerName = sortedPlayerList[i];
+            secondPlayerName = sortedPlayerList[i+1]
+            //check if the two rows should switch place:
+            if (getPlayerPoints(firstPlayerName) < getPlayerPoints(secondPlayerName)) {
+            //if so, mark as a switch and break the loop:
+            shouldSwitch = true;
+            break;
+            }else if((getPlayerPoints(firstPlayerName) === getPlayerPoints(secondPlayerName)) && (getPlayerGamesPlayed(firstPlayerName) > getPlayerGamesPlayed(secondPlayerName)) ){
+                //if so, mark as a switch and break the loop:
+                shouldSwitch = true;
+                break;
+            }
+        }
+        if (shouldSwitch) {
+        /*If a switch has been marked, make the switch
+        and mark that a switch has been done:*/
+        sortedPlayerList[i] = secondPlayerName;
+        sortedPlayerList[i+1] = firstPlayerName;
+
+        switching = true;
+        }
+    }
+    
+    return sortedPlayerList;
+}
+
 
 
 $(document).ready(function(){
