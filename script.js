@@ -43,8 +43,6 @@ function generateGame(ev){
     localStorage.setItem(newGameName + '-matches', JSON.stringify(matches));
 
     updateGameTableDisplay();
-    
-    //generate matches
     generateMatches();
 
     $('#newGameForm')[0].reset();
@@ -57,8 +55,7 @@ function generateGame(ev){
  * @param {event} ev 
  */
  function generateMatches() {
-    let gameObj = localStorage.getItem('Beerio 2021'); //change to work dynamically!!
-    parsedGameObj = JSON.parse(gameObj);
+    let parsedGameObj = getParsedGameObj();
 
     let numberOfPlayers = parsedGameObj.length;
     numberOfMatches = (numberOfPlayers*8)/4; //each player will have 8 matches. Number of matches is therefor numberOfPlayers*8/4 since 4 players play pr match
@@ -94,8 +91,8 @@ function generateGame(ev){
         }
 
         //update matches in localstorage
-        let matchesObj = localStorage.getItem('Beerio 2021-matches'); //change to work dynamically!!
-        parsedMatchesObj = JSON.parse(matchesObj);
+        let parsedMatchesObj = getParsedMatchesObj();
+
         let newlyGeneratedMatch = {
             matchId: matchNumber,
             players: matchPlayersList,
@@ -162,11 +159,8 @@ function updateGameTableDisplay(){
  * Updates player points and gamesPlayed for all players in game-JSON based on match results in matches-JSON. Is triggered in updateGameTableDisplay()
  */
  function updatePlayerPointsAndGamesPlayedFromAllMatchResults() {
-    let gameObj = localStorage.getItem('Beerio 2021'); //change to work dynamically!!
-    let parsedGameObj = JSON.parse(gameObj);
-
-    let matchesObj = localStorage.getItem('Beerio 2021-matches'); //change to work dynamically!!
-    let parsedMatchesObj = JSON.parse(matchesObj);
+    let parsedGameObj = getParsedGameObj();
+    let parsedMatchesObj = getParsedMatchesObj();
 
     //loop though all players
     for (let i=0; i<parsedGameObj.length; i++){
@@ -207,8 +201,7 @@ function updateMatchesList() {
     $('.matches-list').empty();
 
     //loop through matches JSON and create new updated match list items
-    let matchesObj = localStorage.getItem('Beerio 2021-matches'); //change to work dynamically!!
-    parsedMatchesObj = JSON.parse(matchesObj);
+    parsedMatchesObj = getParsedMatchesObj();
 
     for (let i=0; i<parsedMatchesObj.length; i++){
         player1BagdeValue = "";
@@ -378,8 +371,7 @@ function getParsedMatchesObj() {
  * @returns number, playerPoints
  */
 function getPlayerPoints(playerName) {
-    let gameObj = localStorage.getItem('Beerio 2021'); //change to work dynamically!!
-    let parsedGameObj = JSON.parse(gameObj);
+    let parsedGameObj = getParsedGameObj();
 
     for (let i=0; i<parsedGameObj.length; i++) {
         if (parsedGameObj[i].playerName === playerName) {
@@ -396,8 +388,7 @@ function getPlayerPoints(playerName) {
  * @param {number} points 
  */
 function setPlayerPoints(playerName, points) {
-    let gameObj = localStorage.getItem('Beerio 2021'); //change to work dynamically!!
-    let parsedGameObj = JSON.parse(gameObj);
+    let parsedGameObj = getParsedGameObj();
 
     for (let i=0; i<parsedGameObj.length; i++) {
         if (parsedGameObj[i].playerName === playerName) {
@@ -415,8 +406,7 @@ function setPlayerPoints(playerName, points) {
  * @returns number
  */
 function getPlayerGamesPlayed(playerName) {
-    let gameObj = localStorage.getItem('Beerio 2021'); //change to work dynamically!!
-    let parsedGameObj = JSON.parse(gameObj);
+    let parsedGameObj = getParsedGameObj();
 
     for (let i=0; i<parsedGameObj.length; i++) {
         if (parsedGameObj[i].playerName === playerName) {
@@ -433,8 +423,7 @@ function getPlayerGamesPlayed(playerName) {
  * @param {number} gamesPlayed 
  */
 function setPlayerGamesPlayed(playerName, gamesPlayed) {
-    let gameObj = localStorage.getItem('Beerio 2021'); //change to work dynamically!!
-    let parsedGameObj = JSON.parse(gameObj);
+    let parsedGameObj = getParsedGameObj();
 
     for (let i=0; i<parsedGameObj.length; i++) {
         if (parsedGameObj[i].playerName === playerName) {
@@ -453,8 +442,7 @@ function setPlayerGamesPlayed(playerName, gamesPlayed) {
  * @returns Player placement
  */
 function getPlayerPlacementInMatch(playerName, matchId){
-    let matchesObj = localStorage.getItem('Beerio 2021-matches'); //change to work dynamically!!
-    let parsedMatchesObj = JSON.parse(matchesObj);
+    let parsedMatchesObj = getParsedMatchesObj();
 
     if (isMatchPlayed(matchId)){
         for (let i=0; i<parsedMatchesObj.length; i++) {
@@ -477,9 +465,7 @@ function getPlayerPlacementInMatch(playerName, matchId){
  * @param {string[]} result 
  */
  function setMatchResult(matchId, result) {
-    //get data from localstorage
-    let matchesObj = localStorage.getItem('Beerio 2021-matches'); //change to work dynamically!!
-    let parsedMatchesObj = JSON.parse(matchesObj);        
+    let parsedMatchesObj = getParsedMatchesObj();        
 
     for (let i=0; i<parsedMatchesObj.length; i++) {
         if (parsedMatchesObj[i].matchId === matchId) {
@@ -498,9 +484,7 @@ function getPlayerPlacementInMatch(playerName, matchId){
  * @returns string[]
  */
  function getSortedPlayerList(){
-    let gameObj = localStorage.getItem('Beerio 2021'); //change to work dynamically!!
-    let parsedGameObj = JSON.parse(gameObj);
-
+    let parsedGameObj = getParsedGameObj();
     let sortedPlayerList = [];
 
     for (let j=0; j<parsedGameObj.length; j++){
@@ -558,9 +542,7 @@ function getPlayerPlacementInMatch(playerName, matchId){
  * @returns boolean
  */
 function isMatchPlayed(matchId) {
-    let matchesObj = localStorage.getItem('Beerio 2021-matches'); //change to work dynamically!!
-    let parsedMatchesObj = JSON.parse(matchesObj); 
-    
+    let parsedMatchesObj = getParsedMatchesObj();     
     let isMatchPlayed = false;
 
     for (let i=0; i<parsedMatchesObj.length; i++) {
