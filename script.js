@@ -351,6 +351,28 @@ function saveMatchResult(ev) {
 /////////////////////////////////// Getters and setters ////////////////////////////////////////////////////////////////////////////
 
 /**
+ * returns parsed gameObj
+ * @returns object
+ */
+function getParsedGameObj() {
+    let gameObj = localStorage.getItem('Beerio 2021'); //change to work dynamically!!
+    let parsedGameObj = JSON.parse(gameObj);
+    return parsedGameObj;
+}
+
+
+/**
+ * Returns parsed matchesObj
+ * @returns object
+ */
+function getParsedMatchesObj() {
+    let matchesObj = localStorage.getItem('Beerio 2021-matches'); //change to work dynamically!!
+    let parsedMatchesObj = JSON.parse(matchesObj);
+    return parsedMatchesObj;
+}
+
+
+/**
  * Returns points for player
  * @param {string} playerName 
  * @returns number, playerPoints
