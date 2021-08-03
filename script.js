@@ -145,7 +145,9 @@ function updateGameTableDisplay(){
     //removes "old" table rows
     $('tbody').empty();
 
+    updatePlayerPointsAndGamesPlayedFromAllMatchResults();
     let sortedPlayerList = getSortedPlayerList();
+
     for (let i=0; i<sortedPlayerList.length; i++){
         playerNameValue = sortedPlayerList[i];
         gamesPlayedValue = getPlayerGamesPlayed(playerNameValue);
@@ -155,9 +157,9 @@ function updateGameTableDisplay(){
     } 
 }
 
-////////////// PUT updatePlayerPointsAndGamesPlayedFromAllMatchResults() inside (in the beginning) of updateGameTableDisplay() (so that before updating gameTable points and gamesPlayed are updated)
+
 /**
- * Updates player points and gamesPlayed for all players in game-JSON based on match results in matches-JSON
+ * Updates player points and gamesPlayed for all players in game-JSON based on match results in matches-JSON. Is triggered in updateGameTableDisplay()
  */
  function updatePlayerPointsAndGamesPlayedFromAllMatchResults() {
     let gameObj = localStorage.getItem('Beerio 2021'); //change to work dynamically!!
@@ -339,8 +341,7 @@ function saveMatchResult(ev) {
     matchResult[player3Placement-1] = player3;
     matchResult[player4Placement-1] = player4;        
 
-    setMatchResult(parseInt(matchId), matchResult);     
-    updatePlayerPointsAndGamesPlayedFromAllMatchResults()
+    setMatchResult(parseInt(matchId), matchResult);
     updateGameTableDisplay();
     updateMatchesList();
 }
@@ -652,7 +653,6 @@ $(document).ready(function(){
 
 
     //running functions when page is entered/refreshed. (Make checks here so we avoid error in console)
-    updatePlayerPointsAndGamesPlayedFromAllMatchResults()
     updateGameTableDisplay();
     updateMatchesList();
     
