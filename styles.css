@@ -4,6 +4,9 @@ body {
 h1 {
     color: green;
 }
+.game-content h1{
+    color: red;
+}
 h2,h3,h4{
     color:green;
     padding-top: 40px;

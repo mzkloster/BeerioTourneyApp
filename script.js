@@ -1,4 +1,3 @@
-let newGameName; //not sure if this is actually used yet. Maybe it can be used when making creating several games more dynamic
 let formErrorMessage = "";
 
 
@@ -42,8 +41,10 @@ function generateGame(ev){
     localStorage.setItem(newGameName, JSON.stringify(game));
     localStorage.setItem(newGameName + '-matches', JSON.stringify(matches));
 
-    updateGameTableDisplay();
-    generateMatches();
+
+    updateViewForAllGames();
+
+    generateMatches(newGameName);
 
     $('#newGameForm')[0].reset();
 }
@@ -54,8 +55,9 @@ function generateGame(ev){
  * Updates matches-JSON.
  * @param {event} ev 
  */
- function generateMatches() {
-    let parsedGameObj = getParsedGameObj();
+ function generateMatches(gameName) {
+    let parsedGameObj = getParsedGameObj(gameName);
+    let matchesKey = gameName + '-matches';
 
     let numberOfPlayers = parsedGameObj.length;
     numberOfMatches = (numberOfPlayers*8)/4; //each player will have 8 matches. Number of matches is therefor numberOfPlayers*8/4 since 4 players play pr match
@@ -91,7 +93,7 @@ function generateGame(ev){
         }
 
         //update matches in localstorage
-        let parsedMatchesObj = getParsedMatchesObj();
+        let parsedMatchesObj = getParsedMatchesObj(gameName);
 
         let newlyGeneratedMatch = {
             matchId: matchNumber,
@@ -99,10 +101,10 @@ function generateGame(ev){
             result: []
         }
         parsedMatchesObj.push(newlyGeneratedMatch);
-        localStorage.setItem('Beerio 2021-matches', JSON.stringify(parsedMatchesObj)); //change to work dynamically!!
+        localStorage.setItem(matchesKey, JSON.stringify(parsedMatchesObj)); //change to work dynamically!!
     }
 
-    updateMatchesList();
+    updateMatchesList(gameName);
 }
 
 
@@ -138,12 +140,16 @@ function updateNumberOfPlayersInCreateGameModal() {
  * create a oveview with all games. Each game should be possible to slideToggle
  */
 function createGamesView(){
+    //Removing all existing games, before adding all (existing + new) games
+    $('.games-overview').empty();
+
+    //adding game-content for all games
     let allGamesNames = getAllGameNames();
     for (let i=0; i<allGamesNames.length; i++){        
         $('.games-overview').append(
-            '<div class="game-content" id=' + allGamesNames[i] + '>' + 
+            '<div class="game-content" name="' + allGamesNames[i] + '">' + 
                 '<div class="game-header">' +
-                    '<h1>' + allGamesNames[i] + '</h1>' +
+                    '<h1>'+ allGamesNames[i] +'</h1>' +
                 '</div>' +
                 '<div class="game-body">' +
                     '<h3>Game table</h3>' +
@@ -172,22 +178,36 @@ function createGamesView(){
 
 
 /**
+ * Create gameViews and updates GameTableDisplay and MatchesLists for all games. Triggered when page is loaded/refreshed and at the end of createGame()
+ */
+function updateViewForAllGames(){
+    createGamesView();
+
+    let allGamesNames = getAllGameNames();
+    for (let i=0; i<allGamesNames.length; i++){        
+        updateGameTableDisplay(allGamesNames[i]);
+        updateMatchesList(allGamesNames[i]);
+    }
+}
+
+
+/**
  * Updates/displays gameTable based on values in game-JSON.
  * Removes all "old" rows inside table body, and then adds new updated table rows
  */
-function updateGameTableDisplay(){
+function updateGameTableDisplay(gameName){
     //removes "old" table rows
-    $('tbody').empty();
+    $('div[name="'+ gameName +'"]').find('.game-table-body').empty();
 
-    updatePlayerPointsAndGamesPlayedFromAllMatchResults();
-    let sortedPlayerList = getSortedPlayerList();
+    updatePlayerPointsAndGamesPlayedFromAllMatchResults(gameName);
+    let sortedPlayerList = getSortedPlayerList(gameName);
 
     for (let i=0; i<sortedPlayerList.length; i++){
         playerNameValue = sortedPlayerList[i];
-        gamesPlayedValue = getPlayerGamesPlayed(playerNameValue);
-        playerPointsValue = getPlayerPoints(playerNameValue);
+        gamesPlayedValue = getPlayerGamesPlayed(gameName, playerNameValue);
+        playerPointsValue = getPlayerPoints(gameName, playerNameValue);
         newTableRow = '<tr><td>' + playerNameValue + '</td><td>' + gamesPlayedValue + '</td><td>' + playerPointsValue + '</td></tr>';
-        $('tbody').append(newTableRow);
+        $('div[name="'+ gameName +'"]').find('.game-table-body').append(newTableRow);
     } 
 }
 
@@ -195,9 +215,9 @@ function updateGameTableDisplay(){
 /**
  * Updates player points and gamesPlayed for all players in game-JSON based on match results in matches-JSON. Is triggered in updateGameTableDisplay()
  */
- function updatePlayerPointsAndGamesPlayedFromAllMatchResults() {
-    let parsedGameObj = getParsedGameObj();
-    let parsedMatchesObj = getParsedMatchesObj();
+ function updatePlayerPointsAndGamesPlayedFromAllMatchResults(gameName) {
+    let parsedGameObj = getParsedGameObj(gameName);
+    let parsedMatchesObj = getParsedMatchesObj(gameName);
 
     //loop though all players
     for (let i=0; i<parsedGameObj.length; i++){
@@ -222,8 +242,8 @@ function updateGameTableDisplay(){
             }
         } 
         //after looping through all games for this player, we set points and gamesPlayed
-        setPlayerGamesPlayed(playerName, playerPlayedGames);
-        setPlayerPoints(playerName, playerPoints);
+        setPlayerGamesPlayed(gameName, playerName, playerPlayedGames);
+        setPlayerPoints(gameName, playerName, playerPoints);
         
     }
 }
@@ -233,12 +253,12 @@ function updateGameTableDisplay(){
  * Updates/displays list with all matches, by adding list items that include matchId and match players.
  * Removes all "old" match list items, and adds new updated match list items.
  */
-function updateMatchesList() {
+function updateMatchesList(gameName) {
     //removes "old" match list items
-    $('.matches-list').empty();
+    $('div[name="'+ gameName +'"]').find('.matches-list').empty();
 
     //loop through matches JSON and create new updated match list items
-    parsedMatchesObj = getParsedMatchesObj();
+    parsedMatchesObj = getParsedMatchesObj(gameName);
 
     for (let i=0; i<parsedMatchesObj.length; i++){
         player1BagdeValue = "";
@@ -247,10 +267,10 @@ function updateMatchesList() {
         player4BagdeValue = "";
         
         //if match is played: loop through players in that match, find player placement, and set bagdeValue
-        if (isMatchPlayed(parsedMatchesObj[i]['matchId'])){            
+        if (isMatchPlayed(gameName, parsedMatchesObj[i]['matchId'])){            
             for (let j=0; j<4; j++){
                 let playerName = parsedMatchesObj[i]['players'][j];
-                let playerPlacement = getPlayerPlacementInMatch(playerName, parsedMatchesObj[i]['matchId'])
+                let playerPlacement = getPlayerPlacementInMatch(gameName, playerName, parsedMatchesObj[i]['matchId'])
 
                 switch(j) {
                     case 0:
@@ -280,11 +300,11 @@ function updateMatchesList() {
                     '<button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#matchResultModal"><i class="fas fa-edit"></i></button>' + 
                 '</div>' +
             '</li>'
-        $('.list-group').append(newListRow);
+        $('div[name="'+ gameName +'"]').find('.list-group').append(newListRow);
     }
 
     //adds onClick event on edit buttons again (since all "old" match list items are removed in the beginning of this function)
-    $('.match-info button').on('click',function(event) {
+    $('div[name="'+ gameName +'"]').find('.match-info button').on('click',function(event) {
         updateMatchResultModal(event, this);
     })
 }
@@ -297,7 +317,10 @@ function updateMatchesList() {
  */
  function updateMatchResultModal(ev, buttonClicked){
     ev.preventDefault();
-    //create if statement checking if match is played (result is not empty). If match is not played input value should be null. If match is played, placement values should be default
+
+    //set gameName value to none displayed div in modal (so gameName can be passed on to saveMatchResult)
+    let gameName = $(buttonClicked).closest('.game-content').attr('name');
+    $('#matchResultModal').find('.game-name').text(gameName);
 
     //update modal title with matchId, and labels with players
     let matchId = $(buttonClicked).parent().find('.match-id').text();    
@@ -312,11 +335,11 @@ function updateMatchesList() {
     $('#matchResultModal').find('label[for="player3Placement"]').text(player3);
     $('#matchResultModal').find('label[for="player4Placement"]').text(player4);
 
-    if (isMatchPlayed(parseInt(matchId))){
-        $('#matchResultModal').find('input[id="player1Placement"]').val(getPlayerPlacementInMatch(player1, parseInt(matchId)));
-        $('#matchResultModal').find('input[id="player2Placement"]').val(getPlayerPlacementInMatch(player2, parseInt(matchId)));
-        $('#matchResultModal').find('input[id="player3Placement"]').val(getPlayerPlacementInMatch(player3, parseInt(matchId)));
-        $('#matchResultModal').find('input[id="player4Placement"]').val(getPlayerPlacementInMatch(player4, parseInt(matchId)));
+    if (isMatchPlayed(gameName, parseInt(matchId))){
+        $('#matchResultModal').find('input[id="player1Placement"]').val(getPlayerPlacementInMatch(gameName, player1, parseInt(matchId)));
+        $('#matchResultModal').find('input[id="player2Placement"]').val(getPlayerPlacementInMatch(gameName, player2, parseInt(matchId)));
+        $('#matchResultModal').find('input[id="player3Placement"]').val(getPlayerPlacementInMatch(gameName, player3, parseInt(matchId)));
+        $('#matchResultModal').find('input[id="player4Placement"]').val(getPlayerPlacementInMatch(gameName, player4, parseInt(matchId)));
     }else {
         $('#matchResultModal').find('input[id="player1Placement"]').val('');
         $('#matchResultModal').find('input[id="player2Placement"]').val('');
@@ -333,6 +356,8 @@ function updateMatchesList() {
 function saveMatchResult(ev) {
     ev.preventDefault();
 
+    let gameName = $('#matchResultModal').find('.game-name').text();
+
     let matchId = $('#matchResultModal').find('.modal-title-matchId').text(); //matchId as string
     let player1 = $('#matchResultModal').find('label[for="player1Placement"]').text();
     let player2 = $('#matchResultModal').find('label[for="player2Placement"]').text();
@@ -344,8 +369,7 @@ function saveMatchResult(ev) {
     let player3Placement = $('#matchResultModal').find('#player3Placement').val();
     let player4Placement = $('#matchResultModal').find('#player4Placement').val();
 
-
-    // Create list with player placements that will be used for validation. Filter elemtents with value ""
+    // Create list with player placements that will be used for validation. Filter out elemtents with value ""
     let playerPlacements = [];
     playerPlacements.push(player1Placement);
     playerPlacements.push(player2Placement);
@@ -371,9 +395,9 @@ function saveMatchResult(ev) {
     matchResult[player3Placement-1] = player3;
     matchResult[player4Placement-1] = player4;        
 
-    setMatchResult(parseInt(matchId), matchResult);
-    updateGameTableDisplay();
-    updateMatchesList();
+    setMatchResult(gameName, parseInt(matchId), matchResult);
+    updateGameTableDisplay(gameName);
+    updateMatchesList(gameName);
 }
 
 
@@ -404,8 +428,8 @@ function getAllGameNames(){
  * returns parsed gameObj
  * @returns object
  */
-function getParsedGameObj() {
-    let gameObj = localStorage.getItem('Beerio 2021'); //change to work dynamically!!
+function getParsedGameObj(gameName) {
+    let gameObj = localStorage.getItem(gameName);
     let parsedGameObj = JSON.parse(gameObj);
     return parsedGameObj;
 }
@@ -415,8 +439,9 @@ function getParsedGameObj() {
  * Returns parsed matchesObj
  * @returns object
  */
-function getParsedMatchesObj() {
-    let matchesObj = localStorage.getItem('Beerio 2021-matches'); //change to work dynamically!!
+function getParsedMatchesObj(gameName) {
+    let matchesKey = gameName + '-matches';
+    let matchesObj = localStorage.getItem(matchesKey);
     let parsedMatchesObj = JSON.parse(matchesObj);
     return parsedMatchesObj;
 }
@@ -427,8 +452,8 @@ function getParsedMatchesObj() {
  * @param {string} playerName 
  * @returns number, playerPoints
  */
-function getPlayerPoints(playerName) {
-    let parsedGameObj = getParsedGameObj();
+function getPlayerPoints(gameName, playerName) {
+    let parsedGameObj = getParsedGameObj(gameName);
 
     for (let i=0; i<parsedGameObj.length; i++) {
         if (parsedGameObj[i].playerName === playerName) {
@@ -444,8 +469,8 @@ function getPlayerPoints(playerName) {
  * @param {string} playerName 
  * @param {number} points 
  */
-function setPlayerPoints(playerName, points) {
-    let parsedGameObj = getParsedGameObj();
+function setPlayerPoints(gameName, playerName, points) {
+    let parsedGameObj = getParsedGameObj(gameName);
 
     for (let i=0; i<parsedGameObj.length; i++) {
         if (parsedGameObj[i].playerName === playerName) {
@@ -453,7 +478,7 @@ function setPlayerPoints(playerName, points) {
             break;
         }
     }
-    localStorage.setItem('Beerio 2021', JSON.stringify(parsedGameObj)); //change to work dynamically!!
+    localStorage.setItem(gameName, JSON.stringify(parsedGameObj));
 }
 
 
@@ -462,8 +487,8 @@ function setPlayerPoints(playerName, points) {
  * @param {string} playerName 
  * @returns number
  */
-function getPlayerGamesPlayed(playerName) {
-    let parsedGameObj = getParsedGameObj();
+function getPlayerGamesPlayed(gameName, playerName) {
+    let parsedGameObj = getParsedGameObj(gameName);
 
     for (let i=0; i<parsedGameObj.length; i++) {
         if (parsedGameObj[i].playerName === playerName) {
@@ -479,8 +504,8 @@ function getPlayerGamesPlayed(playerName) {
  * @param {string} playerName 
  * @param {number} gamesPlayed 
  */
-function setPlayerGamesPlayed(playerName, gamesPlayed) {
-    let parsedGameObj = getParsedGameObj();
+function setPlayerGamesPlayed(gameName, playerName, gamesPlayed) {
+    let parsedGameObj = getParsedGameObj(gameName);
 
     for (let i=0; i<parsedGameObj.length; i++) {
         if (parsedGameObj[i].playerName === playerName) {
@@ -488,7 +513,7 @@ function setPlayerGamesPlayed(playerName, gamesPlayed) {
             break;
         }
     }
-    localStorage.setItem('Beerio 2021', JSON.stringify(parsedGameObj)); //change to work dynamically!!
+    localStorage.setItem(gameName, JSON.stringify(parsedGameObj));
 }
 
 
@@ -498,10 +523,10 @@ function setPlayerGamesPlayed(playerName, gamesPlayed) {
  * @param {number} matchId 
  * @returns Player placement
  */
-function getPlayerPlacementInMatch(playerName, matchId){
-    let parsedMatchesObj = getParsedMatchesObj();
+function getPlayerPlacementInMatch(gameName, playerName, matchId){
+    let parsedMatchesObj = getParsedMatchesObj(gameName);
 
-    if (isMatchPlayed(matchId)){
+    if (isMatchPlayed(gameName, matchId)){
         for (let i=0; i<parsedMatchesObj.length; i++) {
             if (parsedMatchesObj[i].matchId === matchId) { 
                 if (parsedMatchesObj[i]['result'].includes(playerName)){
@@ -521,8 +546,8 @@ function getPlayerPlacementInMatch(playerName, matchId){
  * @param {number} matchId 
  * @param {string[]} result 
  */
- function setMatchResult(matchId, result) {
-    let parsedMatchesObj = getParsedMatchesObj();        
+ function setMatchResult(gameName, matchId, result) {
+    let parsedMatchesObj = getParsedMatchesObj(gameName);        
 
     for (let i=0; i<parsedMatchesObj.length; i++) {
         if (parsedMatchesObj[i].matchId === matchId) {
@@ -532,7 +557,8 @@ function getPlayerPlacementInMatch(playerName, matchId){
     }
 
     //Update localstorage with results
-    localStorage.setItem('Beerio 2021-matches', JSON.stringify(parsedMatchesObj)); //change to work dynamically!!
+    let matchesKey = gameName + '-matches';
+    localStorage.setItem(matchesKey, JSON.stringify(parsedMatchesObj));
 }
 
 
@@ -540,8 +566,8 @@ function getPlayerPlacementInMatch(playerName, matchId){
  * Returns a sorted list of playerNames base on points
  * @returns string[]
  */
- function getSortedPlayerList(){
-    let parsedGameObj = getParsedGameObj();
+ function getSortedPlayerList(gameName){
+    let parsedGameObj = getParsedGameObj(gameName);
     let sortedPlayerList = [];
 
     for (let j=0; j<parsedGameObj.length; j++){
@@ -566,11 +592,11 @@ function getPlayerPlacementInMatch(playerName, matchId){
             firstPlayerName = sortedPlayerList[i];
             secondPlayerName = sortedPlayerList[i+1]
             //check if the two rows should switch place:
-            if (getPlayerPoints(firstPlayerName) < getPlayerPoints(secondPlayerName)) {
+            if (getPlayerPoints(gameName, firstPlayerName) < getPlayerPoints(gameName, secondPlayerName)) {
             //if so, mark as a switch and break the loop:
             shouldSwitch = true;
             break;
-            }else if((getPlayerPoints(firstPlayerName) === getPlayerPoints(secondPlayerName)) && (getPlayerGamesPlayed(firstPlayerName) > getPlayerGamesPlayed(secondPlayerName)) ){
+            }else if((getPlayerPoints(gameName, firstPlayerName) === getPlayerPoints(gameName, secondPlayerName)) && (getPlayerGamesPlayed(gameName, firstPlayerName) > getPlayerGamesPlayed(gameName, secondPlayerName)) ){
                 //if so, mark as a switch and break the loop:
                 shouldSwitch = true;
                 break;
@@ -598,8 +624,8 @@ function getPlayerPlacementInMatch(playerName, matchId){
  * @param {number} matchId 
  * @returns boolean
  */
-function isMatchPlayed(matchId) {
-    let parsedMatchesObj = getParsedMatchesObj();     
+function isMatchPlayed(gameName, matchId) {
+    let parsedMatchesObj = getParsedMatchesObj(gameName);     
     let isMatchPlayed = false;
 
     for (let i=0; i<parsedMatchesObj.length; i++) {
@@ -713,10 +739,8 @@ $(document).ready(function(){
     // })
 
 
-    //running functions when page is entered/refreshed. (Make checks here so we avoid error in console)
-    createGamesView();
-    updateGameTableDisplay();
-    updateMatchesList();
+    //running functions when page is entered/refreshed. (Make checks that localStorage is not empty before running, so we avoid error in console)
+    updateViewForAllGames();
     
 });
 

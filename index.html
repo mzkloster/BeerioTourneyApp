@@ -65,26 +65,6 @@
             </div>
         </div>
 
-
-        <h3>Game table</h3>
-        <table id="gameTable" class="center">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>&nbsp; Games played &nbsp;</th> 
-                    <th>Points</th>
-                </tr>
-            </thead>
-            <tbody class="game-table-body">
-                <!-- table rows are generated here -->
-            </tbody>
-        </table>
-
-        <h3>Game matches</h3>
-        <ul class="list-group list-group-flush matches-list">
-            <!-- list rows with matches are generated here. Example: -->
-        </ul>
-
     
         <!-- Modal for saving/updating match result -->
         <div class="modal fade" id="matchResultModal" tabindex="-1" aria-labelledby="matchResultModalLabel" aria-hidden="true">
@@ -119,25 +99,15 @@
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="button" class="btn btn-primary" id="saveMatchResultbutton" data-bs-dismiss="modal">Save result</button>
                 </div>
+                <div class="game-name d-none"></div>
             </div>
             </div>
         </div>
 
         <hr>
-        <h6>Test: Here comes games overview:</h6>
         <div class="games-overview">
             <!-- All games (gameNames) will be shown here. All with sideToggle to show gameTable and matches -->
-            <div class="game-content">
-                <div class="game-header">
-                    <h1>Example game!</h1>
-                </div>
-                <div class="game-body">
-
-                </div>
-            </div>
-            <hr>
-        </div>
-        
+        </div> 
 
     </div>
 
