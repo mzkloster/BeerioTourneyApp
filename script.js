@@ -140,7 +140,33 @@ function updateNumberOfPlayersInCreateGameModal() {
 function createGamesView(){
     let allGamesNames = getAllGameNames();
     for (let i=0; i<allGamesNames.length; i++){        
-        $('.games-overview').append('<div class="game-content" id=' + allGamesNames[i] + '><div class="game-header"><h1>' + allGamesNames[i] + '</h1></div><div class="game-body"></div></div><hr>');
+        $('.games-overview').append(
+            '<div class="game-content" id=' + allGamesNames[i] + '>' + 
+                '<div class="game-header">' +
+                    '<h1>' + allGamesNames[i] + '</h1>' +
+                '</div>' +
+                '<div class="game-body">' +
+                    '<h3>Game table</h3>' +
+                    '<table id="gameTable" class="center">' +
+                        '<thead>' +
+                            '<tr>' +
+                                '<th>Name</th>' +
+                                '<th>&nbsp; Games played &nbsp;</th>' +
+                                '<th>Points</th>' +
+                            '</tr>' +
+                        '</thead>' +
+                        '<tbody class="game-table-body">' +
+                            '<!-- table rows are generated here -->' +
+                        '</tbody>' +
+                    '</table>' +
+            
+                    '<h3>Game matches</h3>' +
+                    '<ul class="list-group list-group-flush matches-list">' +
+                        '<!-- list rows with matches are generated here. Example: -->' +
+                    '</ul>' +
+                '</div>' +
+            '</div>' +
+            '<hr>');
     }
 }
 
