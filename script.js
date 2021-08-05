@@ -135,6 +135,17 @@ function updateNumberOfPlayersInCreateGameModal() {
 
 
 /**
+ * create a oveview with all games. Each game should be possible to slideToggle
+ */
+function createGamesView(){
+    let allGamesNames = getAllGameNames();
+    for (let i=0; i<allGamesNames.length; i++){        
+        $('.games-overview').append('<div class="game-content" id=' + allGamesNames[i] + '><div class="game-header"><h1>' + allGamesNames[i] + '</h1></div><div class="game-body"></div></div><hr>');
+    }
+}
+
+
+/**
  * Updates/displays gameTable based on values in game-JSON.
  * Removes all "old" rows inside table body, and then adds new updated table rows
  */
@@ -342,6 +353,26 @@ function saveMatchResult(ev) {
 
 
 /////////////////////////////////// Getters and setters ////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Return all gameNames in localstorage
+ * @returns string[]
+ */
+function getAllGameNames(){
+    //get all keys from localstorage, both gameName(game-obj) and gameName-matches(matches-obj)
+    let allKeys = Object.keys(localStorage);
+    //all gameNames(only game-obj, filtered out matches-obj (keyes without '-matches'))
+    let allGamesNames = [];
+
+    for (let i=0; i<allKeys.length; i++){
+        if (!(allKeys[i].includes("-matches"))){
+            allGamesNames.push(allKeys[i]);            
+        }
+    }
+
+    return allGamesNames;
+}
+
 
 /**
  * returns parsed gameObj
@@ -657,6 +688,7 @@ $(document).ready(function(){
 
 
     //running functions when page is entered/refreshed. (Make checks here so we avoid error in console)
+    createGamesView();
     updateGameTableDisplay();
     updateMatchesList();
     
