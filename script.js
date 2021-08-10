@@ -646,18 +646,31 @@ function isMatchPlayed(gameName, matchId) {
  * @returns boolean
  */
 function isMatchResultFormValid(playerPlacements){        
-    // matchResult length should be either 4, or 0. (4: placements for all players. 0: Match is not played)
+    // check: matchResult length should be either 4, or 0. (4: placements for all players. 0: Match is not played)
     if (!(playerPlacements.length === 0 || playerPlacements.length === 4)) {
         console.log("Match result form not valid: must fill out all or none of the placements!");
         formErrorMessage = "All or none of the placements must have values.";
         return false;
     } 
 
-    // all elements in matchResult should be unique. 2 players can't get 1st place etc.
-    if (new Set(playerPlacements).size !== playerPlacements.length){
-        console.log("Match result form not valid: match result contains duplicates placement values!");
-        formErrorMessage = "All placement values must be unique. Two players can't place 1st, for example.";
-        return false;
+    // check: all elements in matchResult should be unique. 2 players can't get 1st place etc.
+    if (playerPlacements.length > 0){
+        if (new Set(playerPlacements).size !== playerPlacements.length){
+            console.log("Match result form not valid: match result contains duplicates placement values!");
+            formErrorMessage = "All placement values must be unique. Two players can't place 1st, for example.";
+            return false;
+        }
+    }
+
+    // check: each placement value should be either 1,2,3 or 4
+    if (playerPlacements.length > 0){
+        for (let i=0; i<playerPlacements.length; i++){
+            if (parseInt(playerPlacements[i]) < 1 || parseInt(playerPlacements[i]) > 4){
+                console.log("All placement values must be either 1, 2, 3 or 4!");
+                formErrorMessage = "All placement values must be either 1, 2, 3 or 4!";
+                return false;
+            }
+        }
     }
 
     return true;
@@ -684,12 +697,24 @@ function isNewGameFormValid(playerNameList, numberOfNewPlayerInputFields, newGam
         return false;
     }
 
-    //TODO: check if newGameName is the same as an existing game name. Return false if so (should not be possible to overwrite)
+    //Check: Should not be possible to create a new game with the same name as one of the existing games as this would overwrite existing game.
+    let existingGamesNames = getAllGameNames();
+    if (existingGamesNames.includes(newGameName)){
+        console.log("New game form is invalid: A game with the name " + newGameName + " already exists!");
+        formErrorMessage = "A game with the name " + newGameName + " already exists!";
+        return false;
+    }
 
+    //Check: Should not be possible to create a new game with a name that includes "-matches". This would cause trouble since matches-json keys are gameName + "-matches".
+    if (newGameName.includes("-matches")){
+        console.log("New game form is invalid: '-matches' can not be included in the game name.");
+        formErrorMessage = "The game name can not include substring '-matches'.";
+        return false;
+    }
 
     //Check: None of the player input fields should be empty
     if (filteredPlayerNameList.length !== numberOfNewPlayerInputFields){
-        console.log("New game form is invalid: none of the player name input fields can be empty");
+        console.log("New game form is invalid: none of the player name input fields can be empty.");
         formErrorMessage = "None of the player input fields can be empty.";
         return false;
     }
