@@ -20,6 +20,13 @@ h2,h3,h4{
     cursor: pointer;
 }
 
+.game-body {
+    display:none;
+}
+
+.flip {
+    transform: rotate(-180deg);
+  }
 
 /* styling for createGameModal */
 input[id="newTournementName"]{

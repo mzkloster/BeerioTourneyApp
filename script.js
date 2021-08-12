@@ -37,14 +37,14 @@ function generateGame(ev){
         return;
     }
 
-    //save to localStorage: both json for players and score(game) and matches(list of all matches for this game)    
+    //generate JSON-fiiles in localStorage: game-json, matches-json, createdDate-json    
     localStorage.setItem(newGameName, JSON.stringify(game));
     localStorage.setItem(newGameName + '-matches', JSON.stringify(matches));
-
-
-    updateViewForAllGames();
+    localStorage.setItem(newGameName + '-createdDate', new Date());
 
     generateMatches(newGameName);
+
+    updateViewForAllGames();    
 
     $('#newGameForm')[0].reset();
 }
@@ -145,15 +145,35 @@ function createGamesView(){
 
     //adding game-content for all games
     let allGamesNames = getAllGameNames();
-    for (let i=0; i<allGamesNames.length; i++){        
+    for (let i=0; i<allGamesNames.length; i++){  
+        let gameName = allGamesNames[i];
+        let gameProgress = getGameProgress(gameName);
+        let gameProgressIconClass = "fas fa-star-half-alt";
+        let gameCreatedDate = getCreatedDate(gameName);
+        let gameNumberOfPlayers = getNumberOfPlayers(gameName);
+
+        if(isGameComplete(gameName)) {
+            gameProgressIconClass = "fas fa-star";
+        }
+
         $('.games-overview').append(
-            '<div class="game-content" name="' + allGamesNames[i] + '">' + 
-                '<div class="game-header">' +
-                    '<h1>'+ allGamesNames[i] +'</h1>' +
-                '</div>' +
+            '<div class="game-content" name="' + gameName + '">' + 
+                '<div class="game-header d-flex justify-content-between">' +
+                    '<div class="game-header-left"><i class="far fa-calendar-alt"></i> '+ gameCreatedDate +'</div>' +
+                    '<div class="game-header-middle">' +
+                        '<div><h1>'+ gameName +'</h1></div>' +
+                        '<div>'+
+                            '<span>'+ gameNumberOfPlayers +' <i class="fas fa-users"></i></span>'+
+                            '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+
+                            '<span class="game-progress">'+ gameProgress +'</span> <i class="fas fa-flag-checkered"></i>'+
+                        '</div>' +
+                        '<div class="d-none"><span class="game-progress">Progress: '+ gameProgress +'</span> <span class="game-progress-icon"><i class="'+ gameProgressIconClass +'"></i></span></div>' + //display:none, but leaves it in case I want to use progress text plus icon later (half star turn into full star when all games are completed)
+                    '</div>' +
+                    '<div class="game-header-right"><span class="invisible">'+ gameCreatedDate +' </span><i class="fas fa-chevron-down"></i></div>' +
+                '</div>' + 
                 '<div class="game-body">' +
                     '<h3>Game table</h3>' +
-                    '<table id="gameTable" class="center">' +
+                    '<table class="game-table center">' +
                         '<thead>' +
                             '<tr>' +
                                 '<th>Name</th>' +
@@ -177,6 +197,7 @@ function createGamesView(){
 }
 
 
+
 /**
  * Create gameViews and updates GameTableDisplay and MatchesLists for all games. Triggered when page is loaded/refreshed and at the end of createGame()
  */
@@ -188,6 +209,31 @@ function updateViewForAllGames(){
         updateGameTableDisplay(allGamesNames[i]);
         updateMatchesList(allGamesNames[i]);
     }
+
+    //adding on-click slideToggle for games
+    $('.game-header').on('click', function(){
+        //adds slideToggle on game-body
+        $(this).siblings('.game-body').slideToggle();
+        //flips game-header-left icon, arrow down->arrow up, and vice versa
+        $(this).find('.game-header-right').find('i').toggleClass('flip');
+    });
+}
+
+
+/**
+ * Updates gameProgress text value and icon on game-header
+ * @param {string} gameName 
+ */
+ function updateGameProgress(gameName){
+    let gameProgress = getGameProgress(gameName);
+    let gameProgressIconClass = "fas fa-star-half-alt";
+
+    $('.game-content[name="'+gameName+'"]').find('.game-progress').text(gameProgress);
+
+    if(isGameComplete(gameName)) {
+        gameProgressIconClass = "fas fa-star";        
+    }
+    $('.game-content[name="'+gameName+'"]').find('.game-progress-icon').find('i').removeClass().addClass(gameProgressIconClass);
 }
 
 
@@ -396,31 +442,46 @@ function saveMatchResult(ev) {
     matchResult[player4Placement-1] = player4;        
 
     setMatchResult(gameName, parseInt(matchId), matchResult);
+
     updateGameTableDisplay(gameName);
     updateMatchesList(gameName);
+    updateGameProgress(gameName);
 }
 
 
 
-/////////////////////////////////// Getters and setters ////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////// GETTERS AND SETTERS //////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Return all gameNames in localstorage
+ * Return all gameNames in localstorage, sorted by createdDate
  * @returns string[]
  */
 function getAllGameNames(){
     //get all keys from localstorage, both gameName(game-obj) and gameName-matches(matches-obj)
     let allKeys = Object.keys(localStorage);
-    //all gameNames(only game-obj, filtered out matches-obj (keyes without '-matches'))
-    let allGamesNames = [];
+    //all gameNames sorted by createdDate(only game-obj, filtered out matches-obj (keyes without '-matches') and createdDate-obj (keyes without '-createdDate'))
+    let allGamesNamesSorted = []
 
+    unsortedgameObjects = [];
     for (let i=0; i<allKeys.length; i++){
         if (!(allKeys[i].includes("-matches"))){
-            allGamesNames.push(allKeys[i]);            
+            if (!(allKeys[i].includes("-createdDate"))){            
+                let newObject = {
+                    gameName: allKeys[i],
+                    date: new Date(localStorage.getItem(allKeys[i] + '-createdDate'))
+                }  
+                unsortedgameObjects.push(newObject);          
+            }
         }
     }
 
-    return allGamesNames;
+    let sortedgameObjects = unsortedgameObjects.slice().sort((a,b) => b.date - a.date)
+
+    for (let i=0; i<sortedgameObjects.length; i++){
+        allGamesNamesSorted.push(sortedgameObjects[i].gameName);
+    }
+
+    return allGamesNamesSorted;
 }
 
 
@@ -428,7 +489,7 @@ function getAllGameNames(){
  * returns parsed gameObj
  * @returns object
  */
-function getParsedGameObj(gameName) {
+ function getParsedGameObj(gameName) {
     let gameObj = localStorage.getItem(gameName);
     let parsedGameObj = JSON.parse(gameObj);
     return parsedGameObj;
@@ -444,6 +505,46 @@ function getParsedMatchesObj(gameName) {
     let matchesObj = localStorage.getItem(matchesKey);
     let parsedMatchesObj = JSON.parse(matchesObj);
     return parsedMatchesObj;
+}
+
+/**
+ * Return total number of matches in a specific game
+ * @param {string} gameName 
+ * @returns number
+ */
+function getNumberOfMatchesInGame(gameName){
+    let parsedMatchesObj = getParsedMatchesObj(gameName);
+    let numberOfMatches = parsedMatchesObj.length;
+    return numberOfMatches;
+}
+
+
+/**
+ * Returns a string with game progress in the form "completedMatches/totalMatches"
+ * @param {string} gameName 
+ * @returns string
+ */
+function getGameProgress(gameName){
+    let gameProgress;
+    gameProgress = getNumberOfCompletedMatchesInGame(gameName) + "/" + getNumberOfMatchesInGame(gameName);
+    return gameProgress;
+}
+
+
+/**
+ * Return number of completed matches in a game
+ * @param {string} gameName 
+ * @returns number
+ */
+function getNumberOfCompletedMatchesInGame(gameName){
+    let parsedMatchesObj = getParsedMatchesObj(gameName);
+    let numberOfCompletedMatches = 0;
+    for (let i=0; i<parsedMatchesObj.length; i++){
+        if (isMatchPlayed(gameName, parsedMatchesObj[i].matchId)){
+            numberOfCompletedMatches += 1;
+        }
+    }
+    return numberOfCompletedMatches
 }
 
 
@@ -518,6 +619,19 @@ function setPlayerGamesPlayed(gameName, playerName, gamesPlayed) {
 
 
 /**
+ * Returns number of players in a game
+ * @param {string} gameName 
+ * @returns number
+ */
+function getNumberOfPlayers(gameName){
+    let parsedGameObj = getParsedGameObj(gameName);
+    let numberOfPlayers = parsedGameObj.length;
+
+    return numberOfPlayers;
+}
+
+
+/**
  * Returns placement, string value between 1 and 4, for a player in a match.
  * @param {string} playerName 
  * @param {number} matchId 
@@ -546,7 +660,7 @@ function getPlayerPlacementInMatch(gameName, playerName, matchId){
  * @param {number} matchId 
  * @param {string[]} result 
  */
- function setMatchResult(gameName, matchId, result) {
+ function setMatchResult(gameName, matchId, result){
     let parsedMatchesObj = getParsedMatchesObj(gameName);        
 
     for (let i=0; i<parsedMatchesObj.length; i++) {
@@ -559,6 +673,61 @@ function getPlayerPlacementInMatch(gameName, playerName, matchId){
     //Update localstorage with results
     let matchesKey = gameName + '-matches';
     localStorage.setItem(matchesKey, JSON.stringify(parsedMatchesObj));
+}
+
+
+/**
+ * Returns createdDate for game in string format "5. januar 2021"
+ * @param {string} gameName 
+ * @returns string
+ */
+function getCreatedDate(gameName){
+    let day, monthValue, month, year, dateString;
+    let createdDate = new Date(localStorage.getItem(gameName + '-createdDate'));
+    day = createdDate.getDate();
+    monthValue = createdDate.getMonth();
+    year = createdDate.getFullYear();
+
+    switch (monthValue) {
+        case 0:
+            month = "januar";
+            break;
+        case 1:
+            month = "februar";
+            break;
+        case 2:
+            month = "mars";
+            break;
+        case 3:
+            month = "april";
+            break;
+        case 4:
+            month = "mai";
+            break;
+        case 5:
+            month = "juni";
+            break;
+        case 6:
+            month = "juli";
+            break;
+        case 7:
+            month = "august";
+            break;
+        case 8:
+            month = "september";
+            break;
+        case 9:
+            month = "oktober";
+            break;
+        case 10:
+            month = "november";
+            break;
+        case 11:
+            month = "desember";
+    }
+
+    dateString = day + '. ' + month + ' ' + year;
+    return dateString;
 }
 
 
@@ -617,7 +786,22 @@ function getPlayerPlacementInMatch(gameName, playerName, matchId){
 
 
 
-//////////////////////////////////////////////// Checks //////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////// CHECKS ///////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Checks if game is complete (all matches are played)
+ * @param {string} gameName 
+ * @returns boolean
+ */
+function isGameComplete(gameName) {
+    let result = false;
+
+    if (getNumberOfMatchesInGame(gameName)>0 && (getNumberOfCompletedMatchesInGame(gameName) === getNumberOfMatchesInGame(gameName))){
+        result = true;
+    }
+    return result;
+}
+
 
 /**
  * Checks if match is played. Returns boolean.
@@ -712,6 +896,13 @@ function isNewGameFormValid(playerNameList, numberOfNewPlayerInputFields, newGam
         return false;
     }
 
+    //Check: Should not be possible to create a new game with a name that includes "-createdDate". This would cause trouble since date-json keys are gameName + "-createdDate".
+    if (newGameName.includes("-createdDate")){
+        console.log("New game form is invalid: '-createdDate' can not be included in the game name.");
+        formErrorMessage = "The game name can not include substring '-createdDate'.";
+        return false;
+    }
+
     //Check: None of the player input fields should be empty
     if (filteredPlayerNameList.length !== numberOfNewPlayerInputFields){
         console.log("New game form is invalid: none of the player name input fields can be empty.");
@@ -737,7 +928,7 @@ function isNewGameFormValid(playerNameList, numberOfNewPlayerInputFields, newGam
 }
 
 
-//////////////////////////////////////////////////// When page is loaded/refreshed //////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////// WHEN PAGE IS LOADED/REFRESHED ///////////////////////////////////////////////////////////////////////////////
 $(document).ready(function(){
     
     //adding onClick-functions to buttons
