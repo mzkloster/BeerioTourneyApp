@@ -254,17 +254,23 @@ function updateGameTableDisplay(gameName){
 
     for (let i=0; i<sortedPlayerList.length; i++){
         let position = i +1;
+        let trClass = "";
         
         playerNameValue = sortedPlayerList[i];
         gamesPlayedValue = getPlayerGamesPlayed(gameName, playerNameValue);
         playerPointsValue = getPlayerPoints(gameName, playerNameValue);
+
+        //Set an underline after every 3 players (since they will play in the same final). No underline under last table row. And not under second last either, since then the last player would play in the final above
+        if (position%3 === 0 && i !== sortedPlayerList.length-1 && i !== sortedPlayerList.length-2){
+            trClass="tr-underline";
+        }
 
         //if the last player is the only player in the lowest final, he will join the 3 players in the final above
         if (i === sortedPlayerList.length-1 && position%3 === 1){
             finalCounter -= 1;
         }
 
-        newTableRow = '<tr><td>'+position +'</td><td>' + playerNameValue + '</td><td>' + gamesPlayedValue + '</td><td>' + playerPointsValue + '</td><td>'+finalLetters[finalCounter]+'</td></tr>';
+        newTableRow = '<tr class="'+trClass+'"><td>'+position +'</td><td>' + playerNameValue + '</td><td>' + gamesPlayedValue + '</td><td>' + playerPointsValue + '</td><td>'+finalLetters[finalCounter]+'</td></tr>';
         $('div[name="'+ gameName +'"]').find('.game-table-body').append(newTableRow);
 
 

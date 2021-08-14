@@ -70,7 +70,9 @@ h2{
 .game-table th{
     width: 20%
 }
-
+tr.tr-underline{
+    border-bottom: 1.1px dashed #212529;
+}
 /* styling for placement-bagdes */
 .badge-placement-1{
     background-color: #ffd700;
