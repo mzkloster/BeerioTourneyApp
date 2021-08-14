@@ -35,7 +35,12 @@ h1 {
     padding: 1rem;
     cursor: pointer;
 }
-
+.game-header:hover{
+    background: linear-gradient(rgba(0, 0, 0, 0.04), rgba(0, 0, 0, 0.04));
+}
+.hr-game-content{
+    margin-top: 0rem;
+}
 .game-header-left, .game-header-right{
     padding-top: 0.8rem;
 }
@@ -58,32 +63,31 @@ h2{
     max-width: 780px;
 }
 
-
-
 .flip {
     transform: rotate(-180deg);
 }
+
 
 /* styling for placement-bagdes */
 .badge-placement-1{
     background-color: #ffd700;
     color: #212529 !important;
-    border: 1px solid #212529;
+    border: 1.5px solid #212529;
 }
 .badge-placement-2{
     background-color: #c0c0c0;
     color: #212529 !important;
-    border: 1px solid #212529;
+    border: 1.5px solid #212529;
 }
 .badge-placement-3{
     background-color: #c5ab84;
     color: #212529 !important;
-    border: 1px solid #212529;
+    border: 1.5px solid #212529;
 }
 .badge-placement-4{
-    background-color: lightcoral;
+    background-color: lightpink;
     color: #212529 !important;
-    border: 1px solid #212529;
+    border: 1.5px solid #212529;
 }
 
 
@@ -115,9 +119,16 @@ input[id="newTournementName"]{
     max-width: 780px;
     margin: auto;
 }
+.match-info{
+    padding-top: 0.8rem;
+    padding-bottom: 0.8rem;
+}
 .match-info .match-number {
     float: left;
 }
 .match-info button {
-    float: right;
+    float: right; 
+    position: absolute;
+    right: 0;
+    top: 0.8rem;
 }

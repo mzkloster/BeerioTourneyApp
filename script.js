@@ -171,7 +171,7 @@ function createGamesView(){
                     '</div>' +
                     '<div class="game-header-right"><span class="invisible">'+ gameCreatedDate +' </span><i class="fas fa-chevron-down"></i></div>' +
                 '</div>' + 
-                '<hr>'+
+                '<hr class="hr-game-content">'+
                 '<div class="game-body">' +
                     '<h3 ="table-header">Table</h3>' +
                     '<table class="game-table table table-striped center">' +
@@ -508,6 +508,7 @@ function getParsedMatchesObj(gameName) {
     let parsedMatchesObj = JSON.parse(matchesObj);
     return parsedMatchesObj;
 }
+
 
 /**
  * Return total number of matches in a specific game
