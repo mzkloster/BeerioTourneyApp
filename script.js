@@ -181,6 +181,7 @@ function createGamesView(){
                                 '<th>Name</th>' +
                                 '<th>Games played</th>' +
                                 '<th>Points</th>' +
+                                '<th>Final</th>' +
                             '</tr>' +
                         '</thead>' +
                         '<tbody class="game-table-body">' +
@@ -248,14 +249,29 @@ function updateGameTableDisplay(gameName){
 
     updatePlayerPointsAndGamesPlayedFromAllMatchResults(gameName);
     let sortedPlayerList = getSortedPlayerList(gameName);
+    let finalLetters = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
+    let finalCounter = 0;
 
     for (let i=0; i<sortedPlayerList.length; i++){
         let position = i +1;
+        
         playerNameValue = sortedPlayerList[i];
         gamesPlayedValue = getPlayerGamesPlayed(gameName, playerNameValue);
         playerPointsValue = getPlayerPoints(gameName, playerNameValue);
-        newTableRow = '<tr><td>'+position +'</td><td>' + playerNameValue + '</td><td>' + gamesPlayedValue + '</td><td>' + playerPointsValue + '</td></tr>';
+
+        //if the last player is the only player in the lowest final, he will join the 3 players in the final above
+        if (i === sortedPlayerList.length-1 && position%3 === 1){
+            finalCounter -= 1;
+        }
+
+        newTableRow = '<tr><td>'+position +'</td><td>' + playerNameValue + '</td><td>' + gamesPlayedValue + '</td><td>' + playerPointsValue + '</td><td>'+finalLetters[finalCounter]+'</td></tr>';
         $('div[name="'+ gameName +'"]').find('.game-table-body').append(newTableRow);
+
+
+        //after every 3 players, finalCounter increase with 1. (3 best players are in A final, next 3 are in B final, etc)
+        if (position%3 === 0){
+            finalCounter += 1;
+        }
     } 
 }
 

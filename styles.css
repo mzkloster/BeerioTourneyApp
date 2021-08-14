@@ -67,6 +67,9 @@ h2{
     transform: rotate(-180deg);
 }
 
+.game-table th{
+    width: 20%
+}
 
 /* styling for placement-bagdes */
 .badge-placement-1{
