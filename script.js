@@ -157,11 +157,11 @@ function createGamesView(){
         }
 
         $('.games-overview').append(
-            '<div class="game-content" name="' + gameName + '">' + 
+            '<div class="game-content shadow" name="' + gameName + '">' + 
                 '<div class="game-header d-flex justify-content-between">' +
                     '<div class="game-header-left"><i class="far fa-calendar-alt"></i> '+ gameCreatedDate +'</div>' +
                     '<div class="game-header-middle">' +
-                        '<div><h1>'+ gameName +'</h1></div>' +
+                        '<div><h2>'+ gameName +'</h2></div>' +
                         '<div>'+
                             '<span>'+ gameNumberOfPlayers +' <i class="fas fa-users"></i></span>'+
                             '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+
@@ -171,13 +171,15 @@ function createGamesView(){
                     '</div>' +
                     '<div class="game-header-right"><span class="invisible">'+ gameCreatedDate +' </span><i class="fas fa-chevron-down"></i></div>' +
                 '</div>' + 
+                '<hr>'+
                 '<div class="game-body">' +
-                    '<h3>Game table</h3>' +
-                    '<table class="game-table center">' +
+                    '<h3 ="table-header">Table</h3>' +
+                    '<table class="game-table table table-striped center">' +
                         '<thead>' +
                             '<tr>' +
+                                '<th>Position</th>' +
                                 '<th>Name</th>' +
-                                '<th>&nbsp; Games played &nbsp;</th>' +
+                                '<th>Games played</th>' +
                                 '<th>Points</th>' +
                             '</tr>' +
                         '</thead>' +
@@ -186,13 +188,12 @@ function createGamesView(){
                         '</tbody>' +
                     '</table>' +
             
-                    '<h3>Game matches</h3>' +
+                    '<h3 class="matches-header">Matches</h3>' +
                     '<ul class="list-group list-group-flush matches-list">' +
                         '<!-- list rows with matches are generated here. Example: -->' +
                     '</ul>' +
                 '</div>' +
-            '</div>' +
-            '<hr>');
+            '</div>');
     }
 }
 
@@ -249,10 +250,11 @@ function updateGameTableDisplay(gameName){
     let sortedPlayerList = getSortedPlayerList(gameName);
 
     for (let i=0; i<sortedPlayerList.length; i++){
+        let position = i +1;
         playerNameValue = sortedPlayerList[i];
         gamesPlayedValue = getPlayerGamesPlayed(gameName, playerNameValue);
         playerPointsValue = getPlayerPoints(gameName, playerNameValue);
-        newTableRow = '<tr><td>' + playerNameValue + '</td><td>' + gamesPlayedValue + '</td><td>' + playerPointsValue + '</td></tr>';
+        newTableRow = '<tr><td>'+position +'</td><td>' + playerNameValue + '</td><td>' + gamesPlayedValue + '</td><td>' + playerPointsValue + '</td></tr>';
         $('div[name="'+ gameName +'"]').find('.game-table-body').append(newTableRow);
     } 
 }
@@ -316,7 +318,7 @@ function updateMatchesList(gameName) {
         if (isMatchPlayed(gameName, parsedMatchesObj[i]['matchId'])){            
             for (let j=0; j<4; j++){
                 let playerName = parsedMatchesObj[i]['players'][j];
-                let playerPlacement = getPlayerPlacementInMatch(gameName, playerName, parsedMatchesObj[i]['matchId'])
+                let playerPlacement = getPlayerPlacementInMatch(gameName, playerName, parsedMatchesObj[i]['matchId']);
 
                 switch(j) {
                     case 0:
@@ -339,10 +341,10 @@ function updateMatchesList(gameName) {
             '<li class="list-group-item">' +
                 '<div class="match-info">' + 
                     '<b class="match-number">Match <span class="match-id">' + parsedMatchesObj[i]['matchId'] + '</span></b>' + 
-                    '<span class="match-player-1">' + parsedMatchesObj[i]['players'][0] + '</span> <span class="match-player-1-bagde badge bg-secondary">' + player1BagdeValue + '</span> &nbsp;|&nbsp; ' + 
-                    '<span class="match-player-2">' + parsedMatchesObj[i]['players'][1] + '</span> <span class="match-player-2-bagde badge bg-secondary">' + player2BagdeValue + '</span> &nbsp;|&nbsp; ' + 
-                    '<span class="match-player-3">' + parsedMatchesObj[i]['players'][2] + '</span> <span class="match-player-3-bagde badge bg-secondary">' + player3BagdeValue + '</span> &nbsp;|&nbsp; ' + 
-                    '<span class="match-player-4">' + parsedMatchesObj[i]['players'][3] + '</span> <span class="match-player-4-bagde badge bg-secondary">' + player4BagdeValue + '</span> ' + 
+                    '<span class="match-player-1">' + parsedMatchesObj[i]['players'][0] + '</span> <span class="match-player-1-bagde badge badge-placement-'+player1BagdeValue+'">' + player1BagdeValue + '</span> &nbsp;|&nbsp; ' + 
+                    '<span class="match-player-2">' + parsedMatchesObj[i]['players'][1] + '</span> <span class="match-player-2-bagde badge badge-placement-'+player2BagdeValue+'">' + player2BagdeValue + '</span> &nbsp;|&nbsp; ' + 
+                    '<span class="match-player-3">' + parsedMatchesObj[i]['players'][2] + '</span> <span class="match-player-3-bagde badge badge-placement-'+player3BagdeValue+'">' + player3BagdeValue + '</span> &nbsp;|&nbsp; ' + 
+                    '<span class="match-player-4">' + parsedMatchesObj[i]['players'][3] + '</span> <span class="match-player-4-bagde badge badge-placement-'+player4BagdeValue+'">' + player4BagdeValue + '</span> ' + 
                     '<button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#matchResultModal"><i class="fas fa-edit"></i></button>' + 
                 '</div>' +
             '</li>'
