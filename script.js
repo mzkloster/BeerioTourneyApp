@@ -974,6 +974,12 @@ $(document).ready(function(){
         saveMatchResult(event);
     })
 
+    $("#scrollToGamesOverviewButton").click(function() {
+        $([document.documentElement, document.body]).animate({
+            scrollTop: $("#gamesOverviewHeader").offset().top
+        }, 100);
+    });
+
     //Commented out because this onClick event is added in updateMatchList()
     // $('.match-info button').on('click',function(event) {
     //     updateMatchResultModal(event, this);

@@ -12,13 +12,24 @@
     <title>Beerio</title>
 </head>
 <body>
-    <div class="container">        
-        <h1>Welcome to Beerio Kart!</h1>
+    <div class="hero-image">
+        <div class="hero-header">
+            <h1><b>Beerio Kart</b></h1>
+        </div>
+        <div class="hero-text">
+          <p>Create a new Beerio Kart tournament, or view existing tournaments</p>
+          <button type="button" class="btn btn-dark-green btn-lg d-inline" data-bs-toggle="modal" data-bs-target="#createGameModal">
+            Create Tournament
+        </button>
+        <button class="btn btn-secondary btn-lg d-inline" id="scrollToGamesOverviewButton">View Tournaments</button>
+        </div>
+    </div>
+    <div class="container">
 
         <!-- Button trigger crete game modal -->
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createGameModal">
+        <!-- <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createGameModal">
             Start new tourney!
-        </button>
+        </button> -->
     
         <!-- Modal for creating game -->
         <div class="modal fade" id="createGameModal" data-bs-backdrop="static" tabindex="-1" aria-labelledby="createGameModalLabel" aria-hidden="true">
@@ -54,12 +65,12 @@
                                 </div>
                             </div>
                             <button type="button" class="btn btn-dark" disabled>Number of players: <span id="numberOfPlayersForNewGame">4</span></button>
-                            <button class="btn btn-success" id="addPlayerInput"><i class="fas fa-user-plus"></i></button>
+                            <button class="btn btn-blue" id="addPlayerInput"><i class="fas fa-user-plus"></i></button>
                         </form>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-primary" id="generateGameButton" data-bs-dismiss="modal">Create tourney!</button>
+                        <button type="button" class="btn btn-green" id="generateGameButton" data-bs-dismiss="modal">Create tourney!</button>
                     </div>
                 </div>
             </div>
@@ -97,18 +108,19 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" id="saveMatchResultbutton" data-bs-dismiss="modal">Save result</button>
+                    <button type="button" class="btn btn-green" id="saveMatchResultbutton" data-bs-dismiss="modal">Save result</button>
                 </div>
                 <div class="game-name d-none"></div>
             </div>
             </div>
         </div>
 
-        <hr>
-        <h2>Tournaments</h2>
+
+        <h2 id="gamesOverviewHeader">Tournaments</h2>
         <div class="games-overview">
             <!-- All games (gameNames) will be shown here. All with sideToggle to show gameTable and matches -->
         </div> 
+        <div class="bottom-fetcher"></div>
 
     </div>
 
