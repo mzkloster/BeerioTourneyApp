@@ -55,55 +55,60 @@ function generateGame(ev){
  * @param {event} ev 
  */
  function generateMatches(gameName) {
-    let parsedGameObj = getParsedGameObj(gameName);
-    let matchesKey = gameName + '-matches';
-
-    let numberOfPlayers = parsedGameObj.length;
-    numberOfMatches = (numberOfPlayers*8)/4; //each player will have 8 matches. Number of matches is therefor numberOfPlayers*8/4 since 4 players play pr match
-
-    let playerOverviewObj = {};
-
-    //adding playerName[key] and playerNumberOfAssignedMatches[value] to playersObj
-    for (let i=0; i<numberOfPlayers; i++){        
-        let playerName = parsedGameObj[i]['playerName'];
-        playerOverviewObj[playerName] = 0;
-    }
-
-    let potentialPlayersForNextMatchList = Object.keys(playerOverviewObj);
-
-    for (let i=0; i<numberOfMatches; i++){
-        let matchNumber = i + 1;
-        let matchPlayersList = [];
-        while (matchPlayersList.length<4){
-            //If there are no potential players for next match left, refill list with all player names
-            if (potentialPlayersForNextMatchList.length === 0){
-                potentialPlayersForNextMatchList = Object.keys(playerOverviewObj);
-            }
-
-            let randomInt = Math.floor(Math.random() * potentialPlayersForNextMatchList.length);
-            let randomlySelctedplayerName = potentialPlayersForNextMatchList[randomInt];
-            if ( playerOverviewObj[randomlySelctedplayerName]<8) { //checks that player is assigned to less than 8 matches
-                if (!(matchPlayersList.includes(randomlySelctedplayerName))){ //checks that player is not already ssigned to this match
-                    matchPlayersList.push(randomlySelctedplayerName);
-                    playerOverviewObj[randomlySelctedplayerName] += 1;
-                    potentialPlayersForNextMatchList.splice(randomInt,1);
+    try {
+        let parsedGameObj = getParsedGameObj(gameName);
+        let matchesKey = gameName + '-matches';
+    
+        let numberOfPlayers = parsedGameObj.length;
+        numberOfMatches = (numberOfPlayers*8)/4; //each player will have 8 matches. Number of matches is therefor numberOfPlayers*8/4 since 4 players play pr match
+    
+        let playerOverviewObj = {};
+    
+        //adding playerName[key] and playerNumberOfAssignedMatches[value] to playersObj
+        for (let i=0; i<numberOfPlayers; i++){        
+            let playerName = parsedGameObj[i]['playerName'];
+            playerOverviewObj[playerName] = 0;
+        }
+    
+        let potentialPlayersForNextMatchList = Object.keys(playerOverviewObj);
+    
+        for (let i=0; i<numberOfMatches; i++){
+            let matchNumber = i + 1;
+            let matchPlayersList = [];
+            while (matchPlayersList.length<4){
+                //If there are no potential players for next match left, refill list with all player names
+                if (potentialPlayersForNextMatchList.length === 0){
+                    potentialPlayersForNextMatchList = Object.keys(playerOverviewObj);
                 }
-            }            
+    
+                let randomInt = Math.floor(Math.random() * potentialPlayersForNextMatchList.length);
+                let randomlySelctedplayerName = potentialPlayersForNextMatchList[randomInt];
+                if ( playerOverviewObj[randomlySelctedplayerName]<8) { //checks that player is assigned to less than 8 matches
+                    if (!(matchPlayersList.includes(randomlySelctedplayerName))){ //checks that player is not already ssigned to this match
+                        matchPlayersList.push(randomlySelctedplayerName);
+                        playerOverviewObj[randomlySelctedplayerName] += 1;
+                        potentialPlayersForNextMatchList.splice(randomInt,1);
+                    }
+                }            
+            }
+    
+            //update matches in localstorage
+            let parsedMatchesObj = getParsedMatchesObj(gameName);
+    
+            let newlyGeneratedMatch = {
+                matchId: matchNumber,
+                players: matchPlayersList,
+                result: []
+            }
+            parsedMatchesObj.push(newlyGeneratedMatch);
+            localStorage.setItem(matchesKey, JSON.stringify(parsedMatchesObj)); //change to work dynamically!!
         }
-
-        //update matches in localstorage
-        let parsedMatchesObj = getParsedMatchesObj(gameName);
-
-        let newlyGeneratedMatch = {
-            matchId: matchNumber,
-            players: matchPlayersList,
-            result: []
-        }
-        parsedMatchesObj.push(newlyGeneratedMatch);
-        localStorage.setItem(matchesKey, JSON.stringify(parsedMatchesObj)); //change to work dynamically!!
+    
+        updateMatchesList(gameName);
     }
-
-    updateMatchesList(gameName);
+    catch(err) {
+        console.log(err.message);
+    }
 }
 
 
@@ -130,8 +135,13 @@ function addPlayerInputField(ev) {
  * update the number displayed as number of players in createGameModal
  */
 function updateNumberOfPlayersInCreateGameModal() {
-    let numberOfPlayers = $('.new-player').length
-    $('#numberOfPlayersForNewGame').text(numberOfPlayers.toString());
+    try {
+        let numberOfPlayers = $('.new-player').length
+        $('#numberOfPlayersForNewGame').text(numberOfPlayers.toString());
+    }
+    catch(err) {
+        console.log(err.message);
+    }
 }
 
 
@@ -139,66 +149,71 @@ function updateNumberOfPlayersInCreateGameModal() {
  * create a oveview with all games. Each game should be possible to slideToggle
  */
 function createGamesView(){
-    let allGamesNames = getAllGameNames();
-    if (allGamesNames.length === 0){
-        showNoExistingGamesAlert()
-        return;
-    }
-
-    //Removing all existing games, before adding all (existing + new) games
-    $('.games-overview').empty();
-
-    //adding game-content for all games    
-    for (let i=0; i<allGamesNames.length; i++){  
-        let gameName = allGamesNames[i];
-        let gameProgress = getGameProgress(gameName);
-        let gameProgressIconClass = "fas fa-star-half-alt";
-        let gameCreatedDate = getCreatedDate(gameName);
-        let gameNumberOfPlayers = getNumberOfPlayers(gameName);
-
-        if(isGameComplete(gameName)) {
-            gameProgressIconClass = "fas fa-star";
+    try {
+        let allGamesNames = getAllGameNames();
+        if (allGamesNames.length === 0){
+            showNoExistingGamesAlert()
+            return;
         }
-
-        $('.games-overview').append(
-            '<div class="game-content shadow" name="' + gameName + '">' + 
-                '<div class="game-header d-flex justify-content-between">' +
-                    '<div class="game-header-left"><i class="far fa-calendar-alt"></i> '+ gameCreatedDate +'</div>' +
-                    '<div class="game-header-middle">' +
-                        '<div><h2>'+ gameName +'</h2></div>' +
-                        '<div>'+
-                            '<span>'+ gameNumberOfPlayers +' <i class="fas fa-users"></i></span>'+
-                            '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+
-                            '<span class="game-progress">'+ gameProgress +'</span> <i class="fas fa-flag-checkered"></i>'+
+    
+        //Removing all existing games, before adding all (existing + new) games
+        $('.games-overview').empty();
+    
+        //adding game-content for all games    
+        for (let i=0; i<allGamesNames.length; i++){  
+            let gameName = allGamesNames[i];
+            let gameProgress = getGameProgress(gameName);
+            let gameProgressIconClass = "fas fa-star-half-alt";
+            let gameCreatedDate = getCreatedDate(gameName);
+            let gameNumberOfPlayers = getNumberOfPlayers(gameName);
+    
+            if(isGameComplete(gameName)) {
+                gameProgressIconClass = "fas fa-star";
+            }
+    
+            $('.games-overview').append(
+                '<div class="game-content shadow" name="' + gameName + '">' + 
+                    '<div class="game-header d-flex justify-content-between">' +
+                        '<div class="game-header-left"><i class="far fa-calendar-alt"></i> '+ gameCreatedDate +'</div>' +
+                        '<div class="game-header-middle">' +
+                            '<div><h2>'+ gameName +'</h2></div>' +
+                            '<div>'+
+                                '<span>'+ gameNumberOfPlayers +' <i class="fas fa-users"></i></span>'+
+                                '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+
+                                '<span class="game-progress">'+ gameProgress +'</span> <i class="fas fa-flag-checkered"></i>'+
+                            '</div>' +
+                            '<div class="d-none"><span class="game-progress">Progress: '+ gameProgress +'</span> <span class="game-progress-icon"><i class="'+ gameProgressIconClass +'"></i></span></div>' + //display:none, but leaves it in case I want to use progress text plus icon later (half star turn into full star when all games are completed)
                         '</div>' +
-                        '<div class="d-none"><span class="game-progress">Progress: '+ gameProgress +'</span> <span class="game-progress-icon"><i class="'+ gameProgressIconClass +'"></i></span></div>' + //display:none, but leaves it in case I want to use progress text plus icon later (half star turn into full star when all games are completed)
+                        '<div class="game-header-right"><span class="invisible">'+ gameCreatedDate +' </span><i class="fas fa-chevron-down"></i></div>' +
+                    '</div>' + 
+                    '<hr class="hr-game-content">'+
+                    '<div class="game-body">' +
+                        '<h3 ="table-header">Table</h3>' +
+                        '<table class="game-table table table-striped center">' +
+                            '<thead>' +
+                                '<tr>' +
+                                    '<th>Position</th>' +
+                                    '<th>Name</th>' +
+                                    '<th>Games played</th>' +
+                                    '<th>Points</th>' +
+                                    '<th>Final</th>' +
+                                '</tr>' +
+                            '</thead>' +
+                            '<tbody class="game-table-body">' +
+                                '<!-- table rows are generated here -->' +
+                            '</tbody>' +
+                        '</table>' +
+                
+                        '<h3 class="matches-header">Matches</h3>' +
+                        '<ul class="list-group list-group-flush matches-list">' +
+                            '<!-- list rows with matches are generated here. Example: -->' +
+                        '</ul>' +
                     '</div>' +
-                    '<div class="game-header-right"><span class="invisible">'+ gameCreatedDate +' </span><i class="fas fa-chevron-down"></i></div>' +
-                '</div>' + 
-                '<hr class="hr-game-content">'+
-                '<div class="game-body">' +
-                    '<h3 ="table-header">Table</h3>' +
-                    '<table class="game-table table table-striped center">' +
-                        '<thead>' +
-                            '<tr>' +
-                                '<th>Position</th>' +
-                                '<th>Name</th>' +
-                                '<th>Games played</th>' +
-                                '<th>Points</th>' +
-                                '<th>Final</th>' +
-                            '</tr>' +
-                        '</thead>' +
-                        '<tbody class="game-table-body">' +
-                            '<!-- table rows are generated here -->' +
-                        '</tbody>' +
-                    '</table>' +
-            
-                    '<h3 class="matches-header">Matches</h3>' +
-                    '<ul class="list-group list-group-flush matches-list">' +
-                        '<!-- list rows with matches are generated here. Example: -->' +
-                    '</ul>' +
-                '</div>' +
-            '</div>');
+                '</div>');
+        }
+    }
+    catch(err) {
+        console.log(err.message);
     }
 }
 
@@ -208,21 +223,26 @@ function createGamesView(){
  * Create gameViews and updates GameTableDisplay and MatchesLists for all games. Triggered when page is loaded/refreshed and at the end of createGame()
  */
 function updateViewForAllGames(){
-    createGamesView();
+    try {
+        createGamesView();
 
-    let allGamesNames = getAllGameNames();
-    for (let i=0; i<allGamesNames.length; i++){        
-        updateGameTableDisplay(allGamesNames[i]);
-        updateMatchesList(allGamesNames[i]);
+        let allGamesNames = getAllGameNames();
+        for (let i=0; i<allGamesNames.length; i++){        
+            updateGameTableDisplay(allGamesNames[i]);
+            updateMatchesList(allGamesNames[i]);
+        }
+    
+        //adding on-click slideToggle for games
+        $('.game-header').on('click', function(){
+            //adds slideToggle on game-body
+            $(this).siblings('.game-body').slideToggle();
+            //flips game-header-left icon, arrow down->arrow up, and vice versa
+            $(this).find('.game-header-right').find('i').toggleClass('flip');
+        });
     }
-
-    //adding on-click slideToggle for games
-    $('.game-header').on('click', function(){
-        //adds slideToggle on game-body
-        $(this).siblings('.game-body').slideToggle();
-        //flips game-header-left icon, arrow down->arrow up, and vice versa
-        $(this).find('.game-header-right').find('i').toggleClass('flip');
-    });
+    catch(err) {
+        console.log(err.message);
+    }
 }
 
 
@@ -230,7 +250,7 @@ function updateViewForAllGames(){
  * Shows an alert in games-overview (shown if there is no games created in localStorage)
  */
 function showNoExistingGamesAlert(){
-    let alertContent = '<button class="btn disabled"><i class="fas fa-info-circle"></i></button>You have no existing tourments. Click the button above to create you first Beerio Kart Tournement!';
+    let alertContent = '<button class="btn disabled"><i class="fas fa-info-circle"></i></button>You have no existing tourments. Click the "Create Tournament" button above to create you first Beerio Kart Tournement!';
     $('.games-overview').append(
         '<div class="alert alert-primary" role="alert">'+ alertContent +'</div>'
     );
@@ -242,15 +262,20 @@ function showNoExistingGamesAlert(){
  * @param {string} gameName 
  */
  function updateGameProgress(gameName){
-    let gameProgress = getGameProgress(gameName);
-    let gameProgressIconClass = "fas fa-star-half-alt";
-
-    $('.game-content[name="'+gameName+'"]').find('.game-progress').text(gameProgress);
-
-    if(isGameComplete(gameName)) {
-        gameProgressIconClass = "fas fa-star";        
+    try {
+        let gameProgress = getGameProgress(gameName);
+        let gameProgressIconClass = "fas fa-star-half-alt";
+    
+        $('.game-content[name="'+gameName+'"]').find('.game-progress').text(gameProgress);
+    
+        if(isGameComplete(gameName)) {
+            gameProgressIconClass = "fas fa-star";        
+        }
+        $('.game-content[name="'+gameName+'"]').find('.game-progress-icon').find('i').removeClass().addClass(gameProgressIconClass);
     }
-    $('.game-content[name="'+gameName+'"]').find('.game-progress-icon').find('i').removeClass().addClass(gameProgressIconClass);
+    catch(err) {
+        console.log(err.message);
+    }
 }
 
 
@@ -259,41 +284,46 @@ function showNoExistingGamesAlert(){
  * Removes all "old" rows inside table body, and then adds new updated table rows
  */
 function updateGameTableDisplay(gameName){
-    //removes "old" table rows
-    $('div[name="'+ gameName +'"]').find('.game-table-body').empty();
+    try {
+        //removes "old" table rows
+        $('div[name="'+ gameName +'"]').find('.game-table-body').empty();
 
-    updatePlayerPointsAndGamesPlayedFromAllMatchResults(gameName);
-    let sortedPlayerList = getSortedPlayerList(gameName);
-    let finalLetters = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
-    let finalCounter = 0;
+        updatePlayerPointsAndGamesPlayedFromAllMatchResults(gameName);
+        let sortedPlayerList = getSortedPlayerList(gameName);
+        let finalLetters = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
+        let finalCounter = 0;
 
-    for (let i=0; i<sortedPlayerList.length; i++){
-        let position = i +1;
-        let trClass = "";
-        
-        playerNameValue = sortedPlayerList[i];
-        gamesPlayedValue = getPlayerGamesPlayed(gameName, playerNameValue);
-        playerPointsValue = getPlayerPoints(gameName, playerNameValue);
+        for (let i=0; i<sortedPlayerList.length; i++){
+            let position = i +1;
+            let trClass = "";
+            
+            playerNameValue = sortedPlayerList[i];
+            gamesPlayedValue = getPlayerGamesPlayed(gameName, playerNameValue);
+            playerPointsValue = getPlayerPoints(gameName, playerNameValue);
 
-        //Set an underline after every 3 players (since they will play in the same final). No underline under last table row. And not under second last either, since then the last player would play in the final above
-        if (position%3 === 0 && i !== sortedPlayerList.length-1 && i !== sortedPlayerList.length-2){
-            trClass="tr-underline";
-        }
+            //Set an underline after every 3 players (since they will play in the same final). No underline under last table row. And not under second last either, since then the last player would play in the final above
+            if (position%3 === 0 && i !== sortedPlayerList.length-1 && i !== sortedPlayerList.length-2){
+                trClass="tr-underline";
+            }
 
-        //if the last player is the only player in the lowest final, he will join the 3 players in the final above
-        if (i === sortedPlayerList.length-1 && position%3 === 1){
-            finalCounter -= 1;
-        }
+            //if the last player is the only player in the lowest final, he will join the 3 players in the final above
+            if (i === sortedPlayerList.length-1 && position%3 === 1){
+                finalCounter -= 1;
+            }
 
-        newTableRow = '<tr class="'+trClass+'"><td>'+position +'</td><td>' + playerNameValue + '</td><td>' + gamesPlayedValue + '</td><td>' + playerPointsValue + '</td><td>'+finalLetters[finalCounter]+'</td></tr>';
-        $('div[name="'+ gameName +'"]').find('.game-table-body').append(newTableRow);
+            newTableRow = '<tr class="'+trClass+'"><td>'+position +'</td><td>' + playerNameValue + '</td><td>' + gamesPlayedValue + '</td><td>' + playerPointsValue + '</td><td>'+finalLetters[finalCounter]+'</td></tr>';
+            $('div[name="'+ gameName +'"]').find('.game-table-body').append(newTableRow);
 
 
-        //after every 3 players, finalCounter increase with 1. (3 best players are in A final, next 3 are in B final, etc)
-        if (position%3 === 0){
-            finalCounter += 1;
-        }
-    } 
+            //after every 3 players, finalCounter increase with 1. (3 best players are in A final, next 3 are in B final, etc)
+            if (position%3 === 0){
+                finalCounter += 1;
+            }
+        } 
+    }
+    catch(err) {
+        console.log(err.message);
+    }    
 }
 
 
@@ -301,36 +331,40 @@ function updateGameTableDisplay(gameName){
  * Updates player points and gamesPlayed for all players in game-JSON based on match results in matches-JSON. Is triggered in updateGameTableDisplay()
  */
  function updatePlayerPointsAndGamesPlayedFromAllMatchResults(gameName) {
-    let parsedGameObj = getParsedGameObj(gameName);
-    let parsedMatchesObj = getParsedMatchesObj(gameName);
-
-    //loop though all players
-    for (let i=0; i<parsedGameObj.length; i++){
-        let playerName = parsedGameObj[i].playerName;
-        let playerPoints = 0;
-        let playerPlayedGames = 0;
-
-        //loop though all games
-        for (let j=0; j<parsedMatchesObj.length; j++){
-            if (parsedMatchesObj[j].result.length > 0){ //check that match has been played (then the result list is not empty)
-                if (parsedMatchesObj[j].players.includes(playerName)){ //check if player played in this match
-                    playerPlayedGames += 1;
-
-                    //checking placement, and adding points
-                    for (let k=0; k<4; k++) {
-                        if (parsedMatchesObj[j].result[k] === playerName){
-                            playerPoints += (3-k);
-                            break;
+    try {
+        let parsedGameObj = getParsedGameObj(gameName);
+        let parsedMatchesObj = getParsedMatchesObj(gameName);
+    
+        //loop though all players
+        for (let i=0; i<parsedGameObj.length; i++){
+            let playerName = parsedGameObj[i].playerName;
+            let playerPoints = 0;
+            let playerPlayedGames = 0;
+    
+            //loop though all games
+            for (let j=0; j<parsedMatchesObj.length; j++){
+                if (parsedMatchesObj[j].result.length > 0){ //check that match has been played (then the result list is not empty)
+                    if (parsedMatchesObj[j].players.includes(playerName)){ //check if player played in this match
+                        playerPlayedGames += 1;
+    
+                        //checking placement, and adding points
+                        for (let k=0; k<4; k++) {
+                            if (parsedMatchesObj[j].result[k] === playerName){
+                                playerPoints += (3-k);
+                                break;
+                            }
                         }
-                    }
-                } 
-            }
-        } 
-        //after looping through all games for this player, we set points and gamesPlayed
-        setPlayerGamesPlayed(gameName, playerName, playerPlayedGames);
-        setPlayerPoints(gameName, playerName, playerPoints);
-        
+                    } 
+                }
+            } 
+            //after looping through all games for this player, we set points and gamesPlayed
+            setPlayerGamesPlayed(gameName, playerName, playerPlayedGames);
+            setPlayerPoints(gameName, playerName, playerPoints);        
+        }
     }
+    catch(err) {
+        console.log(err.message);
+    }    
 }
 
 
@@ -339,59 +373,64 @@ function updateGameTableDisplay(gameName){
  * Removes all "old" match list items, and adds new updated match list items.
  */
 function updateMatchesList(gameName) {
-    //removes "old" match list items
-    $('div[name="'+ gameName +'"]').find('.matches-list').empty();
+    try {
+        //removes "old" match list items
+        $('div[name="'+ gameName +'"]').find('.matches-list').empty();
 
-    //loop through matches JSON and create new updated match list items
-    parsedMatchesObj = getParsedMatchesObj(gameName);
+        //loop through matches JSON and create new updated match list items
+        parsedMatchesObj = getParsedMatchesObj(gameName);
 
-    for (let i=0; i<parsedMatchesObj.length; i++){
-        player1BagdeValue = "";
-        player2BagdeValue = "";
-        player3BagdeValue = "";
-        player4BagdeValue = "";
-        
-        //if match is played: loop through players in that match, find player placement, and set bagdeValue
-        if (isMatchPlayed(gameName, parsedMatchesObj[i]['matchId'])){            
-            for (let j=0; j<4; j++){
-                let playerName = parsedMatchesObj[i]['players'][j];
-                let playerPlacement = getPlayerPlacementInMatch(gameName, playerName, parsedMatchesObj[i]['matchId']);
+        for (let i=0; i<parsedMatchesObj.length; i++){
+            player1BagdeValue = "";
+            player2BagdeValue = "";
+            player3BagdeValue = "";
+            player4BagdeValue = "";
+            
+            //if match is played: loop through players in that match, find player placement, and set bagdeValue
+            if (isMatchPlayed(gameName, parsedMatchesObj[i]['matchId'])){            
+                for (let j=0; j<4; j++){
+                    let playerName = parsedMatchesObj[i]['players'][j];
+                    let playerPlacement = getPlayerPlacementInMatch(gameName, playerName, parsedMatchesObj[i]['matchId']);
 
-                switch(j) {
-                    case 0:
-                        player1BagdeValue = playerPlacement;
-                        break;
-                    case 1:
-                        player2BagdeValue = playerPlacement;
-                        break;
-                    case 2:
-                        player3BagdeValue = playerPlacement;
-                        break;
-                    case 3:
-                        player4BagdeValue = playerPlacement;
-                        break;                      
+                    switch(j) {
+                        case 0:
+                            player1BagdeValue = playerPlacement;
+                            break;
+                        case 1:
+                            player2BagdeValue = playerPlacement;
+                            break;
+                        case 2:
+                            player3BagdeValue = playerPlacement;
+                            break;
+                        case 3:
+                            player4BagdeValue = playerPlacement;
+                            break;                      
+                    }
                 }
             }
+            
+            newListRow = 
+                '<li class="list-group-item">' +
+                    '<div class="match-info">' + 
+                        '<b class="match-number">Match <span class="match-id">' + parsedMatchesObj[i]['matchId'] + '</span></b>' + 
+                        '<span class="match-player-1">' + parsedMatchesObj[i]['players'][0] + '</span> <span class="match-player-1-bagde badge badge-placement-'+player1BagdeValue+'">' + player1BagdeValue + '</span> &nbsp;|&nbsp; ' + 
+                        '<span class="match-player-2">' + parsedMatchesObj[i]['players'][1] + '</span> <span class="match-player-2-bagde badge badge-placement-'+player2BagdeValue+'">' + player2BagdeValue + '</span> &nbsp;|&nbsp; ' + 
+                        '<span class="match-player-3">' + parsedMatchesObj[i]['players'][2] + '</span> <span class="match-player-3-bagde badge badge-placement-'+player3BagdeValue+'">' + player3BagdeValue + '</span> &nbsp;|&nbsp; ' + 
+                        '<span class="match-player-4">' + parsedMatchesObj[i]['players'][3] + '</span> <span class="match-player-4-bagde badge badge-placement-'+player4BagdeValue+'">' + player4BagdeValue + '</span> ' + 
+                        '<button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#matchResultModal"><i class="fas fa-edit"></i></button>' + 
+                    '</div>' +
+                '</li>'
+            $('div[name="'+ gameName +'"]').find('.list-group').append(newListRow);
         }
-        
-        newListRow = 
-            '<li class="list-group-item">' +
-                '<div class="match-info">' + 
-                    '<b class="match-number">Match <span class="match-id">' + parsedMatchesObj[i]['matchId'] + '</span></b>' + 
-                    '<span class="match-player-1">' + parsedMatchesObj[i]['players'][0] + '</span> <span class="match-player-1-bagde badge badge-placement-'+player1BagdeValue+'">' + player1BagdeValue + '</span> &nbsp;|&nbsp; ' + 
-                    '<span class="match-player-2">' + parsedMatchesObj[i]['players'][1] + '</span> <span class="match-player-2-bagde badge badge-placement-'+player2BagdeValue+'">' + player2BagdeValue + '</span> &nbsp;|&nbsp; ' + 
-                    '<span class="match-player-3">' + parsedMatchesObj[i]['players'][2] + '</span> <span class="match-player-3-bagde badge badge-placement-'+player3BagdeValue+'">' + player3BagdeValue + '</span> &nbsp;|&nbsp; ' + 
-                    '<span class="match-player-4">' + parsedMatchesObj[i]['players'][3] + '</span> <span class="match-player-4-bagde badge badge-placement-'+player4BagdeValue+'">' + player4BagdeValue + '</span> ' + 
-                    '<button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#matchResultModal"><i class="fas fa-edit"></i></button>' + 
-                '</div>' +
-            '</li>'
-        $('div[name="'+ gameName +'"]').find('.list-group').append(newListRow);
-    }
 
-    //adds onClick event on edit buttons again (since all "old" match list items are removed in the beginning of this function)
-    $('div[name="'+ gameName +'"]').find('.match-info button').on('click',function(event) {
-        updateMatchResultModal(event, this);
-    })
+        //adds onClick event on edit buttons again (since all "old" match list items are removed in the beginning of this function)
+        $('div[name="'+ gameName +'"]').find('.match-info button').on('click',function(event) {
+            updateMatchResultModal(event, this);
+        });
+    }
+    catch(err) {
+        console.log(err.message);
+    }    
 }
 
 
@@ -496,31 +535,36 @@ function saveMatchResult(ev) {
  * @returns string[]
  */
 function getAllGameNames(){
-    //get all keys from localstorage, both gameName(game-obj) and gameName-matches(matches-obj)
-    let allKeys = Object.keys(localStorage);
-    //all gameNames sorted by createdDate(only game-obj, filtered out matches-obj (keyes without '-matches') and createdDate-obj (keyes without '-createdDate'))
-    let allGamesNamesSorted = []
+    try {
+        //get all keys from localstorage, both gameName(game-obj) and gameName-matches(matches-obj)
+        let allKeys = Object.keys(localStorage);
+        //all gameNames sorted by createdDate(only game-obj, filtered out matches-obj (keyes without '-matches') and createdDate-obj (keyes without '-createdDate'))
+        let allGamesNamesSorted = []
 
-    unsortedgameObjects = [];
-    for (let i=0; i<allKeys.length; i++){
-        if (!(allKeys[i].includes("-matches"))){
-            if (!(allKeys[i].includes("-createdDate"))){            
-                let newObject = {
-                    gameName: allKeys[i],
-                    date: new Date(localStorage.getItem(allKeys[i] + '-createdDate'))
-                }  
-                unsortedgameObjects.push(newObject);          
+        unsortedgameObjects = [];
+        for (let i=0; i<allKeys.length; i++){
+            if (!(allKeys[i].includes("-matches"))){
+                if (!(allKeys[i].includes("-createdDate"))){            
+                    let newObject = {
+                        gameName: allKeys[i],
+                        date: new Date(localStorage.getItem(allKeys[i] + '-createdDate'))
+                    }  
+                    unsortedgameObjects.push(newObject);          
+                }
             }
         }
+
+        let sortedgameObjects = unsortedgameObjects.slice().sort((a,b) => b.date - a.date)
+
+        for (let i=0; i<sortedgameObjects.length; i++){
+            allGamesNamesSorted.push(sortedgameObjects[i].gameName);
+        }
+
+        return allGamesNamesSorted;
     }
-
-    let sortedgameObjects = unsortedgameObjects.slice().sort((a,b) => b.date - a.date)
-
-    for (let i=0; i<sortedgameObjects.length; i++){
-        allGamesNamesSorted.push(sortedgameObjects[i].gameName);
-    }
-
-    return allGamesNamesSorted;
+    catch(err) {
+        console.log(err.message);
+    }    
 }
 
 
@@ -529,9 +573,14 @@ function getAllGameNames(){
  * @returns object
  */
  function getParsedGameObj(gameName) {
-    let gameObj = localStorage.getItem(gameName);
-    let parsedGameObj = JSON.parse(gameObj);
-    return parsedGameObj;
+    try {
+        let gameObj = localStorage.getItem(gameName);
+        let parsedGameObj = JSON.parse(gameObj);
+        return parsedGameObj;
+    }
+    catch(err) {
+        console.log(err.message);
+    }
 }
 
 
@@ -540,10 +589,16 @@ function getAllGameNames(){
  * @returns object
  */
 function getParsedMatchesObj(gameName) {
-    let matchesKey = gameName + '-matches';
-    let matchesObj = localStorage.getItem(matchesKey);
-    let parsedMatchesObj = JSON.parse(matchesObj);
-    return parsedMatchesObj;
+    try {
+        let matchesKey = gameName + '-matches';
+        let matchesObj = localStorage.getItem(matchesKey);
+        let parsedMatchesObj = JSON.parse(matchesObj);
+        return parsedMatchesObj;
+    }
+    catch(err) {
+        console.log(err.message);
+    }
+
 }
 
 
@@ -553,9 +608,14 @@ function getParsedMatchesObj(gameName) {
  * @returns number
  */
 function getNumberOfMatchesInGame(gameName){
-    let parsedMatchesObj = getParsedMatchesObj(gameName);
-    let numberOfMatches = parsedMatchesObj.length;
-    return numberOfMatches;
+    try {
+        let parsedMatchesObj = getParsedMatchesObj(gameName);
+        let numberOfMatches = parsedMatchesObj.length;
+        return numberOfMatches;
+    }
+    catch(err) {
+        console.log(err.message);
+    }
 }
 
 
@@ -565,9 +625,14 @@ function getNumberOfMatchesInGame(gameName){
  * @returns string
  */
 function getGameProgress(gameName){
-    let gameProgress;
-    gameProgress = getNumberOfCompletedMatchesInGame(gameName) + "/" + getNumberOfMatchesInGame(gameName);
-    return gameProgress;
+    try {
+        let gameProgress;
+        gameProgress = getNumberOfCompletedMatchesInGame(gameName) + "/" + getNumberOfMatchesInGame(gameName);
+        return gameProgress;
+    }
+    catch(err) {
+        console.log(err.message);
+    }
 }
 
 
@@ -577,14 +642,19 @@ function getGameProgress(gameName){
  * @returns number
  */
 function getNumberOfCompletedMatchesInGame(gameName){
-    let parsedMatchesObj = getParsedMatchesObj(gameName);
-    let numberOfCompletedMatches = 0;
-    for (let i=0; i<parsedMatchesObj.length; i++){
-        if (isMatchPlayed(gameName, parsedMatchesObj[i].matchId)){
-            numberOfCompletedMatches += 1;
+    try {
+        let parsedMatchesObj = getParsedMatchesObj(gameName);
+        let numberOfCompletedMatches = 0;
+        for (let i=0; i<parsedMatchesObj.length; i++){
+            if (isMatchPlayed(gameName, parsedMatchesObj[i].matchId)){
+                numberOfCompletedMatches += 1;
+            }
         }
+        return numberOfCompletedMatches
     }
-    return numberOfCompletedMatches
+    catch(err) {
+        console.log(err.message);
+    }
 }
 
 
@@ -594,14 +664,19 @@ function getNumberOfCompletedMatchesInGame(gameName){
  * @returns number, playerPoints
  */
 function getPlayerPoints(gameName, playerName) {
-    let parsedGameObj = getParsedGameObj(gameName);
+    try {
+        let parsedGameObj = getParsedGameObj(gameName);
 
-    for (let i=0; i<parsedGameObj.length; i++) {
-        if (parsedGameObj[i].playerName === playerName) {
-            let playerPoints = parsedGameObj[i].points;
-            return playerPoints;           
+        for (let i=0; i<parsedGameObj.length; i++) {
+            if (parsedGameObj[i].playerName === playerName) {
+                let playerPoints = parsedGameObj[i].points;
+                return playerPoints;           
+            }
         }
-    }    
+    }
+    catch(err) {
+        console.log(err.message);
+    }   
 }
 
 
@@ -611,15 +686,20 @@ function getPlayerPoints(gameName, playerName) {
  * @param {number} points 
  */
 function setPlayerPoints(gameName, playerName, points) {
-    let parsedGameObj = getParsedGameObj(gameName);
+    try {
+        let parsedGameObj = getParsedGameObj(gameName);
 
-    for (let i=0; i<parsedGameObj.length; i++) {
-        if (parsedGameObj[i].playerName === playerName) {
-            parsedGameObj[i].points = points;
-            break;
+        for (let i=0; i<parsedGameObj.length; i++) {
+            if (parsedGameObj[i].playerName === playerName) {
+                parsedGameObj[i].points = points;
+                break;
+            }
         }
+        localStorage.setItem(gameName, JSON.stringify(parsedGameObj));
     }
-    localStorage.setItem(gameName, JSON.stringify(parsedGameObj));
+    catch(err) {
+        console.log(err.message);
+    }
 }
 
 
@@ -629,13 +709,18 @@ function setPlayerPoints(gameName, playerName, points) {
  * @returns number
  */
 function getPlayerGamesPlayed(gameName, playerName) {
-    let parsedGameObj = getParsedGameObj(gameName);
+    try {
+        let parsedGameObj = getParsedGameObj(gameName);
 
-    for (let i=0; i<parsedGameObj.length; i++) {
-        if (parsedGameObj[i].playerName === playerName) {
-            let gamesPlayed = parsedGameObj[i].gamesPlayed;
-            return gamesPlayed;
+        for (let i=0; i<parsedGameObj.length; i++) {
+            if (parsedGameObj[i].playerName === playerName) {
+                let gamesPlayed = parsedGameObj[i].gamesPlayed;
+                return gamesPlayed;
+            }
         }
+    }
+    catch(err) {
+        console.log(err.message);
     }
 }
 
@@ -646,15 +731,20 @@ function getPlayerGamesPlayed(gameName, playerName) {
  * @param {number} gamesPlayed 
  */
 function setPlayerGamesPlayed(gameName, playerName, gamesPlayed) {
-    let parsedGameObj = getParsedGameObj(gameName);
+    try {
+        let parsedGameObj = getParsedGameObj(gameName);
 
-    for (let i=0; i<parsedGameObj.length; i++) {
-        if (parsedGameObj[i].playerName === playerName) {
-            parsedGameObj[i].gamesPlayed = gamesPlayed;
-            break;
+        for (let i=0; i<parsedGameObj.length; i++) {
+            if (parsedGameObj[i].playerName === playerName) {
+                parsedGameObj[i].gamesPlayed = gamesPlayed;
+                break;
+            }
         }
+        localStorage.setItem(gameName, JSON.stringify(parsedGameObj));
     }
-    localStorage.setItem(gameName, JSON.stringify(parsedGameObj));
+    catch(err) {
+        console.log(err.message);
+    }
 }
 
 
@@ -664,10 +754,14 @@ function setPlayerGamesPlayed(gameName, playerName, gamesPlayed) {
  * @returns number
  */
 function getNumberOfPlayers(gameName){
-    let parsedGameObj = getParsedGameObj(gameName);
-    let numberOfPlayers = parsedGameObj.length;
-
-    return numberOfPlayers;
+    try {
+        let parsedGameObj = getParsedGameObj(gameName);
+        let numberOfPlayers = parsedGameObj.length;
+        return numberOfPlayers;
+    }
+    catch(err) {
+        console.log(err.message);
+    }    
 }
 
 
@@ -678,19 +772,24 @@ function getNumberOfPlayers(gameName){
  * @returns Player placement
  */
 function getPlayerPlacementInMatch(gameName, playerName, matchId){
-    let parsedMatchesObj = getParsedMatchesObj(gameName);
+    try {
+        let parsedMatchesObj = getParsedMatchesObj(gameName);
 
-    if (isMatchPlayed(gameName, matchId)){
-        for (let i=0; i<parsedMatchesObj.length; i++) {
-            if (parsedMatchesObj[i].matchId === matchId) { 
-                if (parsedMatchesObj[i]['result'].includes(playerName)){
-                    let playerPlacementIndex = parsedMatchesObj[i]['result'].indexOf(playerName);
-                    let playerPlacementInt = 1 + parseInt(playerPlacementIndex);
-                    let playerPlacement = playerPlacementInt.toString();
-                    return playerPlacement;
+        if (isMatchPlayed(gameName, matchId)){
+            for (let i=0; i<parsedMatchesObj.length; i++) {
+                if (parsedMatchesObj[i].matchId === matchId) { 
+                    if (parsedMatchesObj[i]['result'].includes(playerName)){
+                        let playerPlacementIndex = parsedMatchesObj[i]['result'].indexOf(playerName);
+                        let playerPlacementInt = 1 + parseInt(playerPlacementIndex);
+                        let playerPlacement = playerPlacementInt.toString();
+                        return playerPlacement;
+                    }
                 }
             }
         }
+    }
+    catch(err) {
+      console.log(err.message);
     }
 }
 
@@ -701,18 +800,23 @@ function getPlayerPlacementInMatch(gameName, playerName, matchId){
  * @param {string[]} result 
  */
  function setMatchResult(gameName, matchId, result){
-    let parsedMatchesObj = getParsedMatchesObj(gameName);        
+    try {
+        let parsedMatchesObj = getParsedMatchesObj(gameName);        
 
-    for (let i=0; i<parsedMatchesObj.length; i++) {
-        if (parsedMatchesObj[i].matchId === matchId) {
-            parsedMatchesObj[i].result = result;
-            break;
+        for (let i=0; i<parsedMatchesObj.length; i++) {
+            if (parsedMatchesObj[i].matchId === matchId) {
+                parsedMatchesObj[i].result = result;
+                break;
+            }
         }
-    }
 
-    //Update localstorage with results
-    let matchesKey = gameName + '-matches';
-    localStorage.setItem(matchesKey, JSON.stringify(parsedMatchesObj));
+        //Update localstorage with results
+        let matchesKey = gameName + '-matches';
+        localStorage.setItem(matchesKey, JSON.stringify(parsedMatchesObj));
+    }
+    catch(err) {
+      console.log(err.message);
+    }    
 }
 
 
@@ -776,52 +880,57 @@ function getCreatedDate(gameName){
  * @returns string[]
  */
  function getSortedPlayerList(gameName){
-    let parsedGameObj = getParsedGameObj(gameName);
-    let sortedPlayerList = [];
-
-    for (let j=0; j<parsedGameObj.length; j++){
-        sortedPlayerList.push(parsedGameObj[j]['playerName']);
-    }
-
-    //sort list of players
-    let switching, i, firstPlayerName, secondPlayerName, shouldSwitch;
-    switching = true;
-    /*Make a loop that will continue until
-    no switching has been done:*/
-    while (switching) {
-        //start by saying: no switching is done:
-        switching = false;
-        /*Loop through all table rows (except the
-        first, which contains table headers):*/
-        for (i = 0; i <(sortedPlayerList.length-1); i++) {
-            //start by saying there should be no switching:
-            shouldSwitch = false;
-            /*Get the two elements you want to compare,
-            one from current row and one from the next:*/
-            firstPlayerName = sortedPlayerList[i];
-            secondPlayerName = sortedPlayerList[i+1]
-            //check if the two rows should switch place:
-            if (getPlayerPoints(gameName, firstPlayerName) < getPlayerPoints(gameName, secondPlayerName)) {
-            //if so, mark as a switch and break the loop:
-            shouldSwitch = true;
-            break;
-            }else if((getPlayerPoints(gameName, firstPlayerName) === getPlayerPoints(gameName, secondPlayerName)) && (getPlayerGamesPlayed(gameName, firstPlayerName) > getPlayerGamesPlayed(gameName, secondPlayerName)) ){
+    try {
+        let parsedGameObj = getParsedGameObj(gameName);
+        let sortedPlayerList = [];
+    
+        for (let j=0; j<parsedGameObj.length; j++){
+            sortedPlayerList.push(parsedGameObj[j]['playerName']);
+        }
+    
+        //sort list of players
+        let switching, i, firstPlayerName, secondPlayerName, shouldSwitch;
+        switching = true;
+        /*Make a loop that will continue until
+        no switching has been done:*/
+        while (switching) {
+            //start by saying: no switching is done:
+            switching = false;
+            /*Loop through all table rows (except the
+            first, which contains table headers):*/
+            for (i = 0; i <(sortedPlayerList.length-1); i++) {
+                //start by saying there should be no switching:
+                shouldSwitch = false;
+                /*Get the two elements you want to compare,
+                one from current row and one from the next:*/
+                firstPlayerName = sortedPlayerList[i];
+                secondPlayerName = sortedPlayerList[i+1]
+                //check if the two rows should switch place:
+                if (getPlayerPoints(gameName, firstPlayerName) < getPlayerPoints(gameName, secondPlayerName)) {
                 //if so, mark as a switch and break the loop:
                 shouldSwitch = true;
                 break;
+                }else if((getPlayerPoints(gameName, firstPlayerName) === getPlayerPoints(gameName, secondPlayerName)) && (getPlayerGamesPlayed(gameName, firstPlayerName) > getPlayerGamesPlayed(gameName, secondPlayerName)) ){
+                    //if so, mark as a switch and break the loop:
+                    shouldSwitch = true;
+                    break;
+                }
+            }
+            if (shouldSwitch) {
+            /*If a switch has been marked, make the switch
+            and mark that a switch has been done:*/
+            sortedPlayerList[i] = secondPlayerName;
+            sortedPlayerList[i+1] = firstPlayerName;
+    
+            switching = true;
             }
         }
-        if (shouldSwitch) {
-        /*If a switch has been marked, make the switch
-        and mark that a switch has been done:*/
-        sortedPlayerList[i] = secondPlayerName;
-        sortedPlayerList[i+1] = firstPlayerName;
 
-        switching = true;
-        }
+        return sortedPlayerList;
     }
-    
-    return sortedPlayerList;
+    catch(err) {
+        console.log(err.message);
+    } 
 }
 
 
@@ -849,18 +958,23 @@ function isGameComplete(gameName) {
  * @returns boolean
  */
 function isMatchPlayed(gameName, matchId) {
-    let parsedMatchesObj = getParsedMatchesObj(gameName);     
-    let isMatchPlayed = false;
-
-    for (let i=0; i<parsedMatchesObj.length; i++) {
-        if (parsedMatchesObj[i].matchId === matchId) {
-            if (parsedMatchesObj[i].result.length > 0){
-                isMatchPlayed = true;
-            }            
+    try {
+        let parsedMatchesObj = getParsedMatchesObj(gameName);     
+        let isMatchPlayed = false;
+    
+        for (let i=0; i<parsedMatchesObj.length; i++) {
+            if (parsedMatchesObj[i].matchId === matchId) {
+                if (parsedMatchesObj[i].result.length > 0){
+                    isMatchPlayed = true;
+                }            
+            }
         }
-    }
 
-    return isMatchPlayed;
+        return isMatchPlayed;
+    }
+    catch(err) {
+        console.log(err.message);        
+    }
 }
 
 
