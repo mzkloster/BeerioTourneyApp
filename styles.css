@@ -57,7 +57,18 @@ body {
 h2{
     color:green;
 }
-
+.games-overview .alert{
+    max-width: 780px;
+    margin: auto;
+    margin-top: 2rem;
+}
+.alert i{
+    font-size: 180%;
+}
+.alert .btn{
+    background-color: transparent;
+    color: #084298;
+}
 .game-table{
     max-width: 780px;
 }

@@ -139,11 +139,16 @@ function updateNumberOfPlayersInCreateGameModal() {
  * create a oveview with all games. Each game should be possible to slideToggle
  */
 function createGamesView(){
+    let allGamesNames = getAllGameNames();
+    if (allGamesNames.length === 0){
+        showNoExistingGamesAlert()
+        return;
+    }
+
     //Removing all existing games, before adding all (existing + new) games
     $('.games-overview').empty();
 
-    //adding game-content for all games
-    let allGamesNames = getAllGameNames();
+    //adding game-content for all games    
     for (let i=0; i<allGamesNames.length; i++){  
         let gameName = allGamesNames[i];
         let gameProgress = getGameProgress(gameName);
@@ -218,6 +223,17 @@ function updateViewForAllGames(){
         //flips game-header-left icon, arrow down->arrow up, and vice versa
         $(this).find('.game-header-right').find('i').toggleClass('flip');
     });
+}
+
+
+/**
+ * Shows an alert in games-overview (shown if there is no games created in localStorage)
+ */
+function showNoExistingGamesAlert(){
+    let alertContent = '<button class="btn disabled"><i class="fas fa-info-circle"></i></button>You have no existing tourments. Click the button above to create you first Beerio Kart Tournement!';
+    $('.games-overview').append(
+        '<div class="alert alert-primary" role="alert">'+ alertContent +'</div>'
+    );
 }
 
 
