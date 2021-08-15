@@ -18,8 +18,7 @@ function generateGame(ev){
     $('.new-player').each(function(index) {
         //for game-json
         let player = {
-            playerId: index+1, //can probably remove this, it is not used. Player names are unique, and is used as id.
-            playerName: $(this).find('input').val(),
+            playerName: $(this).find('input').val(), //used as id. All playerNames in a game must be unique
             gamesPlayed: 0,
             points: 0
         }
