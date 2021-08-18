@@ -409,18 +409,30 @@ function updateMatchesList(gameName) {
                 }
             }
             
+            let spacingElement;
+            if ($(window).width() < 576) {
+                spacingElement = "";
+             }
+             else {
+                spacingElement = " &nbsp;&nbsp;|&nbsp;&nbsp; ";
+            }
+
             newListRow = 
-                '<li class="list-group-item">' +
-                    '<div class="match-info">' + 
-                        '<b class="match-number">Match <span class="match-id">' + parsedMatchesObj[i]['matchId'] + '</span></b>' + 
-                        '<span class="match-player-1">' + parsedMatchesObj[i]['players'][0] + '</span> <span class="match-player-1-bagde badge badge-placement-'+player1BagdeValue+'">' + player1BagdeValue + '</span> &nbsp;|&nbsp; ' +
-                        '<span class="match-player-2">' + parsedMatchesObj[i]['players'][1] + '</span> <span class="match-player-2-bagde badge badge-placement-'+player2BagdeValue+'">' + player2BagdeValue + '</span> &nbsp;|&nbsp; ' + 
-                        '<span class="match-player-3">' + parsedMatchesObj[i]['players'][2] + '</span> <span class="match-player-3-bagde badge badge-placement-'+player3BagdeValue+'">' + player3BagdeValue + '</span> &nbsp;|&nbsp; ' +  
-                        '<span class="match-player-4">' + parsedMatchesObj[i]['players'][3] + '</span> <span class="match-player-4-bagde badge badge-placement-'+player4BagdeValue+'">' + player4BagdeValue + '</span> ' + 
-                        '<button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#matchResultModal"><i class="fas fa-edit"></i></button>' + 
+            '<li class="list-group-item">' +
+                '<div class="match-info d-flex justify-content-between">' + 
+                    '<div><b class="match-number">Match <span class="match-id">' + parsedMatchesObj[i]['matchId'] + '</span></b></div>' +
+                    '<div>' +
+                        '<div class="d-sm-flex justify-content-center">' +
+                        '<div><span class="match-player-1">' + parsedMatchesObj[i]['players'][0] + '</span> <span class="match-player-1-bagde badge badge-placement-'+player1BagdeValue+'">' + player1BagdeValue + '</span>' + spacingElement + '</div>' +
+                        '<div><span class="match-player-2">' + parsedMatchesObj[i]['players'][1] + '</span> <span class="match-player-2-bagde badge badge-placement-'+player2BagdeValue+'">' + player2BagdeValue + '</span>' + spacingElement + '</div>' + 
+                        '<div><span class="match-player-3">' + parsedMatchesObj[i]['players'][2] + '</span> <span class="match-player-3-bagde badge badge-placement-'+player3BagdeValue+'">' + player3BagdeValue + '</span>' + spacingElement + '</div>' +  
+                        '<div><span class="match-player-4">' + parsedMatchesObj[i]['players'][3] + '</span> <span class="match-player-4-bagde badge badge-placement-'+player4BagdeValue+'">' + player4BagdeValue + '</span> </div>' + 
+                        '</div>' +
                     '</div>' +
-                '</li>'
-            $('div[name="'+ gameName +'"]').find('.list-group').append(newListRow);
+                    '<div><button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#matchResultModal"><i class="fas fa-edit"></i></button></div>' + 
+                '</div>' +
+            '</li>'
+        $('div[name="'+ gameName +'"]').find('.list-group').append(newListRow);
         }
 
         //adds onClick event on edit buttons again (since all "old" match list items are removed in the beginning of this function)
@@ -447,11 +459,11 @@ function updateMatchesList(gameName) {
     $('#matchResultModal').find('.game-name').text(gameName);
 
     //update modal title with matchId, and labels with players
-    let matchId = $(buttonClicked).parent().find('.match-id').text();    
-    let player1 = $(buttonClicked).parent().find('.match-player-1').text();
-    let player2 = $(buttonClicked).parent().find('.match-player-2').text();
-    let player3 = $(buttonClicked).parent().find('.match-player-3').text();
-    let player4 = $(buttonClicked).parent().find('.match-player-4').text();
+    let matchId = $(buttonClicked).closest('.match-info').find('.match-id').text();    
+    let player1 = $(buttonClicked).closest('.match-info').find('.match-player-1').text();
+    let player2 = $(buttonClicked).closest('.match-info').find('.match-player-2').text();
+    let player3 = $(buttonClicked).closest('.match-info').find('.match-player-3').text();
+    let player4 = $(buttonClicked).closest('.match-info').find('.match-player-4').text();
 
     $('#matchResultModal').find('.modal-title-matchId').text(matchId + ' - Result');
     $('#matchResultModal').find('label[for="player1Placement"]').text(player1);
