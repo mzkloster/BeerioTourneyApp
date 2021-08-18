@@ -173,7 +173,7 @@ function createGamesView(){
     
             $('.games-overview').append(
                 '<div class="game-content shadow" name="' + gameName + '">' + 
-                    '<div class="game-header d-flex justify-content-between">' +
+                    '<div class="game-header d-sm-flex justify-content-between">' +
                         '<div class="game-header-left"><i class="far fa-calendar-alt"></i> '+ gameCreatedDate +'</div>' +
                         '<div class="game-header-middle">' +
                             '<div><h2>'+ gameName +'</h2></div>' +
@@ -413,9 +413,9 @@ function updateMatchesList(gameName) {
                 '<li class="list-group-item">' +
                     '<div class="match-info">' + 
                         '<b class="match-number">Match <span class="match-id">' + parsedMatchesObj[i]['matchId'] + '</span></b>' + 
-                        '<span class="match-player-1">' + parsedMatchesObj[i]['players'][0] + '</span> <span class="match-player-1-bagde badge badge-placement-'+player1BagdeValue+'">' + player1BagdeValue + '</span> &nbsp;|&nbsp; ' + 
+                        '<span class="match-player-1">' + parsedMatchesObj[i]['players'][0] + '</span> <span class="match-player-1-bagde badge badge-placement-'+player1BagdeValue+'">' + player1BagdeValue + '</span> &nbsp;|&nbsp; ' +
                         '<span class="match-player-2">' + parsedMatchesObj[i]['players'][1] + '</span> <span class="match-player-2-bagde badge badge-placement-'+player2BagdeValue+'">' + player2BagdeValue + '</span> &nbsp;|&nbsp; ' + 
-                        '<span class="match-player-3">' + parsedMatchesObj[i]['players'][2] + '</span> <span class="match-player-3-bagde badge badge-placement-'+player3BagdeValue+'">' + player3BagdeValue + '</span> &nbsp;|&nbsp; ' + 
+                        '<span class="match-player-3">' + parsedMatchesObj[i]['players'][2] + '</span> <span class="match-player-3-bagde badge badge-placement-'+player3BagdeValue+'">' + player3BagdeValue + '</span> &nbsp;|&nbsp; ' +  
                         '<span class="match-player-4">' + parsedMatchesObj[i]['players'][3] + '</span> <span class="match-player-4-bagde badge badge-placement-'+player4BagdeValue+'">' + player4BagdeValue + '</span> ' + 
                         '<button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#matchResultModal"><i class="fas fa-edit"></i></button>' + 
                     '</div>' +
@@ -834,40 +834,84 @@ function getCreatedDate(gameName){
 
     switch (monthValue) {
         case 0:
-            month = "januar";
+            if ($(window).width() < 450) {
+                month = "jan";
+            }else {
+                month = "januar";
+            }
             break;
         case 1:
-            month = "februar";
+            if ($(window).width() < 450) {
+                month = "feb";
+            }else {
+                month = "februar";
+            }
             break;
         case 2:
-            month = "mars";
+            if ($(window).width() < 450) {
+                month = "mar";
+            }else {
+                month = "mars";
+            }
             break;
         case 3:
-            month = "april";
+            if ($(window).width() < 450) {
+                month = "apr";
+            }else {
+                month = "april";
+            }
             break;
         case 4:
             month = "mai";
             break;
         case 5:
-            month = "juni";
+            if ($(window).width() < 450) {
+                month = "jun";
+            }else {
+                month = "juni";
+            }
             break;
         case 6:
-            month = "juli";
+            if ($(window).width() < 450) {
+                month = "jul";
+            }else {
+                month = "juli";
+            }
             break;
         case 7:
-            month = "august";
+            if ($(window).width() < 450) {
+                month = "aug";
+            }else {
+                month = "august";
+            }
             break;
         case 8:
-            month = "september";
+            if ($(window).width() < 450) {
+                month = "sep";
+            }else {
+                month = "september";
+            }
             break;
         case 9:
-            month = "oktober";
+            if ($(window).width() < 450) {
+                month = "okt";
+            }else {
+                month = "oktober";
+            }
             break;
         case 10:
-            month = "november";
+            if ($(window).width() < 450) {
+                month = "nov";
+            }else {
+                month = "november";
+            }
             break;
         case 11:
-            month = "desember";
+            if ($(window).width() < 450) {
+                month = "des";
+            }else {
+                month = "desember";
+            }
     }
 
     dateString = day + '. ' + month + ' ' + year;
