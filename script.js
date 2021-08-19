@@ -158,7 +158,17 @@ function createGamesView(){
     
         //Removing all existing games, before adding all (existing + new) games
         $('.games-overview').empty();
-    
+        
+        let positionTableHeader;
+        let matchesPlayedTableHeader;
+        if ($(window).width() > 575) {
+            positionTableHeader = 'Position';
+            matchesPlayedTableHeader = 'Matches played';
+        }else {
+            positionTableHeader = 'Pos';
+            matchesPlayedTableHeader = 'Matches';
+        }
+
         //adding game-content for all games    
         for (let i=0; i<allGamesNames.length; i++){  
             let gameName = allGamesNames[i];
@@ -192,11 +202,11 @@ function createGamesView(){
                         '<table class="game-table table table-striped center">' +
                             '<thead>' +
                                 '<tr>' +
-                                    '<th>Position</th>' +
+                                    '<th>'+positionTableHeader+'</th>' +
                                     '<th>Name</th>' +
-                                    '<th>Games played</th>' +
+                                    '<th>'+matchesPlayedTableHeader+'</th>' +
                                     '<th>Points</th>' +
-                                    '<th>Final</th>' +
+                                    '<th class="final-letter-th">Final</th>' +
                                 '</tr>' +
                             '</thead>' +
                             '<tbody class="game-table-body">' +
@@ -311,7 +321,7 @@ function updateGameTableDisplay(gameName){
                 finalCounter -= 1;
             }
 
-            newTableRow = '<tr class="'+trClass+'"><td>'+position +'</td><td>' + playerNameValue + '</td><td>' + gamesPlayedValue + '</td><td>' + playerPointsValue + '</td><td>'+finalLetters[finalCounter]+'</td></tr>';
+            newTableRow = '<tr class="'+trClass+'"><td>'+position +'</td><td>' + playerNameValue + '</td><td>' + gamesPlayedValue + '</td><td>' + playerPointsValue + '</td><td class="final-letter-td">'+finalLetters[finalCounter]+'</td></tr>';
             $('div[name="'+ gameName +'"]').find('.game-table-body').append(newTableRow);
 
 
