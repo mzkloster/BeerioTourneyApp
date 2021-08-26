@@ -150,6 +150,13 @@ input[id="newTournementName"]{
 .new-player input {
     width: 180px;
 }
+.game-rounds-group {
+    max-width: 160px;;
+    margin: auto;
+}
+#gameRounds{
+    cursor: pointer;
+}
 
 
 /* styling matchResutModal */

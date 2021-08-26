@@ -12,6 +12,7 @@ function generateGame(ev){
     let matches = [];
     let numberOfPlayers = $('.new-player').length
     let newGameName = $('#newTournementName').val();
+    let gameRounds = parseInt($('#gameRounds').val());
     let playerNamesForValidation = [];
 
     
@@ -41,7 +42,7 @@ function generateGame(ev){
     localStorage.setItem(newGameName + '-matches', JSON.stringify(matches));
     localStorage.setItem(newGameName + '-createdDate', new Date());
 
-    generateMatches(newGameName);
+    generateMatches(newGameName, gameRounds);
 
     updateViewForAllGames();    
 
@@ -54,13 +55,13 @@ function generateGame(ev){
  * Updates matches-JSON.
  * @param {event} ev 
  */
- function generateMatches(gameName) {
+ function generateMatches(gameName, gameRounds) {
     try {
         let parsedGameObj = getParsedGameObj(gameName);
         let matchesKey = gameName + '-matches';
     
         let numberOfPlayers = parsedGameObj.length;
-        numberOfMatches = (numberOfPlayers*8)/4; //each player will have 8 matches. Number of matches is therefor numberOfPlayers*8/4 since 4 players play pr match
+        numberOfMatches = (numberOfPlayers*gameRounds)/4; //each player will have number of matches equal to gameRounds. Number of matches is therefor numberOfPlayers*gameRounds/4, since 4 players play pr match
     
         let playerOverviewObj = {};
     
@@ -124,10 +125,13 @@ function addPlayerInputField(ev) {
     $('.delete-player').on('click', function(event) {
         $(this).parent('div').remove();
         updateNumberOfPlayersInCreateGameModal();
+        updateGameRoundsOptions()
     })
 
     //update number of players shown 
     updateNumberOfPlayersInCreateGameModal();
+    //update gameRounds options
+    updateGameRoundsOptions()
 }
 
 
@@ -142,6 +146,26 @@ function updateNumberOfPlayersInCreateGameModal() {
     catch(err) {
         console.log(err.message);
     }
+}
+
+
+/**
+ * update game rounds options
+ */
+function updateGameRoundsOptions() {
+    try {
+        $('#gameRounds').children('option:not(:first)').remove();
+
+        let numberOfPlayers = $('.new-player').length
+        for (let i=4; i<13; i++){
+            if ((numberOfPlayers * i)%4 === 0) {
+                $('#gameRounds').append('<option value="'+i+'">'+i+'</option>')
+            }        
+        }
+    }
+    catch(err) {
+        console.log(err.message)
+    }    
 }
 
 
@@ -1163,6 +1187,7 @@ $(document).ready(function(){
     $('.delete-player').on('click', function(event) {
         $(this).parent('div').remove();
         updateNumberOfPlayersInCreateGameModal();
+        updateGameRoundsOptions()
     })
     
     $('#saveMatchResultbutton').on('click',function(event) {
