@@ -51,9 +51,10 @@ function generateGame(ev){
 
 
 /**
- * Generates all matches consisting off random players selected in each match. Each player will play 8 matches. 
+ * Generates all matches consisting off random players selected in each match. Each player will play gameRounds matches. 
  * Updates matches-JSON.
- * @param {event} ev 
+ * @param {string} gameName 
+ * @param {number} gameRounds 
  */
  function generateMatches(gameName, gameRounds) {
     try {
@@ -675,6 +676,26 @@ function getGameProgress(gameName){
         let gameProgress;
         gameProgress = getNumberOfCompletedMatchesInGame(gameName) + "/" + getNumberOfMatchesInGame(gameName);
         return gameProgress;
+    }
+    catch(err) {
+        console.log(err.message);
+    }
+}
+
+
+/**
+ * Returns number of rounds in a Game
+ * @param {string} gameName 
+ * @returns number
+ */
+function getGameRounds(gameName){
+    try {
+        let gameRounds;
+        let numberOfPlayers = getNumberOfPlayers(gameName);
+        let numberOfMatches = getNumberOfMatchesInGame(gameName);
+
+        gameRounds = (4 * numberOfMatches)/numberOfPlayers;
+        return gameRounds;
     }
     catch(err) {
         console.log(err.message);
