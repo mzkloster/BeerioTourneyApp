@@ -85,7 +85,7 @@ function generateGame(ev){
     
                 let randomInt = Math.floor(Math.random() * potentialPlayersForNextMatchList.length);
                 let randomlySelctedplayerName = potentialPlayersForNextMatchList[randomInt];
-                if ( playerOverviewObj[randomlySelctedplayerName]<8) { //checks that player is assigned to less than 8 matches
+                if ( playerOverviewObj[randomlySelctedplayerName]<gameRounds) { //checks that player is assigned to less than 8 matches
                     if (!(matchPlayersList.includes(randomlySelctedplayerName))){ //checks that player is not already ssigned to this match
                         matchPlayersList.push(randomlySelctedplayerName);
                         playerOverviewObj[randomlySelctedplayerName] += 1;
@@ -201,6 +201,8 @@ function createGamesView(){
             let gameProgressIconClass = "fas fa-star-half-alt";
             let gameCreatedDate = getCreatedDate(gameName);
             let gameNumberOfPlayers = getNumberOfPlayers(gameName);
+            let gameNumberOfMatches = getNumberOfMatchesInGame(gameName);
+            let gameRounds = (4 * gameNumberOfMatches)/gameNumberOfPlayers;
     
             if(isGameComplete(gameName)) {
                 gameProgressIconClass = "fas fa-star";
@@ -214,6 +216,8 @@ function createGamesView(){
                             '<div><h2>'+ gameName +'</h2></div>' +
                             '<div>'+
                                 '<span>'+ gameNumberOfPlayers +' <i class="fas fa-users"></i></span>'+
+                                '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+
+                                '<span>'+ gameRounds +' <i class="fas fa-circle"></i></span>'+
                                 '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+
                                 '<span class="game-progress">'+ gameProgress +'</span> <i class="fas fa-flag-checkered"></i>'+
                             '</div>' +
@@ -684,7 +688,7 @@ function getGameProgress(gameName){
 
 
 /**
- * Returns number of rounds in a Game
+ * DONT USE THIS. CAUSES ERROR. REWRITE AFTER REFARCTORING JSON TO GET GAMEROUNDS DIRECTLY FROM JSON. Returns number of rounds in a Game.
  * @param {string} gameName 
  * @returns number
  */
