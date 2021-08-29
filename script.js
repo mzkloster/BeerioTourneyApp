@@ -2,8 +2,7 @@ let formErrorMessage = "";
 
 
 /**
- * Creates game-JSON with all players that were added in createGameModal.
- * Also creates a match-JSON with an empty [] as value. This [] will be populated with generateMatches().
+ * Creates game-JSON
  * @param {event} ev 
  */
 function generateGame(ev){
@@ -18,7 +17,6 @@ function generateGame(ev){
 
     
     $('.new-player').each(function(index) {
-        //for game-json
         let player = {
             playerName: $(this).find('input').val(), //used as id. All playerNames in a game must be unique
             gamesPlayed: 0,
@@ -38,12 +36,6 @@ function generateGame(ev){
         return;
     }
 
-    //generate JSON-fiiles in localStorage: game-json, matches-json, createdDate-json (THIS CAN BE REMOVED AFTER NEW JSON FORMAT)    
-    // localStorage.setItem(newGameName, JSON.stringify(players));
-    // localStorage.setItem(newGameName + '-matches', JSON.stringify(matches));
-    // localStorage.setItem(newGameName + '-createdDate', new Date());
-
-
     //add data to game object
     game['gameName'] = newGameName;
     game['createdDate'] = new Date();
@@ -51,7 +43,6 @@ function generateGame(ev){
     game['players'] = players;
     game['matches'] = matches;
     localStorage.setItem(newGameName, JSON.stringify(game));
-
 
     generateMatches(newGameName, gameRounds);
 
@@ -62,15 +53,13 @@ function generateGame(ev){
 
 
 /**
- * Generates all matches consisting off random players selected in each match. Each player will play gameRounds matches. 
- * Updates matches-JSON.
+ * Generates all matches consisting off random players selected in each match. Each player will play gameRounds matches.
  * @param {string} gameName 
  * @param {number} gameRounds 
  */
  function generateMatches(gameName, gameRounds) {
     try {
         let parsedGameObj = getParsedGameObj(gameName);
-        // let matchesKey = gameName + '-matches'; CAN DELETE THIS AFTER NEW JSON FORMAT
         let matches = [];
         let players = parsedGameObj['players'];
         let numberOfPlayers = players.length;
@@ -78,7 +67,7 @@ function generateGame(ev){
     
         let playerOverviewObj = {};
     
-        //adding playerName[key] and playerNumberOfAssignedMatches[value] to playersObj
+        //adding playerName[key] and playerNumberOfAssignedMatches[value] to playersOverviewObj
         for (let i=0; i<numberOfPlayers; i++){        
             let playerName = players[i]['playerName'];
             playerOverviewObj[playerName] = 0;
@@ -97,7 +86,7 @@ function generateGame(ev){
     
                 let randomInt = Math.floor(Math.random() * potentialPlayersForNextMatchList.length);
                 let randomlySelctedplayerName = potentialPlayersForNextMatchList[randomInt];
-                if ( playerOverviewObj[randomlySelctedplayerName]<gameRounds) { //checks that player is assigned to less than 8 matches
+                if ( playerOverviewObj[randomlySelctedplayerName]<gameRounds) { //checks that player is assigned to less than gameRounds matches
                     if (!(matchPlayersList.includes(randomlySelctedplayerName))){ //checks that player is not already ssigned to this match
                         matchPlayersList.push(randomlySelctedplayerName);
                         playerOverviewObj[randomlySelctedplayerName] += 1;
@@ -111,12 +100,6 @@ function generateGame(ev){
                 players: matchPlayersList,
                 result: []
             }
-
-            //update matches in localstorage
-            // let parsedMatchesObj = getParsedMatchesObj(gameName);
-            // parsedMatchesObj.push(newlyGeneratedMatch);
-            // localStorage.setItem(matchesKey, JSON.stringify(parsedMatchesObj));
-
 
             //add newlyGeneratedMatch to matches (list)
             matches.push(newlyGeneratedMatch);
@@ -221,7 +204,6 @@ function createGamesView(){
             let gameProgressIconClass = "fas fa-star-half-alt";
             let gameCreatedDate = getCreatedDate(gameName);
             let gameNumberOfPlayers = getNumberOfPlayers(gameName);
-            let gameNumberOfMatches = getNumberOfMatchesInGame(gameName);
             let gameRounds = getGameRounds(gameName);
     
             if(isGameComplete(gameName)) {
@@ -438,7 +420,7 @@ function updateMatchesList(gameName) {
         //removes "old" match list items
         $('div[name="'+ gameName +'"]').find('.matches-list').empty();
 
-        //loop through matches JSON and create new updated match list items
+        //loop through matches and create new updated match list items
         let parsedGameObj = getParsedGameObj(gameName);
         let matches = parsedGameObj['matches'];
 
@@ -610,23 +592,12 @@ function saveMatchResult(ev) {
  */
 function getAllGameNames(){
     try {
-        //get all keys from localstorage, both gameName(game-obj) and gameName-matches(matches-obj)
+        //get all keys from localstorage
         let allKeys = Object.keys(localStorage);
-        //all gameNames sorted by createdDate(only game-obj, filtered out matches-obj (keyes without '-matches') and createdDate-obj (keyes without '-createdDate'))
+        //all gameNames sorted by createdDate
         let allGamesNamesSorted = []
 
         unsortedgameObjects = [];
-        // for (let i=0; i<allKeys.length; i++){
-        //     if (!(allKeys[i].includes("-matches"))){
-        //         if (!(allKeys[i].includes("-createdDate"))){            
-        //             let newObject = {
-        //                 gameName: allKeys[i],
-        //                 date: new Date(localStorage.getItem(allKeys[i] + '-createdDate'))
-        //             }  
-        //             unsortedgameObjects.push(newObject);          
-        //         }
-        //     }
-        // }
 
         for (let i=0; i<allKeys.length; i++){
             let parsedGameObj = getParsedGameObj(allKeys[i]);
@@ -668,24 +639,6 @@ function getAllGameNames(){
         console.log(err.message);
     }
 }
-
-
-/**
- * Returns parsed matchesObj. DOESNT NEED THIS ANYMORE
- * @returns object
- */
-// function getParsedMatchesObj(gameName) {
-//     try {
-//         let matchesKey = gameName + '-matches';
-//         let matchesObj = localStorage.getItem(matchesKey);
-//         let parsedMatchesObj = JSON.parse(matchesObj);
-//         return parsedMatchesObj;
-//     }
-//     catch(err) {
-//         console.log(err.message);
-//     }
-
-// }
 
 
 /**
@@ -1177,7 +1130,7 @@ function isMatchResultFormValid(playerPlacements){
 
 
 /**
- * TODO!! Check is form is valid. No empty input fields. No duplicate names. For later: tournementname should not be equal to an existing tournement
+ * TODO!! Checks i newGameForm is valid. No empty input fields.
  * @param {string[]} playerNameList 
  * @param {number} numberOfNewPlayerInputFields 
  * @param {string} newGameName 
@@ -1201,20 +1154,6 @@ function isNewGameFormValid(playerNameList, numberOfNewPlayerInputFields, newGam
     if (existingGamesNames.includes(newGameName)){
         console.log("New game form is invalid: A game with the name " + newGameName + " already exists!");
         formErrorMessage = "A game with the name " + newGameName + " already exists!";
-        return false;
-    }
-
-    //Check: Should not be possible to create a new game with a name that includes "-matches". This would cause trouble since matches-json keys are gameName + "-matches".
-    if (newGameName.includes("-matches")){
-        console.log("New game form is invalid: '-matches' can not be included in the game name.");
-        formErrorMessage = "The game name can not include substring '-matches'.";
-        return false;
-    }
-
-    //Check: Should not be possible to create a new game with a name that includes "-createdDate". This would cause trouble since date-json keys are gameName + "-createdDate".
-    if (newGameName.includes("-createdDate")){
-        console.log("New game form is invalid: '-createdDate' can not be included in the game name.");
-        formErrorMessage = "The game name can not include substring '-createdDate'.";
         return false;
     }
 
