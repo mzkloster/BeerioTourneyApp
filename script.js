@@ -202,7 +202,7 @@ function createGamesView(){
             let gameName = allGamesNames[i];
             let gameProgress = getGameProgress(gameName);
             let gameProgressIconClass = "fas fa-star-half-alt";
-            let gameCreatedDate = getCreatedDate(gameName);
+            let gameCreatedDate = getCreatedDateToString(gameName);
             let gameNumberOfPlayers = getNumberOfPlayers(gameName);
             let gameRounds = getGameRounds(gameName);
     
@@ -892,7 +892,7 @@ function getPlayerPlacementInMatch(gameName, playerName, matchId){
  * @param {string} gameName 
  * @returns string
  */
-function getCreatedDate(gameName){
+function getCreatedDateToString(gameName){
     let day, monthValue, month, year, dateString;
     let parsedGameObj = getParsedGameObj(gameName);
     let createdDate = new Date(parsedGameObj['createdDate']);
