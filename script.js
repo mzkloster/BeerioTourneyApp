@@ -215,11 +215,11 @@ function createGamesView(){
                         '<div class="game-header-middle">' +
                             '<div><h2>'+ gameName +'</h2></div>' +
                             '<div>'+
-                                '<span>'+ gameNumberOfPlayers +' <i class="fas fa-users"></i></span>'+
+                                '<span>'+ gameNumberOfPlayers +' <i class="fas fa-users" data-toggle="tooltip" title="Players"></i></span>'+
                                 '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+
-                                '<span>'+ gameRounds +' <i class="fas fa-circle"></i></span>'+
+                                '<span>'+ gameRounds +' <i class="fas fa-circle" data-toggle="tooltip" title="Rounds"></i></span>'+
                                 '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+
-                                '<span class="game-progress">'+ gameProgress +'</span> <i class="fas fa-flag-checkered"></i>'+
+                                '<span class="game-progress">'+ gameProgress +'</span> <i class="fas fa-flag-checkered" data-toggle="tooltip" title="Matches, progress"></i>'+
                             '</div>' +
                             '<div class="d-none"><span class="game-progress">Progress: '+ gameProgress +'</span> <span class="game-progress-icon"><i class="'+ gameProgressIconClass +'"></i></span></div>' + //display:none, but leaves it in case I want to use progress text plus icon later (half star turn into full star when all games are completed)
                         '</div>' +
@@ -278,6 +278,7 @@ function updateViewForAllGames(){
             //flips game-header-left icon, arrow down->arrow up, and vice versa
             $(this).find('.game-header-right').find('i').toggleClass('flip');
         });
+        $('[data-toggle="tooltip"]').tooltip();
     }
     catch(err) {
         console.log(err.message);
