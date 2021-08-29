@@ -19,7 +19,7 @@ function generateGame(ev){
     $('.new-player').each(function(index) {
         let player = {
             playerName: $(this).find('input').val(), //used as id. All playerNames in a game must be unique
-            gamesPlayed: 0,
+            matchesPlayed: 0,
             points: 0
         }
         players.push(player);
@@ -330,7 +330,7 @@ function updateGameTableDisplay(gameName){
         //removes "old" table rows
         $('div[name="'+ gameName +'"]').find('.game-table-body').empty();
 
-        updatePlayerPointsAndGamesPlayedFromAllMatchResults(gameName);
+        updatePlayerPointsAndMatchesPlayedFromAllMatchResults(gameName);
         let sortedPlayerList = getSortedPlayerList(gameName);
         let finalLetters = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
         let finalCounter = 0;
@@ -340,7 +340,7 @@ function updateGameTableDisplay(gameName){
             let trClass = "";
             
             playerNameValue = sortedPlayerList[i];
-            gamesPlayedValue = getPlayerGamesPlayed(gameName, playerNameValue);
+            matchesPlayedValue = getPlayerMatchesPlayed(gameName, playerNameValue);
             playerPointsValue = getPlayerPoints(gameName, playerNameValue);
 
             //Set an underline after every 3 players (since they will play in the same final). No underline under last table row. And not under second last either, since then the last player would play in the final above
@@ -353,7 +353,7 @@ function updateGameTableDisplay(gameName){
                 finalCounter -= 1;
             }
 
-            newTableRow = '<tr class="'+trClass+'"><td>'+position +'</td><td>' + playerNameValue + '</td><td>' + gamesPlayedValue + '</td><td>' + playerPointsValue + '</td><td class="final-letter-td">'+finalLetters[finalCounter]+'</td></tr>';
+            newTableRow = '<tr class="'+trClass+'"><td>'+position +'</td><td>' + playerNameValue + '</td><td>' + matchesPlayedValue + '</td><td>' + playerPointsValue + '</td><td class="final-letter-td">'+finalLetters[finalCounter]+'</td></tr>';
             $('div[name="'+ gameName +'"]').find('.game-table-body').append(newTableRow);
 
 
@@ -370,9 +370,9 @@ function updateGameTableDisplay(gameName){
 
 
 /**
- * Updates player points and gamesPlayed for all players in game-JSON based on match results in matches-JSON. Is triggered in updateGameTableDisplay()
+ * Updates player points and matchesPlayed for all players in game-JSON based on match results in matches. Is triggered in updateGameTableDisplay()
  */
- function updatePlayerPointsAndGamesPlayedFromAllMatchResults(gameName) {
+ function updatePlayerPointsAndMatchesPlayedFromAllMatchResults(gameName) {
     try {
         let parsedGameObj = getParsedGameObj(gameName);
         let players = parsedGameObj['players'];
@@ -400,8 +400,8 @@ function updateGameTableDisplay(gameName){
                     } 
                 }
             } 
-            //after looping through all games for this player, we set points and gamesPlayed
-            setPlayerGamesPlayed(gameName, playerName, playerPlayedGames);
+            //after looping through all games for this player, we set points and matchesPlayed
+            setPlayerMatchesPlayed(gameName, playerName, playerPlayedGames);
             setPlayerPoints(gameName, playerName, playerPoints);        
         }
     }
@@ -766,19 +766,19 @@ function setPlayerPoints(gameName, playerName, points) {
 
 
 /**
- * Return gamesPlayed for player
+ * Return matchesPlayed for player
  * @param {string} playerName 
  * @returns number
  */
-function getPlayerGamesPlayed(gameName, playerName) {
+function getPlayerMatchesPlayed(gameName, playerName) {
     try {
         let parsedGameObj = getParsedGameObj(gameName);
         let players = parsedGameObj['players'];
 
         for (let i=0; i<players.length; i++) {
             if (players[i].playerName === playerName) {
-                let gamesPlayed = players[i].gamesPlayed;
-                return gamesPlayed;
+                let matchesPlayed = players[i].matchesPlayed;
+                return matchesPlayed;
             }
         }
     }
@@ -789,18 +789,18 @@ function getPlayerGamesPlayed(gameName, playerName) {
 
 
 /**
- * Sets parameter gamesPlayed for given player.
+ * Sets parameter matchesPlayed for given player.
  * @param {string} playerName 
- * @param {number} gamesPlayed 
+ * @param {number} matchesPlayed 
  */
-function setPlayerGamesPlayed(gameName, playerName, gamesPlayed) {
+function setPlayerMatchesPlayed(gameName, playerName, matchesPlayed) {
     try {
         let parsedGameObj = getParsedGameObj(gameName);
         let players = parsedGameObj['players'];
 
         for (let i=0; i<players.length; i++) {
             if (players[i].playerName === playerName) {
-                players[i].gamesPlayed = gamesPlayed;
+                players[i].matchesPlayed = matchesPlayed;
                 break;
             }
         }
@@ -1023,7 +1023,7 @@ function getCreatedDateToString(gameName){
                 //if so, mark as a switch and break the loop:
                 shouldSwitch = true;
                 break;
-                }else if((getPlayerPoints(gameName, firstPlayerName) === getPlayerPoints(gameName, secondPlayerName)) && (getPlayerGamesPlayed(gameName, firstPlayerName) > getPlayerGamesPlayed(gameName, secondPlayerName)) ){
+                }else if((getPlayerPoints(gameName, firstPlayerName) === getPlayerPoints(gameName, secondPlayerName)) && (getPlayerMatchesPlayed(gameName, firstPlayerName) > getPlayerMatchesPlayed(gameName, secondPlayerName)) ){
                     //if so, mark as a switch and break the loop:
                     shouldSwitch = true;
                     break;
