@@ -266,17 +266,17 @@ input[id="newTournementName"]{
 /* Rules page */
 .about-block {
     margin-top: 100px;
-    padding-bottom: 50px;
+    padding-bottom: 70px;
 }
 .rules-block {    
     box-sizing: border-box;
     background-color: white;
     margin-top: 0px;
-    padding-top: 50px;
-    padding-bottom: 50px;
+    padding-top: 70px;
+    padding-bottom: 70px;
 }
 .tournament-format-block{
-    padding-top: 50px;
+    padding-top: 70px;
 
 }
 
