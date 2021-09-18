@@ -261,3 +261,32 @@ input[id="newTournementName"]{
     }
 
 }
+
+/* Rules page */
+.about-block {
+    margin-top: 100px;
+    padding-bottom: 50px;
+}
+.rules-block {    
+    box-sizing: border-box;
+    background-color: white;
+    margin-top: 0px;
+    padding-top: 50px;
+    padding-bottom: 50px;
+}
+.tournament-format-block{
+    padding-top: 50px;
+
+}
+
+.about-block img, .rules-block img, .tournament-format-block img {
+    max-width: 100%;
+    height: auto;
+}
+
+.text-align-left {
+    text-align: left;
+}
+.text-align-center {
+    text-align: center !important;
+}
