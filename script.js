@@ -230,21 +230,23 @@ function createGamesView(){
                     '<hr class="hr-game-content">'+
                     '<div class="game-body">' +
                         '<h3 ="table-header">Table</h3>' +
-                        '<table class="game-table table table-striped center">' +
-                            '<thead>' +
-                                '<tr>' +
-                                    '<th>'+positionTableHeader+'</th>' +
-                                    '<th>Name</th>' +
-                                    '<th>'+matchesPlayedTableHeader+'</th>' +
-                                    '<th>Points</th>' +
-                                    '<th class="final-letter-th">Final</th>' +
-                                '</tr>' +
-                            '</thead>' +
-                            '<tbody class="game-table-body">' +
-                                '<!-- table rows are generated here -->' +
-                            '</tbody>' +
-                        '</table>' +
-                
+                        '<div class="table-responsive">' +
+                            '<table class="game-table table table-striped center">' +
+                                '<thead>' +
+                                    '<tr>' +
+                                        '<th>'+positionTableHeader+'</th>' +
+                                        '<th>Name</th>' +
+                                        '<th>'+matchesPlayedTableHeader+'</th>' +
+                                        '<th>Points</th>' +
+                                        '<th class="final-letter-th">Final</th>' +
+                                    '</tr>' +
+                                '</thead>' +
+                                '<tbody class="game-table-body">' +
+                                    '<!-- table rows are generated here -->' +
+                                '</tbody>' +
+                            '</table>' +
+                        '</div>' +   
+                        
                         '<h3 class="matches-header">Matches</h3>' +
                         '<ul class="list-group list-group-flush matches-list">' +
                             '<!-- list rows with matches are generated here. Example: -->' +

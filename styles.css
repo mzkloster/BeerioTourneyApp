@@ -257,10 +257,13 @@ input[id="newTournementName"]{
     }
 }
 @media screen and (max-device-width : 575px){
-    .game-header-right, .final-letter-th, .final-letter-td{
+    /* Removing final-letter col from table on small screens. Comment out since change table to be responsive */
+    /* .game-header-right, .final-letter-th, .final-letter-td{
+        display: none;
+    } */
+    .game-header-right{
         display: none;
     }
-
 }
 
 /* Rules page */
