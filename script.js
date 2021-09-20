@@ -43,7 +43,8 @@ function generateGame(ev){
     game['rounds'] = gameRounds;
     game['players'] = players;
     game['matches'] = matches;
-    gameId = newGameName + '_' + game['createdDate'].toISOString();
+    let gameNameSlugified = convertToSlug(newGameName);
+    gameId = gameNameSlugified + '_' + game['createdDate'].toISOString();
     localStorage.setItem(gameId, JSON.stringify(game));
 
     generateMatches(gameId, gameRounds);
@@ -589,6 +590,17 @@ function saveMatchResult(ev) {
 }
 
 
+/**
+ * Converts text to slug
+ * @param {string} Text 
+ * @returns string
+ */
+function convertToSlug(text){
+    return text
+        .toLowerCase()
+        .replace(/[^\w ]+/g,'')
+        .replace(/ +/g,'-');
+}
 
 ///////////////////////////////////////////////////////////////////////////////////// GETTERS AND SETTERS //////////////////////////////////////////////////////////////////////////////////////
 
