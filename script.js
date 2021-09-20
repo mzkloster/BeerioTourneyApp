@@ -7,6 +7,7 @@ let formErrorMessage = "";
  */
 function generateGame(ev){
     ev.preventDefault();
+    let gameId
     let game = {};
     let players = [];
     let matches = [];
@@ -42,9 +43,10 @@ function generateGame(ev){
     game['rounds'] = gameRounds;
     game['players'] = players;
     game['matches'] = matches;
-    localStorage.setItem(newGameName, JSON.stringify(game));
+    gameId = newGameName + '_' + game['createdDate'].toISOString();
+    localStorage.setItem(gameId, JSON.stringify(game));
 
-    generateMatches(newGameName, gameRounds);
+    generateMatches(gameId, gameRounds);
 
     updateViewForAllGames();    
 
@@ -54,12 +56,12 @@ function generateGame(ev){
 
 /**
  * Generates all matches consisting off random players selected in each match. Each player will play gameRounds matches.
- * @param {string} gameName 
+ * @param {string} gameId 
  * @param {number} gameRounds 
  */
- function generateMatches(gameName, gameRounds) {
+ function generateMatches(gameId, gameRounds) {
     try {
-        let parsedGameObj = getParsedGameObj(gameName);
+        let parsedGameObj = getParsedGameObj(gameId);
         let matches = [];
         let players = parsedGameObj['players'];
         let numberOfPlayers = players.length;
@@ -107,9 +109,9 @@ function generateGame(ev){
         
         //add matches to gameObj
         parsedGameObj['matches'] = matches;
-        localStorage.setItem(gameName, JSON.stringify(parsedGameObj));
+        localStorage.setItem(gameId, JSON.stringify(parsedGameObj));
 
-        updateMatchesList(gameName);
+        updateMatchesList(gameId);
     }
     catch(err) {
         console.log(err.message);
@@ -154,7 +156,7 @@ function updateNumberOfPlayersInCreateGameModal() {
 
 
 /**
- * update game rounds options
+ * update game rounds options on create game modal
  */
 function updateGameRoundsOptions() {
     try {
@@ -178,8 +180,8 @@ function updateGameRoundsOptions() {
  */
 function createGamesView(){
     try {
-        let allGamesNames = getAllGameNames();
-        if (allGamesNames.length === 0){
+        let allGamesIds = getAllGameIds();
+        if (allGamesIds.length === 0){
             showNoExistingGamesAlert()
             return;
         }
@@ -198,20 +200,21 @@ function createGamesView(){
         }
 
         //adding game-content for all games    
-        for (let i=0; i<allGamesNames.length; i++){  
-            let gameName = allGamesNames[i];
-            let gameProgress = getGameProgress(gameName);
+        for (let i=0; i<allGamesIds.length; i++){
+            let gameId = allGamesIds[i];
+            let gameName = getGameName(gameId);
+            let gameProgress = getGameProgress(gameId);
             let gameProgressIconClass = "fas fa-star-half-alt";
-            let gameCreatedDate = getCreatedDateToString(gameName);
-            let gameNumberOfPlayers = getNumberOfPlayers(gameName);
-            let gameRounds = getGameRounds(gameName);
+            let gameCreatedDate = getCreatedDateToString(gameId);
+            let gameNumberOfPlayers = getNumberOfPlayers(gameId);
+            let gameRounds = getGameRounds(gameId);
     
-            if(isGameComplete(gameName)) {
+            if(isGameComplete(gameId)) {
                 gameProgressIconClass = "fas fa-star";
             }
     
             $('.games-overview').append(
-                '<div class="game-content shadow" name="' + gameName + '">' + 
+                '<div class="game-content shadow" id="' + gameId + '">' + 
                     '<div class="game-header d-sm-flex justify-content-between">' +
                         '<div class="game-header-left"><i class="far fa-calendar-alt"></i> '+ gameCreatedDate +'</div>' +
                         '<div class="game-header-middle">' +
@@ -269,10 +272,10 @@ function updateViewForAllGames(){
     try {
         createGamesView();
 
-        let allGamesNames = getAllGameNames();
-        for (let i=0; i<allGamesNames.length; i++){        
-            updateGameTableDisplay(allGamesNames[i]);
-            updateMatchesList(allGamesNames[i]);
+        let allGamesIds = getAllGameIds();
+        for (let i=0; i<allGamesIds.length; i++){        
+            updateGameTableDisplay(allGamesIds[i]);
+            updateMatchesList(allGamesIds[i]);
         }
     
         //adding on-click slideToggle for games
@@ -303,19 +306,20 @@ function showNoExistingGamesAlert(){
 
 /**
  * Updates gameProgress text value and icon on game-header
- * @param {string} gameName 
+ * @param {string} gameId 
  */
- function updateGameProgress(gameName){
+ function updateGameProgress(gameId){
     try {
-        let gameProgress = getGameProgress(gameName);
+        let gameName = getGameName(gameId)
+        let gameProgress = getGameProgress(gameId);
         let gameProgressIconClass = "fas fa-star-half-alt";
     
-        $('.game-content[name="'+gameName+'"]').find('.game-progress').text(gameProgress);
+        $('.game-content[id="'+gameId+'"]').find('.game-progress').text(gameProgress);
     
-        if(isGameComplete(gameName)) {
+        if(isGameComplete(gameId)) {
             gameProgressIconClass = "fas fa-star";        
         }
-        $('.game-content[name="'+gameName+'"]').find('.game-progress-icon').find('i').removeClass().addClass(gameProgressIconClass);
+        $('.game-content[id="'+gameId+'"]').find('.game-progress-icon').find('i').removeClass().addClass(gameProgressIconClass);
     }
     catch(err) {
         console.log(err.message);
@@ -327,13 +331,13 @@ function showNoExistingGamesAlert(){
  * Updates/displays gameTable based on values in game-JSON.
  * Removes all "old" rows inside table body, and then adds new updated table rows
  */
-function updateGameTableDisplay(gameName){
+function updateGameTableDisplay(gameId){
     try {
         //removes "old" table rows
-        $('div[name="'+ gameName +'"]').find('.game-table-body').empty();
+        $('div[id="'+ gameId +'"]').find('.game-table-body').empty();
 
-        updatePlayerPointsAndMatchesPlayedFromAllMatchResults(gameName);
-        let sortedPlayerList = getSortedPlayerList(gameName);
+        updatePlayerPointsAndMatchesPlayedFromAllMatchResults(gameId);
+        let sortedPlayerList = getSortedPlayerList(gameId);
         let finalLetters = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
         let finalCounter = 0;
 
@@ -342,8 +346,8 @@ function updateGameTableDisplay(gameName){
             let trClass = "";
             
             playerNameValue = sortedPlayerList[i];
-            matchesPlayedValue = getPlayerMatchesPlayed(gameName, playerNameValue);
-            playerPointsValue = getPlayerPoints(gameName, playerNameValue);
+            matchesPlayedValue = getPlayerMatchesPlayed(gameId, playerNameValue);
+            playerPointsValue = getPlayerPoints(gameId, playerNameValue);
 
             //Set an underline after every 3 players (since they will play in the same final). No underline under last table row. And not under second last either, since then the last player would play in the final above
             if (position%3 === 0 && i !== sortedPlayerList.length-1 && i !== sortedPlayerList.length-2){
@@ -356,7 +360,7 @@ function updateGameTableDisplay(gameName){
             }
 
             newTableRow = '<tr class="'+trClass+'"><td>'+position +'</td><td>' + playerNameValue + '</td><td>' + matchesPlayedValue + '</td><td>' + playerPointsValue + '</td><td class="final-letter-td">'+finalLetters[finalCounter]+'</td></tr>';
-            $('div[name="'+ gameName +'"]').find('.game-table-body').append(newTableRow);
+            $('div[id="'+ gameId +'"]').find('.game-table-body').append(newTableRow);
 
 
             //after every 3 players, finalCounter increase with 1. (3 best players are in A final, next 3 are in B final, etc)
@@ -374,9 +378,9 @@ function updateGameTableDisplay(gameName){
 /**
  * Updates player points and matchesPlayed for all players in game-JSON based on match results in matches. Is triggered in updateGameTableDisplay()
  */
- function updatePlayerPointsAndMatchesPlayedFromAllMatchResults(gameName) {
+ function updatePlayerPointsAndMatchesPlayedFromAllMatchResults(gameId) {
     try {
-        let parsedGameObj = getParsedGameObj(gameName);
+        let parsedGameObj = getParsedGameObj(gameId);
         let players = parsedGameObj['players'];
         let matches = parsedGameObj['matches'];
     
@@ -403,8 +407,8 @@ function updateGameTableDisplay(gameName){
                 }
             } 
             //after looping through all games for this player, we set points and matchesPlayed
-            setPlayerMatchesPlayed(gameName, playerName, playerPlayedGames);
-            setPlayerPoints(gameName, playerName, playerPoints);        
+            setPlayerMatchesPlayed(gameId, playerName, playerPlayedGames);
+            setPlayerPoints(gameId, playerName, playerPoints);        
         }
     }
     catch(err) {
@@ -417,13 +421,13 @@ function updateGameTableDisplay(gameName){
  * Updates/displays list with all matches, by adding list items that include matchId and match players.
  * Removes all "old" match list items, and adds new updated match list items.
  */
-function updateMatchesList(gameName) {
+function updateMatchesList(gameId) {
     try {
         //removes "old" match list items
-        $('div[name="'+ gameName +'"]').find('.matches-list').empty();
+        $('div[id="'+ gameId +'"]').find('.matches-list').empty();
 
         //loop through matches and create new updated match list items
-        let parsedGameObj = getParsedGameObj(gameName);
+        let parsedGameObj = getParsedGameObj(gameId);
         let matches = parsedGameObj['matches'];
 
         for (let i=0; i<matches.length; i++){
@@ -433,10 +437,10 @@ function updateMatchesList(gameName) {
             player4BagdeValue = "";
             
             //if match is played: loop through players in that match, find player placement, and set bagdeValue
-            if (isMatchPlayed(gameName, matches[i]['matchId'])){            
+            if (isMatchPlayed(gameId, matches[i]['matchId'])){            
                 for (let j=0; j<4; j++){
                     let playerName = matches[i]['players'][j];
-                    let playerPlacement = getPlayerPlacementInMatch(gameName, playerName, matches[i]['matchId']);
+                    let playerPlacement = getPlayerPlacementInMatch(gameId, playerName, matches[i]['matchId']);
 
                     switch(j) {
                         case 0:
@@ -478,11 +482,11 @@ function updateMatchesList(gameName) {
                     '<div><button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#matchResultModal"><i class="fas fa-edit"></i></button></div>' + 
                 '</div>' +
             '</li>'
-        $('div[name="'+ gameName +'"]').find('.list-group').append(newListRow);
+        $('div[id="'+ gameId +'"]').find('.list-group').append(newListRow);
         }
 
         //adds onClick event on edit buttons again (since all "old" match list items are removed in the beginning of this function)
-        $('div[name="'+ gameName +'"]').find('.match-info button').on('click',function(event) {
+        $('div[id="'+ gameId +'"]').find('.match-info button').on('click',function(event) {
             updateMatchResultModal(event, this);
         });
     }
@@ -500,9 +504,9 @@ function updateMatchesList(gameName) {
  function updateMatchResultModal(ev, buttonClicked){
     ev.preventDefault();
 
-    //set gameName value to none displayed div in modal (so gameName can be passed on to saveMatchResult)
-    let gameName = $(buttonClicked).closest('.game-content').attr('name');
-    $('#matchResultModal').find('.game-name').text(gameName);
+    //set gameId value to none displayed div in modal (so gameId can be passed on to saveMatchResult)
+    let gameId = $(buttonClicked).closest('.game-content').attr('id');
+    $('#matchResultModal').find('.game-id').text(gameId);
 
     //update modal title with matchId, and labels with players
     let matchId = $(buttonClicked).closest('.match-info').find('.match-id').text();    
@@ -517,11 +521,11 @@ function updateMatchesList(gameName) {
     $('#matchResultModal').find('label[for="player3Placement"]').text(player3);
     $('#matchResultModal').find('label[for="player4Placement"]').text(player4);
 
-    if (isMatchPlayed(gameName, parseInt(matchId))){
-        $('#matchResultModal').find('input[id="player1Placement"]').val(getPlayerPlacementInMatch(gameName, player1, parseInt(matchId)));
-        $('#matchResultModal').find('input[id="player2Placement"]').val(getPlayerPlacementInMatch(gameName, player2, parseInt(matchId)));
-        $('#matchResultModal').find('input[id="player3Placement"]').val(getPlayerPlacementInMatch(gameName, player3, parseInt(matchId)));
-        $('#matchResultModal').find('input[id="player4Placement"]').val(getPlayerPlacementInMatch(gameName, player4, parseInt(matchId)));
+    if (isMatchPlayed(gameId, parseInt(matchId))){
+        $('#matchResultModal').find('input[id="player1Placement"]').val(getPlayerPlacementInMatch(gameId, player1, parseInt(matchId)));
+        $('#matchResultModal').find('input[id="player2Placement"]').val(getPlayerPlacementInMatch(gameId, player2, parseInt(matchId)));
+        $('#matchResultModal').find('input[id="player3Placement"]').val(getPlayerPlacementInMatch(gameId, player3, parseInt(matchId)));
+        $('#matchResultModal').find('input[id="player4Placement"]').val(getPlayerPlacementInMatch(gameId, player4, parseInt(matchId)));
     }else {
         $('#matchResultModal').find('input[id="player1Placement"]').val('');
         $('#matchResultModal').find('input[id="player2Placement"]').val('');
@@ -538,7 +542,7 @@ function updateMatchesList(gameName) {
 function saveMatchResult(ev) {
     ev.preventDefault();
 
-    let gameName = $('#matchResultModal').find('.game-name').text();
+    let gameId = $('#matchResultModal').find('.game-id').text();
 
     let matchId = $('#matchResultModal').find('.modal-title-matchId').text(); //matchId as string
     let player1 = $('#matchResultModal').find('label[for="player1Placement"]').text();
@@ -577,63 +581,25 @@ function saveMatchResult(ev) {
     matchResult[player3Placement-1] = player3;
     matchResult[player4Placement-1] = player4;        
 
-    setMatchResult(gameName, parseInt(matchId), matchResult);
+    setMatchResult(gameId, parseInt(matchId), matchResult);
 
-    updateGameTableDisplay(gameName);
-    updateMatchesList(gameName);
-    updateGameProgress(gameName);
+    updateGameTableDisplay(gameId);
+    updateMatchesList(gameId);
+    updateGameProgress(gameId);
 }
 
 
 
 ///////////////////////////////////////////////////////////////////////////////////// GETTERS AND SETTERS //////////////////////////////////////////////////////////////////////////////////////
 
-/**
- * Return all gameNames in localstorage, sorted by createdDate
- * @returns string[]
- */
-function getAllGameNames(){
-    try {
-        //get all keys from localstorage
-        let allKeys = Object.keys(localStorage);
-        //all gameNames sorted by createdDate
-        let allGamesNamesSorted = []
-
-        unsortedgameObjects = [];
-
-        for (let i=0; i<allKeys.length; i++){
-            let parsedGameObj = getParsedGameObj(allKeys[i]);
-            let gameName = parsedGameObj['gameName'];
-            let createdDate = parsedGameObj['createdDate'];
-            
-            let newObject = {
-                gameName: gameName,
-                date: new Date(createdDate)
-            }  
-            unsortedgameObjects.push(newObject);
-        }
-
-        let sortedgameObjects = unsortedgameObjects.slice().sort((a,b) => b.date - a.date)
-
-        for (let i=0; i<sortedgameObjects.length; i++){
-            allGamesNamesSorted.push(sortedgameObjects[i].gameName);
-        }
-
-        return allGamesNamesSorted;
-    }
-    catch(err) {
-        console.log(err.message);
-    }    
-}
-
 
 /**
  * returns parsed gameObj
  * @returns object
  */
- function getParsedGameObj(gameName) {
+ function getParsedGameObj(gameId) {
     try {
-        let gameObj = localStorage.getItem(gameName);
+        let gameObj = localStorage.getItem(gameId);
         let parsedGameObj = JSON.parse(gameObj);
         return parsedGameObj;
     }
@@ -644,13 +610,88 @@ function getAllGameNames(){
 
 
 /**
+ * Returns gameName
+ * @param {string} gameId 
+ * @returns string
+ */
+function getGameName(gameId){
+    try {
+        let parsedGameObj = getParsedGameObj(gameId);
+        let gameName = parsedGameObj['gameName'];
+
+        return gameName;
+    }
+    catch(err) {
+        console.log(err.message);
+    }
+}
+
+
+/**
+ * Return all gameId's in localstorage, sorted by createdDate
+ * @returns string[]
+ */
+function getAllGameIds(){
+    try {
+        //get all keys from localstorage
+        let allKeys = Object.keys(localStorage);
+        //all gameNames sorted by createdDate
+        let allGamesIdsSorted = []
+
+        unsortedgameObjects = [];
+
+        for (let i=0; i<allKeys.length; i++){
+            let parsedGameObj = getParsedGameObj(allKeys[i]);
+            // let gameName = parsedGameObj['gameName'];
+            let createdDate = parsedGameObj['createdDate'];
+            
+            let newObject = {
+                gameId: allKeys[i],
+                date: new Date(createdDate)
+            }  
+            unsortedgameObjects.push(newObject);
+        }
+
+        let sortedgameObjects = unsortedgameObjects.slice().sort((a,b) => b.date - a.date)
+
+        for (let i=0; i<sortedgameObjects.length; i++){
+            allGamesIdsSorted.push(sortedgameObjects[i].gameId);
+        }
+
+        return allGamesIdsSorted;
+    }
+    catch(err) {
+        console.log(err.message);
+    }    
+}
+
+
+
+function getAllGameNames(){
+    try {
+        let allGameNames = [];
+        let allGameIds = getAllGameIds();
+
+        for (let i = 0; i<allGameIds.length; i++){
+            allGameNames.push(getGameName(allGameIds[i]));
+        }
+        return allGameNames;
+    }
+    catch(err) {
+        console.log(err.message);
+    }
+}
+
+
+
+/**
  * Return total number of matches in a specific game
- * @param {string} gameName 
+ * @param {string} gameId
  * @returns number
  */
-function getNumberOfMatchesInGame(gameName){
+function getNumberOfMatchesInGame(gameId){
     try {
-        let parsedGameObj = getParsedGameObj(gameName);
+        let parsedGameObj = getParsedGameObj(gameId);
         let numberOfMatches = parsedGameObj['matches'].length;
         return numberOfMatches;
     }
@@ -662,13 +703,13 @@ function getNumberOfMatchesInGame(gameName){
 
 /**
  * Returns a string with game progress in the form "completedMatches/totalMatches"
- * @param {string} gameName 
+ * @param {string} gameId
  * @returns string
  */
-function getGameProgress(gameName){
+function getGameProgress(gameId){
     try {
         let gameProgress;
-        gameProgress = getNumberOfCompletedMatchesInGame(gameName) + "/" + getNumberOfMatchesInGame(gameName);
+        gameProgress = getNumberOfCompletedMatchesInGame(gameId) + "/" + getNumberOfMatchesInGame(gameId);
         return gameProgress;
     }
     catch(err) {
@@ -679,12 +720,12 @@ function getGameProgress(gameName){
 
 /**
  * Returns number of rounds in a Game.
- * @param {string} gameName 
+ * @param {string} gameId 
  * @returns number
  */
-function getGameRounds(gameName){
+function getGameRounds(gameId){
     try {
-        let parsedGameObj = getParsedGameObj(gameName);
+        let parsedGameObj = getParsedGameObj(gameId);
         let gameRounds = parsedGameObj['rounds'];
 
         return gameRounds;
@@ -697,17 +738,17 @@ function getGameRounds(gameName){
 
 /**
  * Return number of completed matches in a game
- * @param {string} gameName 
+ * @param {string} gameId 
  * @returns number
  */
-function getNumberOfCompletedMatchesInGame(gameName){
+function getNumberOfCompletedMatchesInGame(gameId){
     try {
-        let parsedGameObj = getParsedGameObj(gameName);
+        let parsedGameObj = getParsedGameObj(gameId);
         let matches = parsedGameObj['matches'];
         let numberOfCompletedMatches = 0;
 
         for (let i=0; i<matches.length; i++){
-            if (isMatchPlayed(gameName, matches[i].matchId)){
+            if (isMatchPlayed(gameId, matches[i].matchId)){
                 numberOfCompletedMatches += 1;
             }
         }
@@ -721,12 +762,13 @@ function getNumberOfCompletedMatchesInGame(gameName){
 
 /**
  * Returns points for player
+ * @param {string} gameId
  * @param {string} playerName 
  * @returns number, playerPoints
  */
-function getPlayerPoints(gameName, playerName) {
+function getPlayerPoints(gameId, playerName) {
     try {
-        let parsedGameObj = getParsedGameObj(gameName);
+        let parsedGameObj = getParsedGameObj(gameId);
         let players = parsedGameObj['players'];
 
         for (let i=0; i<players.length; i++) {
@@ -744,12 +786,13 @@ function getPlayerPoints(gameName, playerName) {
 
 /**
  * Sets paramter playerPoints for given player.
+ * @param {string} gameId
  * @param {string} playerName 
  * @param {number} points 
  */
-function setPlayerPoints(gameName, playerName, points) {
+function setPlayerPoints(gameId, playerName, points) {
     try {
-        let parsedGameObj = getParsedGameObj(gameName);
+        let parsedGameObj = getParsedGameObj(gameId);
         let players = parsedGameObj['players'];
 
         for (let i=0; i<players.length; i++) {
@@ -759,7 +802,7 @@ function setPlayerPoints(gameName, playerName, points) {
             }
         }
         parsedGameObj['players'] = players;
-        localStorage.setItem(gameName, JSON.stringify(parsedGameObj));
+        localStorage.setItem(gameId, JSON.stringify(parsedGameObj));
     }
     catch(err) {
         console.log(err.message);
@@ -769,12 +812,13 @@ function setPlayerPoints(gameName, playerName, points) {
 
 /**
  * Return matchesPlayed for player
+ * @param {string} gameId
  * @param {string} playerName 
  * @returns number
  */
-function getPlayerMatchesPlayed(gameName, playerName) {
+function getPlayerMatchesPlayed(gameId, playerName) {
     try {
-        let parsedGameObj = getParsedGameObj(gameName);
+        let parsedGameObj = getParsedGameObj(gameId);
         let players = parsedGameObj['players'];
 
         for (let i=0; i<players.length; i++) {
@@ -792,12 +836,13 @@ function getPlayerMatchesPlayed(gameName, playerName) {
 
 /**
  * Sets parameter matchesPlayed for given player.
+ * @param {string} gameId
  * @param {string} playerName 
  * @param {number} matchesPlayed 
  */
-function setPlayerMatchesPlayed(gameName, playerName, matchesPlayed) {
+function setPlayerMatchesPlayed(gameId, playerName, matchesPlayed) {
     try {
-        let parsedGameObj = getParsedGameObj(gameName);
+        let parsedGameObj = getParsedGameObj(gameId);
         let players = parsedGameObj['players'];
 
         for (let i=0; i<players.length; i++) {
@@ -807,7 +852,7 @@ function setPlayerMatchesPlayed(gameName, playerName, matchesPlayed) {
             }
         }
         parsedGameObj['players'] = players;
-        localStorage.setItem(gameName, JSON.stringify(parsedGameObj));
+        localStorage.setItem(gameId, JSON.stringify(parsedGameObj));
     }
     catch(err) {
         console.log(err.message);
@@ -817,12 +862,12 @@ function setPlayerMatchesPlayed(gameName, playerName, matchesPlayed) {
 
 /**
  * Returns number of players in a game
- * @param {string} gameName 
+ * @param {string} gameId 
  * @returns number
  */
-function getNumberOfPlayers(gameName){
+function getNumberOfPlayers(gameId){
     try {
-        let parsedGameObj = getParsedGameObj(gameName);
+        let parsedGameObj = getParsedGameObj(gameId);
         let numberOfPlayers = parsedGameObj['players'].length;
         return numberOfPlayers;
     }
@@ -834,16 +879,17 @@ function getNumberOfPlayers(gameName){
 
 /**
  * Returns placement, string value between 1 and 4, for a player in a match.
+ * @param {string} gameId
  * @param {string} playerName 
  * @param {number} matchId 
  * @returns Player placement
  */
-function getPlayerPlacementInMatch(gameName, playerName, matchId){
+function getPlayerPlacementInMatch(gameId, playerName, matchId){
     try {
-        let parsedGameObj = getParsedGameObj(gameName);
+        let parsedGameObj = getParsedGameObj(gameId);
         let matches = parsedGameObj['matches'];
 
-        if (isMatchPlayed(gameName, matchId)){
+        if (isMatchPlayed(gameId, matchId)){
             for (let i=0; i<matches.length; i++) {
                 if (matches[i].matchId === matchId) { 
                     if (matches[i]['result'].includes(playerName)){
@@ -863,13 +909,14 @@ function getPlayerPlacementInMatch(gameName, playerName, matchId){
 
 
 /**
- * 
+ * Sets match result
+ * @param {string} gameId
  * @param {number} matchId 
  * @param {string[]} result 
  */
- function setMatchResult(gameName, matchId, result){
+ function setMatchResult(gameId, matchId, result){
     try {
-        let parsedGameObj = getParsedGameObj(gameName);        
+        let parsedGameObj = getParsedGameObj(gameId);        
         let matches = parsedGameObj['matches'];
 
         for (let i=0; i<matches.length; i++) {
@@ -881,7 +928,7 @@ function getPlayerPlacementInMatch(gameName, playerName, matchId){
 
         //Update localstorage with results
         parsedGameObj['matches'] = matches;
-        localStorage.setItem(gameName, JSON.stringify(parsedGameObj));
+        localStorage.setItem(gameId, JSON.stringify(parsedGameObj));
     }
     catch(err) {
       console.log(err.message);
@@ -891,12 +938,12 @@ function getPlayerPlacementInMatch(gameName, playerName, matchId){
 
 /**
  * Returns createdDate for game in string format "5. januar 2021"
- * @param {string} gameName 
+ * @param {string} gameId 
  * @returns string
  */
-function getCreatedDateToString(gameName){
+function getCreatedDateToString(gameId){
     let day, monthValue, month, year, dateString;
-    let parsedGameObj = getParsedGameObj(gameName);
+    let parsedGameObj = getParsedGameObj(gameId);
     let createdDate = new Date(parsedGameObj['createdDate']);
     day = createdDate.getDate();
     monthValue = createdDate.getMonth();
@@ -991,11 +1038,12 @@ function getCreatedDateToString(gameName){
 
 /**
  * Returns a sorted list of playerNames base on points
+ * @param {string} gameId
  * @returns string[]
  */
- function getSortedPlayerList(gameName){
+ function getSortedPlayerList(gameId){
     try {
-        let parsedGameObj = getParsedGameObj(gameName);
+        let parsedGameObj = getParsedGameObj(gameId);
         let players = parsedGameObj['players'];
         let sortedPlayerList = [];
     
@@ -1021,11 +1069,11 @@ function getCreatedDateToString(gameName){
                 firstPlayerName = sortedPlayerList[i];
                 secondPlayerName = sortedPlayerList[i+1]
                 //check if the two rows should switch place:
-                if (getPlayerPoints(gameName, firstPlayerName) < getPlayerPoints(gameName, secondPlayerName)) {
+                if (getPlayerPoints(gameId, firstPlayerName) < getPlayerPoints(gameId, secondPlayerName)) {
                 //if so, mark as a switch and break the loop:
                 shouldSwitch = true;
                 break;
-                }else if((getPlayerPoints(gameName, firstPlayerName) === getPlayerPoints(gameName, secondPlayerName)) && (getPlayerMatchesPlayed(gameName, firstPlayerName) > getPlayerMatchesPlayed(gameName, secondPlayerName)) ){
+                }else if((getPlayerPoints(gameId, firstPlayerName) === getPlayerPoints(gameId, secondPlayerName)) && (getPlayerMatchesPlayed(gameId, firstPlayerName) > getPlayerMatchesPlayed(gameId, secondPlayerName)) ){
                     //if so, mark as a switch and break the loop:
                     shouldSwitch = true;
                     break;
@@ -1054,13 +1102,13 @@ function getCreatedDateToString(gameName){
 
 /**
  * Checks if game is complete (all matches are played)
- * @param {string} gameName 
+ * @param {string} gameId 
  * @returns boolean
  */
-function isGameComplete(gameName) {
+function isGameComplete(gameId) {
     let result = false;
 
-    if (getNumberOfMatchesInGame(gameName)>0 && (getNumberOfCompletedMatchesInGame(gameName) === getNumberOfMatchesInGame(gameName))){
+    if (getNumberOfMatchesInGame(gameId)>0 && (getNumberOfCompletedMatchesInGame(gameId) === getNumberOfMatchesInGame(gameId))){
         result = true;
     }
     return result;
@@ -1069,12 +1117,13 @@ function isGameComplete(gameName) {
 
 /**
  * Checks if match is played. Returns boolean.
+ * @param {string} gameId
  * @param {number} matchId 
  * @returns boolean
  */
-function isMatchPlayed(gameName, matchId) {
+function isMatchPlayed(gameId, matchId) {
     try {
-        let parsedGameObj = getParsedGameObj(gameName);   
+        let parsedGameObj = getParsedGameObj(gameId);   
         let matches = parsedGameObj['matches'];
         let isMatchPlayed = false;
     
@@ -1151,7 +1200,7 @@ function isNewGameFormValid(playerNameList, numberOfNewPlayerInputFields, newGam
         return false;
     }
 
-    //Check: Should not be possible to create a new game with the same name as one of the existing games as this would overwrite existing game.
+    //Check: Should not be possible to create a new game with the same name as one of the existing games as this would overwrite existing game.    
     let existingGamesNames = getAllGameNames();
     if (existingGamesNames.includes(newGameName)){
         console.log("New game form is invalid: A game with the name " + newGameName + " already exists!");
