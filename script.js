@@ -210,9 +210,6 @@ function createGamesView(){
             let gameNumberOfPlayers = getNumberOfPlayers(gameId);
             let gameRounds = getGameRounds(gameId);
     
-            if(isGameComplete(gameId)) {
-                gameProgressIconClass = "fas fa-star";
-            }
     
             $('.games-overview').append(
                 '<div class="game-content shadow" id="' + gameId + '">' + 
@@ -227,7 +224,6 @@ function createGamesView(){
                                 '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+
                                 '<span class="game-progress">'+ gameProgress +'</span> <i class="fas fa-flag-checkered" data-toggle="tooltip" title="Matches, progress"></i>'+
                             '</div>' +
-                            '<div class="d-none"><span class="game-progress">Progress: '+ gameProgress +'</span> <span class="game-progress-icon"><i class="'+ gameProgressIconClass +'"></i></span></div>' + //display:none, but leaves it in case I want to use progress text plus icon later (half star turn into full star when all games are completed)
                         '</div>' +
                         '<div class="game-header-right"><span class="invisible">'+ gameCreatedDate +' </span><i class="fas fa-chevron-down"></i></div>' +
                     '</div>' + 
@@ -600,6 +596,15 @@ function convertToSlug(text){
         .toLowerCase()
         .replace(/[^\w ]+/g,'')
         .replace(/ +/g,'-');
+}
+
+
+
+function exportGameJson(gameId) {
+
+    let parsedGameObj = getParsedGameObj(gameId);
+    let data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(parsedGameObj));
+    $('<a href="data:' + data + '" download="'+gameId+'.json">download JSON</a>').appendTo('#downloadTest');
 }
 
 ///////////////////////////////////////////////////////////////////////////////////// GETTERS AND SETTERS //////////////////////////////////////////////////////////////////////////////////////
