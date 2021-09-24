@@ -214,7 +214,10 @@ function createGamesView(){
             $('.games-overview').append(
                 '<div class="game-content shadow" id="' + gameId + '">' + 
                     '<div class="game-header d-sm-flex justify-content-between">' +
-                        '<div class="game-header-left"><i class="far fa-calendar-alt"></i> '+ gameCreatedDate +'</div>' +
+                        '<div class="game-header-left"> ' +
+                            '<div class=""><i class="far fa-calendar-alt"></i> '+ gameCreatedDate +'</div>' +
+                            '<div class="ps-4 invisible d-none-on-sm"><i class="fas fa-ellipsis-v"></i></div>' +
+                        '</div>' +
                         '<div class="game-header-middle">' +
                             '<div><h2>'+ gameName +'</h2></div>' +
                             '<div>'+
@@ -225,7 +228,17 @@ function createGamesView(){
                                 '<span class="game-progress">'+ gameProgress +'</span> <i class="fas fa-flag-checkered" data-toggle="tooltip" title="Matches, progress"></i>'+
                             '</div>' +
                         '</div>' +
-                        '<div class="game-header-right"><span class="invisible">'+ gameCreatedDate +' </span><i class="fas fa-chevron-down"></i></div>' +
+                        '<div class="game-header-right">' +
+                            '<div class="d-inline invisible">'+ gameCreatedDate +'</div>' +
+                            '<div class="d-inline"><i class="fas fa-chevron-down"></i></div>' +
+                            '<div class="dropdown d-inline ps-3">' +
+                                '<a  type="button" id="dropdownMenuGameHeader" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></a>' +
+                                '<div class="dropdown-menu dropdown-primary">' +
+                                    '<a class="dropdown-item" role="button" tabindex="0"><i class="fas fa-download"></i>&nbsp;&nbsp;Download</a>' +
+                                    '<a class="dropdown-item" role="button" tabindex="0"><i class="fas fa-trash-alt"></i>&nbsp;&nbsp;Delete</a>' +
+                                '</div>' +
+                            '</div>' +
+                        '</div>' +
                     '</div>' + 
                     '<hr class="hr-game-content">'+
                     '<div class="game-body">' +
@@ -280,7 +293,10 @@ function updateViewForAllGames(){
             //adds slideToggle on game-body
             $(this).siblings('.game-body').slideToggle();
             //flips game-header-left icon, arrow down->arrow up, and vice versa
-            $(this).find('.game-header-right').find('i').toggleClass('flip');
+            $(this).find('.game-header-right').find('.fa-chevron-down').toggleClass('flip');
+        }).find('#dropdownMenuGameHeader').click(function() {
+            //prevent slideToggle if menu icon is clicked
+            return false;
         });
         $('[data-toggle="tooltip"]').tooltip();
     }
@@ -966,30 +982,31 @@ function getCreatedDateToString(gameId){
     monthValue = createdDate.getMonth();
     year = createdDate.getFullYear();
 
-    switch (monthValue) {
+    let screenWidth = 768;
+    switch (monthValue) {        
         case 0:
-            if ($(window).width() < 450) {
+            if ($(window).width() < screenWidth) {
                 month = "jan";
             }else {
                 month = "januar";
             }
             break;
         case 1:
-            if ($(window).width() < 450) {
+            if ($(window).width() < screenWidth) {
                 month = "feb";
             }else {
                 month = "februar";
             }
             break;
         case 2:
-            if ($(window).width() < 450) {
+            if ($(window).width() < screenWidth) {
                 month = "mar";
             }else {
                 month = "mars";
             }
             break;
         case 3:
-            if ($(window).width() < 450) {
+            if ($(window).width() < screenWidth) {
                 month = "apr";
             }else {
                 month = "april";
@@ -999,49 +1016,49 @@ function getCreatedDateToString(gameId){
             month = "mai";
             break;
         case 5:
-            if ($(window).width() < 450) {
+            if ($(window).width() < screenWidth) {
                 month = "jun";
             }else {
                 month = "juni";
             }
             break;
         case 6:
-            if ($(window).width() < 450) {
+            if ($(window).width() < screenWidth) {
                 month = "jul";
             }else {
                 month = "juli";
             }
             break;
         case 7:
-            if ($(window).width() < 450) {
+            if ($(window).width() < screenWidth) {
                 month = "aug";
             }else {
                 month = "august";
             }
             break;
         case 8:
-            if ($(window).width() < 450) {
+            if ($(window).width() < screenWidth) {
                 month = "sep";
             }else {
                 month = "september";
             }
             break;
         case 9:
-            if ($(window).width() < 450) {
+            if ($(window).width() < screenWidth) {
                 month = "okt";
             }else {
                 month = "oktober";
             }
             break;
         case 10:
-            if ($(window).width() < 450) {
+            if ($(window).width() < screenWidth) {
                 month = "nov";
             }else {
                 month = "november";
             }
             break;
         case 11:
-            if ($(window).width() < 450) {
+            if ($(window).width() < screenWidth) {
                 month = "des";
             }else {
                 month = "desember";

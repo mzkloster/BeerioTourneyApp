@@ -17,7 +17,9 @@ body {
 .fas, .fa, .far {
     cursor: pointer;
 }
-
+h2{
+    color:green;
+}
 .game-body {
     display:none;
 }
@@ -40,11 +42,19 @@ body {
 .hr-game-content{
     margin-top: 0rem;
 }
-.game-header-left, .game-header-right{
-    padding-top: 0.8rem;
-}
 .game-header-left i, .game-header-right i{
     font-size: 120%;
+}
+#dropdownMenuGameHeader{
+    width: 1rem;
+    color: inherit;
+}
+#dropdownMenuGameHeader:hover{
+    /* border: 2px solid gray; */
+    background: linear-gradient(rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.15));
+}
+.game-header-right .fa-chevron-down:hover{
+    background: linear-gradient(rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.15));
 }
 .game-body{
     padding-top: 1rem;
@@ -53,9 +63,6 @@ body {
 .matches-header{
     padding-top: 5rem;
     padding-bottom: 1.5rem;
-}
-h2{
-    color:green;
 }
 .games-overview .alert{
     max-width: 780px;
@@ -79,12 +86,6 @@ h2{
 
 .bottom-fetcher{
     padding-bottom: 5rem;
-}
-
-@media screen and (min-device-width : 576px){
-    .game-table th{
-        width: 20%
-    }
 }
 
 tr.tr-underline{
@@ -256,13 +257,30 @@ input[id="newTournementName"]{
         margin: -0.3rem;
     }
 }
+@media screen and (min-device-width : 576px){
+    .game-header-left, .game-header-right{
+        /* padding-top: 0.8rem; */
+        display: flex;
+        align-items: center;
+    }
+
+    .game-table th{
+        width: 20%
+    }
+}
 @media screen and (max-device-width : 575px){
     /* Removing final-letter col from table on small screens. Comment out since change table to be responsive */
     /* .game-header-right, .final-letter-th, .final-letter-td{
         display: none;
     } */
+    .game-header-left div{
+        display: inline;
+    }
     .game-header-right{
         display: none;
+    }
+    .d-none-on-sm{
+        display: none !important;
     }
 }
 
