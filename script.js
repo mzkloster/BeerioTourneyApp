@@ -302,7 +302,6 @@ function updateViewForAllGames(){
         $('[data-toggle="tooltip"]').tooltip();
 
         $('.export-game').on('click',function(event) {
-            console.log("on click!");
             exportGameJson(event, this);
         })
     }
