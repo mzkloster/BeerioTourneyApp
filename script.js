@@ -234,7 +234,7 @@ function createGamesView(){
                             '<div class="dropdown d-inline ps-3">' +
                                 '<a  type="button" id="dropdownMenuGameHeader" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></a>' +
                                 '<div class="dropdown-menu dropdown-primary">' +
-                                    '<a class="dropdown-item" role="button" tabindex="0"><i class="fas fa-download"></i>&nbsp;&nbsp;Download</a>' +
+                                    '<a class="dropdown-item export-game" role="button" tabindex="0"><i class="fas fa-download"></i>&nbsp;&nbsp;Download</a>' +
                                     '<a class="dropdown-item" role="button" tabindex="0"><i class="fas fa-trash-alt"></i>&nbsp;&nbsp;Delete</a>' +
                                 '</div>' +
                             '</div>' +
@@ -294,11 +294,17 @@ function updateViewForAllGames(){
             $(this).siblings('.game-body').slideToggle();
             //flips game-header-left icon, arrow down->arrow up, and vice versa
             $(this).find('.game-header-right').find('.fa-chevron-down').toggleClass('flip');
-        }).find('#dropdownMenuGameHeader').click(function() {
+        }).find('#dropdownMenuGameHeader, .dropdown-item').click(function() {
             //prevent slideToggle if menu icon is clicked
             return false;
         });
+
         $('[data-toggle="tooltip"]').tooltip();
+
+        $('.export-game').on('click',function(event) {
+            console.log("on click!");
+            exportGameJson(event, this);
+        })
     }
     catch(err) {
         console.log(err.message);
@@ -616,11 +622,18 @@ function convertToSlug(text){
 
 
 
-function exportGameJson(gameId) {
+function exportGameJson(ev, buttonClicked) {
+    ev.preventDefault();
 
+    let gameId = $(buttonClicked).closest('.game-content').attr('id');
     let parsedGameObj = getParsedGameObj(gameId);
+
     let data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(parsedGameObj));
-    $('<a href="data:' + data + '" download="'+gameId+'.json">download JSON</a>').appendTo('#downloadTest');
+    $('<a href="data:' + data + '" download="'+gameId+'.json">download JSON</a>')
+        .appendTo("body")
+        .click(function() {
+            $(this).remove()
+        })[0].click();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////// GETTERS AND SETTERS //////////////////////////////////////////////////////////////////////////////////////
@@ -1299,7 +1312,6 @@ $(document).ready(function(){
     // $('.match-info button').on('click',function(event) {
     //     updateMatchResultModal(event, this);
     // })
-
 
     //running functions when page is entered/refreshed. (Make checks that localStorage is not empty before running, so we avoid error in console)
     updateViewForAllGames();
