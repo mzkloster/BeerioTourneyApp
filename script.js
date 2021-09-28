@@ -620,7 +620,11 @@ function convertToSlug(text){
 }
 
 
-
+/**
+ * Exports game json
+ * @param {event} ev 
+ * @param {html-element} buttonClicked 
+ */
 function exportGameJson(ev, buttonClicked) {
     ev.preventDefault();
 
@@ -634,6 +638,31 @@ function exportGameJson(ev, buttonClicked) {
             $(this).remove()
         })[0].click();
 }
+
+
+/**
+ * Imports game from JSON file
+ * @param {event} ev 
+ */
+function importGame(ev){
+    ev.preventDefault();
+    var reader = new FileReader();
+    var fileToRead = $('#selectFile')[0].files[0];
+
+    reader.onload = function() {
+        let gameObj = JSON.parse(reader.result);
+        let gameName = gameObj['gameName'];
+        let gameNameSlugified = convertToSlug(gameName);
+        let createdDate = new Date(gameObj['createdDate']);
+        gameId = gameNameSlugified + '_' + createdDate.toISOString();
+        localStorage.setItem(gameId, JSON.stringify(gameObj));
+        updateViewForAllGames();
+    };
+
+    reader.readAsText(fileToRead);
+
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////////// GETTERS AND SETTERS //////////////////////////////////////////////////////////////////////////////////////
 
@@ -1307,6 +1336,10 @@ $(document).ready(function(){
         }, 100);
     });
 
+    $('#importGameButton').on('click',function(event) {
+        importGame(event);        
+    })
+    
     //Commented out because this onClick event is added in updateMatchList()
     // $('.match-info button').on('click',function(event) {
     //     updateMatchResultModal(event, this);

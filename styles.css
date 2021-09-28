@@ -160,6 +160,15 @@ input[id="newTournementName"]{
 }
 
 
+/* styling for importGameModal */
+#importGameModal .modal-content{
+    background-color: #ededed;
+}
+input[id="selectFile"]{
+    max-width: 550px;
+    margin: auto;
+}
+
 /* styling matchResutModal */
 #matchResultForm {
     max-width: 180px;
@@ -267,6 +276,10 @@ input[id="newTournementName"]{
     .game-table th{
         width: 20%
     }
+
+    #scrollToGamesOverviewButton, #heroTextView{
+        display: none !important;
+    }
 }
 @media screen and (max-device-width : 575px){
     /* Removing final-letter col from table on small screens. Comment out since change table to be responsive */
@@ -280,6 +293,10 @@ input[id="newTournementName"]{
         display: none;
     }
     .d-none-on-sm{
+        display: none !important;
+    }
+
+    #importGameHeroButton, #heroTextImport{
         display: none !important;
     }
 }

@@ -36,11 +36,13 @@
             <h1><b>Beerio Kart</b></h1>
         </div>
         <div class="hero-text">
-          <p>Create a new Beerio Kart tournament, or view existing tournaments</p>
-          <button type="button" class="btn btn-dark-green btn-lg d-inline" data-bs-toggle="modal" data-bs-target="#createGameModal">
-            Create Tournament
-        </button>
-        <button class="btn btn-secondary btn-lg d-inline" id="scrollToGamesOverviewButton">View Tournaments</button>
+            <p id="heroTextImport">Import or create new Beerio Kart tournament</p>
+            <p id="heroTextView">Create a new Beerio Kart tournament, or view existing tournaments</p>
+            <button type="button" class="btn btn-dark-green btn-lg d-inline" data-bs-toggle="modal" data-bs-target="#createGameModal">
+                Create Tournament
+            </button>
+            <button class="btn btn-secondary btn-lg d-inline" id="importGameHeroButton" data-bs-toggle="modal" data-bs-target="#importGameModal">Import Tournament</button>
+            <button class="btn btn-secondary btn-lg d-inline" id="scrollToGamesOverviewButton">View Tournaments</button>
         </div>
     </div>
     <div class="container">
@@ -106,7 +108,29 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-green" id="generateGameButton" data-bs-dismiss="modal">Create tourney!</button>
+                        <button type="button" class="btn btn-green" id="generateGameButton" data-bs-dismiss="modal">Create</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Modal for import game -->
+        <div class="modal fade" id="importGameModal" tabindex="-1" aria-labelledby="importGameModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header d-flex justify-content-between">
+                        <div><button type="button" class="btn-close invisible" data-bs-dismiss="modal" aria-label="Close"></button></div>
+                        <div><h5 class="modal-title" id="importGameModalLabel">Import tournament</h5></div>
+                        <div><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>                        
+                    </div>
+                    <div class="modal-body">
+                        <label class="form-label" for="selectFile">Select the file you want to import</label>
+                        <input type="file" class="form-control" id="selectFile" accept="application/json" value="Import"/>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-green" id="importGameButton" data-bs-dismiss="modal">Import</button>
                     </div>
                 </div>
             </div>
