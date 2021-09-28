@@ -665,6 +665,7 @@ function importGame(ev){
 
         localStorage.setItem(gameId, JSON.stringify(gameObj));
         updateViewForAllGames();
+        $('#selectFile').val("");
     };
 
     reader.readAsText(fileToRead);
