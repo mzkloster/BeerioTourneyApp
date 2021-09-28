@@ -630,9 +630,11 @@ function exportGameJson(ev, buttonClicked) {
 
     let gameId = $(buttonClicked).closest('.game-content').attr('id');
     let parsedGameObj = getParsedGameObj(gameId);
+    let gameName = parsedGameObj['gameName'];
+    let gameNameSlugified = convertToSlug(gameName);
 
     let data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(parsedGameObj));
-    $('<a href="data:' + data + '" download="'+gameId+'.json">download JSON</a>')
+    $('<a href="data:' + data + '" download="'+gameNameSlugified+'.json">download JSON</a>')
         .appendTo("body")
         .click(function() {
             $(this).remove()
