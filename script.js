@@ -655,6 +655,14 @@ function importGame(ev){
         let gameNameSlugified = convertToSlug(gameName);
         let createdDate = new Date(gameObj['createdDate']);
         gameId = gameNameSlugified + '_' + createdDate.toISOString();
+
+        //Should not be possible to import game if game already exists
+        let existingGameIdsList = getAllGameIds();
+        if (existingGameIdsList.includes(gameId)){
+            alert('Your game was not imported because game "'+ gameName +'" already exists. \nIf you still want to upload this game, you have to delete the existing game first, and then try to import again.');
+            return;
+        }
+
         localStorage.setItem(gameId, JSON.stringify(gameObj));
         updateViewForAllGames();
     };
