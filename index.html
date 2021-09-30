@@ -136,6 +136,28 @@
             </div>
         </div>
 
+
+        <!-- Modal for deleting game -->
+        <div class="modal fade" id="deleteGameModal" tabindex="-1" aria-labelledby="deleteGameModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header d-flex justify-content-between">
+                        <div><button type="button" class="btn-close invisible" data-bs-dismiss="modal" aria-label="Close"></button></div>
+                        <div><h5 class="modal-title" id="deleteGameModalLabel">Confirm deletion</h5></div>
+                        <div><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>                        
+                    </div>
+                    <div class="modal-body">
+                        <p class="pt-1">Do you want to permanently delete the game "<span class="game-name"></span>" ?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-danger" id="deleteGameButton" data-bs-dismiss="modal">Delete</button>
+                    </div>
+                    <div class="game-id d-none"></div>
+                </div>
+            </div>
+        </div>
+
     
         <!-- Modal for saving/updating match result -->
         <div class="modal fade" id="matchResultModal" tabindex="-1" aria-labelledby="matchResultModalLabel" aria-hidden="true">
@@ -168,7 +190,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-green" id="saveMatchResultbutton" data-bs-dismiss="modal">Save result</button>
+                    <button type="button" class="btn btn-green" id="saveMatchResultButton" data-bs-dismiss="modal">Save result</button>
                 </div>
                 <div class="game-id d-none"></div>
             </div>

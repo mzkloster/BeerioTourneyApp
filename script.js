@@ -235,7 +235,7 @@ function createGamesView(){
                                 '<a  type="button" id="dropdownMenuGameHeader" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></a>' +
                                 '<div class="dropdown-menu dropdown-primary">' +
                                     '<a class="dropdown-item export-game" role="button" tabindex="0"><i class="fas fa-download"></i>&nbsp;&nbsp;Download</a>' +
-                                    '<a class="dropdown-item" role="button" tabindex="0"><i class="fas fa-trash-alt"></i>&nbsp;&nbsp;Delete</a>' +
+                                    '<a class="dropdown-item delete-game" role="button" tabindex="0" data-bs-toggle="modal" data-bs-target="#deleteGameModal"><i class="fas fa-trash-alt"></i>&nbsp;&nbsp;Delete</a>' +
                                 '</div>' +
                             '</div>' +
                         '</div>' +
@@ -303,6 +303,9 @@ function updateViewForAllGames(){
 
         $('.export-game').on('click',function(event) {
             exportGameJson(event, this);
+        })
+        $('.delete-game').on('click',function(event) {
+            updateDeleteGameModal(event, this);
         })
     }
     catch(err) {
@@ -672,6 +675,38 @@ function importGame(ev){
 
     reader.readAsText(fileToRead);
 
+}
+
+
+
+/**
+ * Updates values in deleteGameModal (matchId, playerNames) that is about to be shown when delete button is clicked
+ * @param {event} ev 
+ * @param {html-element} buttonClicked delete button game settings
+ */
+ function updateDeleteGameModal(ev, buttonClicked){
+    ev.preventDefault();
+
+    //set gameId value to none displayed div in modal (so gameId can be passed on to deleteGame function)
+    let gameId = $(buttonClicked).closest('.game-content').attr('id');
+    $('#deleteGameModal').find('.game-id').text(gameId);
+
+    let gameName = getGameName(gameId);
+    $('#deleteGameModal').find('.modal-body').find('.game-name').text(gameName);
+
+}
+
+
+/**
+ * Delete game. Triggered when clicking delete button in deleteGameModal
+ * @param {event} ev
+ */
+function deleteGameFromDeleteGameModal(ev){
+    ev.preventDefault();
+
+    let gameId = $('#deleteGameModal').find('.game-id').text();
+    localStorage.removeItem(gameId);
+    updateViewForAllGames();
 }
 
 
@@ -1337,7 +1372,7 @@ $(document).ready(function(){
         updateGameRoundsOptions()
     })
     
-    $('#saveMatchResultbutton').on('click',function(event) {
+    $('#saveMatchResultButton').on('click',function(event) {
         saveMatchResult(event);
     })
 
@@ -1349,6 +1384,10 @@ $(document).ready(function(){
 
     $('#importGameButton').on('click',function(event) {
         importGame(event);        
+    })
+
+    $('#deleteGameButton').on('click',function(event) {
+        deleteGameFromDeleteGameModal(event);
     })
     
     //Commented out because this onClick event is added in updateMatchList()
