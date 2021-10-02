@@ -264,6 +264,18 @@ function createGamesView(){
                         '<ul class="list-group list-group-flush matches-list">' +
                             '<!-- list rows with matches are generated here. Example: -->' +
                         '</ul>' +
+                        '<div class="mobile-game-footer">' +
+                            '<hr class="mt-4">' +
+                            '<div class="mt-4">' +
+                                '<div class="d-inline float-start invisible"><a class="dropdownMenuGameFooter ms-1" type="button" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></a></div>' +
+                                '<div class="d-inline game-footer-toggle"><i class="fas fa-chevron-up"></i></div>' +
+                                '<div class="dropdown d-inline float-end">' +
+                                '<a class="dropdownMenuGameFooter me-1" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></a>' +
+                                '<div class="dropdown-menu dropdown-primary">' +
+                                    '<a class="dropdown-item delete-game" role="button" tabindex="0" data-bs-toggle="modal" data-bs-target="#deleteGameModal"><i class="fas fa-trash-alt"></i>&nbsp;&nbsp;Delete</a>' +
+                                '</div>' +
+                            '</div>' +
+                        '</div>' +
                     '</div>' +
                 '</div>');
         }
@@ -298,6 +310,10 @@ function updateViewForAllGames(){
             //prevent slideToggle if menu icon is clicked
             return false;
         });
+        $('.game-footer-toggle').on('click', function(){
+            //adds slideToggle on game-body
+            $(this).closest('.game-body').slideToggle();
+        })
 
         $('[data-toggle="tooltip"]').tooltip();
 

@@ -45,9 +45,13 @@ h2{
 .game-header-left i, .game-header-right i{
     font-size: 120%;
 }
-#dropdownMenuGameHeader{
+#dropdownMenuGameHeader, .dropdownMenuGameFooter{
     width: 1rem;
     color: inherit;
+}
+.dropdownMenuGameFooter{
+    width: 2.5rem;
+    color: inherit !important;
 }
 #dropdownMenuGameHeader:hover{
     /* border: 2px solid gray; */
@@ -92,6 +96,12 @@ tr.tr-underline{
     border-bottom: 1.1px dashed #212529;
 }
 
+.fa-chevron-up{
+    transform: scale(4,1.6);
+}
+.mobile-game-footer .fa-ellipsis-v{
+    font-size: 120%;
+}
 
 /* styling for buttons */
 .btn-blue{
@@ -279,6 +289,9 @@ input[id="selectFile"]{
 
     #scrollToGamesOverviewButton, #heroTextView{
         display: none !important;
+    }
+    .mobile-game-footer{
+        display: none;
     }
 }
 @media screen and (max-device-width : 575px){
