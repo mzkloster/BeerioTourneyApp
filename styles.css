@@ -8,7 +8,6 @@ body {
     color: #212529 !important;
     text-align: center;
     font-family: Arial, sans-serif;
-    
 }
 .center {
     margin: auto;
@@ -102,6 +101,7 @@ tr.tr-underline{
 .mobile-game-footer .fa-ellipsis-v{
     font-size: 120%;
 }
+
 
 /* styling for buttons */
 .btn-blue{
@@ -311,6 +311,10 @@ input[id="selectFile"]{
 
     #importGameHeroButton, #heroTextImport{
         display: none !important;
+    }
+    /* fix for delete modal padding right bug */
+    .modal-open{
+        padding-right: 0px !important;
     }
 }
 
