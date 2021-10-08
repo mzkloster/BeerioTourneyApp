@@ -181,14 +181,14 @@ function updateGameRoundsOptions() {
  */
 function createGamesView(){
     try {
+        //Removing all existing games, before adding all (existing + new) games
+        $('.games-overview').empty();
+
         let allGamesIds = getAllGameIds();
         if (allGamesIds.length === 0){
             showNoExistingGamesAlert()
             return;
         }
-    
-        //Removing all existing games, before adding all (existing + new) games
-        $('.games-overview').empty();
         
         let positionTableHeader;
         let matchesPlayedTableHeader;
