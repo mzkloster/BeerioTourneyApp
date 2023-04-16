@@ -115,7 +115,7 @@ function generateGame(ev){
         updateMatchesList(gameId);
     }
     catch(err) {
-        console.log(err.message);
+        console.log("Error from generateMatches: " + err.message);
     }
 }
 
@@ -151,7 +151,7 @@ function updateNumberOfPlayersInCreateGameModal() {
         $('#numberOfPlayersForNewGame').text(numberOfPlayers.toString());
     }
     catch(err) {
-        console.log(err.message);
+        console.log("Error from updateNumberOfPlayersInCreateGameModal: " + err.message);
     }
 }
 
@@ -171,7 +171,7 @@ function updateGameRoundsOptions() {
         }
     }
     catch(err) {
-        console.log(err.message)
+        console.log("Error from updateGameRoundsOptions: " + err.message)
     }    
 }
 
@@ -281,7 +281,7 @@ function createGamesView(){
         }
     }
     catch(err) {
-        console.log(err.message);
+        console.log("Error from createGamesView: " + err.message);
     }
 }
 
@@ -325,7 +325,7 @@ function updateViewForAllGames(){
         })
     }
     catch(err) {
-        console.log(err.message);
+        console.log("Error from updateViewForAllGames: " + err.message);
     }
 }
 
@@ -359,7 +359,7 @@ function showNoExistingGamesAlert(){
         $('.game-content[id="'+gameId+'"]').find('.game-progress-icon').find('i').removeClass().addClass(gameProgressIconClass);
     }
     catch(err) {
-        console.log(err.message);
+        console.log("Error from updateGameProgress: " + err.message);
     }
 }
 
@@ -407,7 +407,7 @@ function updateGameTableDisplay(gameId){
         } 
     }
     catch(err) {
-        console.log(err.message);
+        console.log("Error from updateGameTableDisplay: " + err.message);
     }    
 }
 
@@ -449,7 +449,7 @@ function updateGameTableDisplay(gameId){
         }
     }
     catch(err) {
-        console.log(err.message);
+        console.log("Error from updatePlayerPointsAndMatchesPlayedFromAllMatchResults: " + err.message);
     }    
 }
 
@@ -528,7 +528,7 @@ function updateMatchesList(gameId) {
         });
     }
     catch(err) {
-        console.log(err.message);
+        console.log("Error from updateMatchesList: " + err.message);
     }    
 }
 
@@ -740,7 +740,7 @@ function deleteGameFromDeleteGameModal(ev){
         return parsedGameObj;
     }
     catch(err) {
-        console.log(err.message);
+        console.log("Error from getParsedGameObj: " + err.message);
     }
 }
 
@@ -758,7 +758,7 @@ function getGameName(gameId){
         return gameName;
     }
     catch(err) {
-        console.log(err.message);
+        console.log("Error from getGameName: " + err.message);
     }
 }
 
@@ -768,15 +768,15 @@ function getGameName(gameId){
  * @returns string[]
  */
 function getAllGameIds(){
-    try {
-        //get all keys from localstorage
-        let allKeys = Object.keys(localStorage);
-        //all gameNames sorted by createdDate
-        let allGamesIdsSorted = []
+    //get all keys from localstorage
+    let allKeys = Object.keys(localStorage);
+    //all gameNames sorted by createdDate
+    let allGamesIdsSorted = []
 
-        unsortedgameObjects = [];
+    let unsortedgameObjects = [];
 
-        for (let i=0; i<allKeys.length; i++){
+    for (let i=0; i<allKeys.length; i++){
+        try {
             let parsedGameObj = getParsedGameObj(allKeys[i]);
             // let gameName = parsedGameObj['gameName'];
             let createdDate = parsedGameObj['createdDate'];
@@ -787,18 +787,19 @@ function getAllGameIds(){
             }  
             unsortedgameObjects.push(newObject);
         }
+        catch(err) {
+            console.log("Error from getAllGameIds: " + err.message);
+        } 
 
-        let sortedgameObjects = unsortedgameObjects.slice().sort((a,b) => b.date - a.date)
-
-        for (let i=0; i<sortedgameObjects.length; i++){
-            allGamesIdsSorted.push(sortedgameObjects[i].gameId);
-        }
-
-        return allGamesIdsSorted;
     }
-    catch(err) {
-        console.log(err.message);
-    }    
+
+    let sortedgameObjects = unsortedgameObjects.slice().sort((a,b) => b.date - a.date)
+
+    for (let i=0; i<sortedgameObjects.length; i++){
+        allGamesIdsSorted.push(sortedgameObjects[i].gameId);
+    }
+
+    return allGamesIdsSorted;  
 }
 
 
@@ -814,7 +815,7 @@ function getAllGameNames(){
         return allGameNames;
     }
     catch(err) {
-        console.log(err.message);
+        console.log("Error from getAllGameNames: " + err.message);
     }
 }
 
@@ -832,7 +833,7 @@ function getNumberOfMatchesInGame(gameId){
         return numberOfMatches;
     }
     catch(err) {
-        console.log(err.message);
+        console.log("Error from getNumberOfMatchesInGame: " + err.message);
     }
 }
 
@@ -849,7 +850,7 @@ function getGameProgress(gameId){
         return gameProgress;
     }
     catch(err) {
-        console.log(err.message);
+        console.log("Error from getGameProgress: " + err.message);
     }
 }
 
@@ -867,7 +868,7 @@ function getGameRounds(gameId){
         return gameRounds;
     }
     catch(err) {
-        console.log(err.message);
+        console.log("Error from getGameRounds: " + err.message);
     }
 }
 
@@ -891,7 +892,7 @@ function getNumberOfCompletedMatchesInGame(gameId){
         return numberOfCompletedMatches
     }
     catch(err) {
-        console.log(err.message);
+        console.log("Error from getNumberOfCompletedMatchesInGame: " + err.message);
     }
 }
 
@@ -915,7 +916,7 @@ function getPlayerPoints(gameId, playerName) {
         }
     }
     catch(err) {
-        console.log(err.message);
+        console.log("Error from getPlayerPoints: " + err.message);
     }   
 }
 
@@ -941,7 +942,7 @@ function setPlayerPoints(gameId, playerName, points) {
         localStorage.setItem(gameId, JSON.stringify(parsedGameObj));
     }
     catch(err) {
-        console.log(err.message);
+        console.log("Error from setPlayerPoints: " + err.message);
     }
 }
 
@@ -965,7 +966,7 @@ function getPlayerMatchesPlayed(gameId, playerName) {
         }
     }
     catch(err) {
-        console.log(err.message);
+        console.log("Error from getPlayerMatchesPlayed: " + err.message);
     }
 }
 
@@ -991,7 +992,7 @@ function setPlayerMatchesPlayed(gameId, playerName, matchesPlayed) {
         localStorage.setItem(gameId, JSON.stringify(parsedGameObj));
     }
     catch(err) {
-        console.log(err.message);
+        console.log("Error from setPlayerMatchesPlayed: " + err.message);
     }
 }
 
@@ -1008,7 +1009,7 @@ function getNumberOfPlayers(gameId){
         return numberOfPlayers;
     }
     catch(err) {
-        console.log(err.message);
+        console.log("Error from getNumberOfPlayers: " + err.message);
     }    
 }
 
@@ -1039,7 +1040,7 @@ function getPlayerPlacementInMatch(gameId, playerName, matchId){
         }
     }
     catch(err) {
-      console.log(err.message);
+      console.log("Error from getPlayerPlacementInMatch: " + err.message);
     }
 }
 
@@ -1067,7 +1068,7 @@ function getPlayerPlacementInMatch(gameId, playerName, matchId){
         localStorage.setItem(gameId, JSON.stringify(parsedGameObj));
     }
     catch(err) {
-      console.log(err.message);
+      console.log("Error from setMatchResult: " + err.message);
     }    
 }
 
@@ -1127,7 +1128,7 @@ function getPlayerPlacementInMatch(gameId, playerName, matchId){
         return sortedPlayerList;
     }
     catch(err) {
-        console.log(err.message);
+        console.log("Error from getSortedPlayerList: " + err.message);
     } 
 }
 
@@ -1173,7 +1174,7 @@ function isMatchPlayed(gameId, matchId) {
         return isMatchPlayed;
     }
     catch(err) {
-        console.log(err.message);        
+        console.log("Error from isMatchPlayed: " + err.message);        
     }
 }
 
