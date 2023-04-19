@@ -346,3 +346,13 @@ input[id="selectFile"]{
 .text-align-center {
     text-align: center !important;
 }
+
+/* scrollbar */
+::-webkit-scrollbar {
+    width: 17px;
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: #c7c7c7;
+    border-radius: 0;
+}
