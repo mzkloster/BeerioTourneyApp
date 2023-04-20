@@ -349,8 +349,9 @@ input[id="selectFile"]{
 
 /* scrollbar */
 ::-webkit-scrollbar {
-    width: 17px;
-    background: transparent;
+    width: 10px;
+    /* background: transparent; */
+    background: #303030;
 }
 ::-webkit-scrollbar-thumb {
     background: #c7c7c7;
