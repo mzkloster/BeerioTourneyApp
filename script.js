@@ -334,7 +334,7 @@ function updateViewForAllGames(){
  * Shows an alert in games-overview (shown if there is no games created in localStorage)
  */
 function showNoExistingGamesAlert(){
-    let alertContent = '<button class="btn disabled"><i class="fas fa-info-circle"></i></button>You have no existing tourments. Click the "Create Tournament" button above to create you first Beerio Kart Tournement!';
+    let alertContent = '<button class="btn disabled"><i class="fas fa-info-circle"></i></button>You have no existing tournaments. Click the "Create Tournament" button above to create you first Beerio Kart Tournement!';
     $('.games-overview').append(
         '<div class="alert alert-primary" role="alert">'+ alertContent +'</div>'
     );
