@@ -189,95 +189,21 @@ function createGamesView(){
             showNoExistingGamesAlert()
             return;
         }
-        
-        let positionTableHeader;
-        let matchesPlayedTableHeader;
-        if ($(window).width() > 575) {
-            positionTableHeader = 'Position';
-            matchesPlayedTableHeader = 'Matches played';
-        }else {
-            positionTableHeader = 'Pos';
-            matchesPlayedTableHeader = 'Matches';
-        }
+
+        const positionTableHeader = $(window).width() > 575 ? 'Position' : 'Pos';
+        const matchesPlayedTableHeader = $(window).width() > 575 ? 'Matches played' : 'Matches';
 
         //adding game-content for all games    
         for (let i=0; i<allGamesIds.length; i++){
             let gameId = allGamesIds[i];
             let gameName = getGameName(gameId);
             let gameProgress = getGameProgress(gameId);
-            let gameProgressIconClass = "fas fa-star-half-alt";
             let gameCreatedDate = getCreatedDateToString(gameId);
             let gameNumberOfPlayers = getNumberOfPlayers(gameId);
             let gameRounds = getGameRounds(gameId);
-    
-    
-            $('.games-overview').append(
-                '<div class="game-content shadow" id="' + gameId + '">' + 
-                    '<div class="game-header d-sm-flex justify-content-between">' +
-                        '<div class="game-header-left"> ' +
-                            '<div class=""><i class="far fa-calendar-alt"></i> '+ gameCreatedDate +'</div>' +
-                            '<div class="ps-4 invisible d-none-on-sm"><i class="fas fa-ellipsis-v"></i></div>' +
-                        '</div>' +
-                        '<div class="game-header-middle">' +
-                            '<div><h2>'+ gameName +'</h2></div>' +
-                            '<div>'+
-                                '<span>'+ gameNumberOfPlayers +' <i class="fas fa-users" data-toggle="tooltip" title="Players"></i></span>'+
-                                '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+
-                                '<span>'+ gameRounds +' <i class="fas fa-circle" data-toggle="tooltip" title="Rounds"></i></span>'+
-                                '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+
-                                '<span class="game-progress">'+ gameProgress +'</span> <i class="fas fa-flag-checkered" data-toggle="tooltip" title="Matches, progress"></i>'+
-                            '</div>' +
-                        '</div>' +
-                        '<div class="game-header-right">' +
-                            '<div class="d-inline invisible">'+ gameCreatedDate +'</div>' +
-                            '<div class="d-inline"><i class="fas fa-chevron-down"></i></div>' +
-                            '<div class="dropdown d-inline ps-3">' +
-                                '<a  type="button" id="dropdownMenuGameHeader" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></a>' +
-                                '<div class="dropdown-menu dropdown-primary">' +
-                                    '<a class="dropdown-item export-game" role="button" tabindex="0"><i class="fas fa-download"></i>&nbsp;&nbsp;Download</a>' +
-                                    '<a class="dropdown-item delete-game" role="button" tabindex="0" data-bs-toggle="modal" data-bs-target="#deleteGameModal"><i class="fas fa-trash-alt"></i>&nbsp;&nbsp;Delete</a>' +
-                                '</div>' +
-                            '</div>' +
-                        '</div>' +
-                    '</div>' + 
-                    '<hr class="hr-game-content">'+
-                    '<div class="game-body">' +
-                        '<h3 ="table-header">Table</h3>' +
-                        '<div class="table-responsive">' +
-                            '<table class="game-table table table-striped center">' +
-                                '<thead>' +
-                                    '<tr>' +
-                                        '<th>'+positionTableHeader+'</th>' +
-                                        '<th>Name</th>' +
-                                        '<th>'+matchesPlayedTableHeader+'</th>' +
-                                        '<th>Points</th>' +
-                                        '<th class="final-letter-th">Final</th>' +
-                                    '</tr>' +
-                                '</thead>' +
-                                '<tbody class="game-table-body">' +
-                                    '<!-- table rows are generated here -->' +
-                                '</tbody>' +
-                            '</table>' +
-                        '</div>' +   
-                        
-                        '<h3 class="matches-header">Matches</h3>' +
-                        '<ul class="list-group list-group-flush matches-list">' +
-                            '<!-- list rows with matches are generated here. Example: -->' +
-                        '</ul>' +
-                        '<div class="mobile-game-footer">' +
-                            '<hr class="mt-4">' +
-                            '<div class="mt-4">' +
-                                '<div class="d-inline float-start invisible"><a class="dropdownMenuGameFooter ms-1" type="button" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></a></div>' +
-                                '<div class="d-inline game-footer-toggle"><i class="fas fa-chevron-up"></i></div>' +
-                                '<div class="dropdown d-inline float-end">' +
-                                '<a class="dropdownMenuGameFooter me-1" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></a>' +
-                                '<div class="dropdown-menu dropdown-primary">' +
-                                    '<a class="dropdown-item delete-game" role="button" tabindex="0" data-bs-toggle="modal" data-bs-target="#deleteGameModal"><i class="fas fa-trash-alt"></i>&nbsp;&nbsp;Delete</a>' +
-                                '</div>' +
-                            '</div>' +
-                        '</div>' +
-                    '</div>' +
-                '</div>');
+
+            let gameContentElement = getGameContentElement(gameId, gameCreatedDate, gameName, gameNumberOfPlayers, gameRounds, gameProgress, positionTableHeader, matchesPlayedTableHeader);
+            $('.games-overview').append(gameContentElement);
         }
     }
     catch(err) {
@@ -336,7 +262,7 @@ function updateViewForAllGames(){
 function showNoExistingGamesAlert(){
     let alertContent = '<button class="btn disabled"><i class="fas fa-info-circle"></i></button>You have no existing tournaments. Click the "Create Tournament" button above to create you first Beerio Kart Tournement!';
     $('.games-overview').append(
-        '<div class="alert alert-primary" role="alert">'+ alertContent +'</div>'
+        `<div class="alert alert-primary" role="alert">${alertContent}</div>`
     );
 }
 
@@ -347,16 +273,8 @@ function showNoExistingGamesAlert(){
  */
  function updateGameProgress(gameId){
     try {
-        let gameName = getGameName(gameId)
-        let gameProgress = getGameProgress(gameId);
-        let gameProgressIconClass = "fas fa-star-half-alt";
-    
+        let gameProgress = getGameProgress(gameId);    
         $('.game-content[id="'+gameId+'"]').find('.game-progress').text(gameProgress);
-    
-        if(isGameComplete(gameId)) {
-            gameProgressIconClass = "fas fa-star";        
-        }
-        $('.game-content[id="'+gameId+'"]').find('.game-progress-icon').find('i').removeClass().addClass(gameProgressIconClass);
     }
     catch(err) {
         console.log("Error from updateGameProgress: " + err.message);
@@ -396,7 +314,8 @@ function updateGameTableDisplay(gameId){
                 finalCounter -= 1;
             }
 
-            newTableRow = '<tr class="'+trClass+'"><td>'+position +'</td><td>' + playerNameValue + '</td><td>' + matchesPlayedValue + '</td><td>' + playerPointsValue + '</td><td class="final-letter-td">'+finalLetters[finalCounter]+'</td></tr>';
+            // newTableRow = '<tr class="'+trClass+'"><td>'+position +'</td><td>' + playerNameValue + '</td><td>' + matchesPlayedValue + '</td><td>' + playerPointsValue + '</td><td class="final-letter-td">'+finalLetters[finalCounter]+'</td></tr>';
+            newTableRow = `<tr class="${trClass}"><td>${position}</td><td>${playerNameValue}</td><td>${matchesPlayedValue}</td><td>${playerPointsValue}</td><td class="final-letter-td">${finalLetters[finalCounter]}</td></tr>`;
             $('div[id="'+ gameId +'"]').find('.game-table-body').append(newTableRow);
 
 
@@ -464,62 +383,16 @@ function updateMatchesList(gameId) {
         $('div[id="'+ gameId +'"]').find('.matches-list').empty();
 
         //loop through matches and create new updated match list items
-        let parsedGameObj = getParsedGameObj(gameId);
-        let matches = parsedGameObj['matches'];
+        let gameObj = getParsedGameObj(gameId);
+        let matches = gameObj.matches;
 
-        for (let i=0; i<matches.length; i++){
-            player1BagdeValue = "";
-            player2BagdeValue = "";
-            player3BagdeValue = "";
-            player4BagdeValue = "";
-            
-            //if match is played: loop through players in that match, find player placement, and set bagdeValue
-            if (isMatchPlayed(gameId, matches[i]['matchId'])){            
-                for (let j=0; j<4; j++){
-                    let playerName = matches[i]['players'][j];
-                    let playerPlacement = getPlayerPlacementInMatch(gameId, playerName, matches[i]['matchId']);
+        for (const match of matches){
+            const matchId = match.matchId;
+            const player1 = match.players[0], player2 = match.players[1], player3 = match.players[2], player4 = match.players[3];
+            const isMatchPlayedBool = isMatchPlayed(gameId, matchId);
 
-                    switch(j) {
-                        case 0:
-                            player1BagdeValue = playerPlacement;
-                            break;
-                        case 1:
-                            player2BagdeValue = playerPlacement;
-                            break;
-                        case 2:
-                            player3BagdeValue = playerPlacement;
-                            break;
-                        case 3:
-                            player4BagdeValue = playerPlacement;
-                            break;                      
-                    }
-                }
-            }
-            
-            let spacingElement;
-            if ($(window).width() < 576) {
-                spacingElement = "";
-             }
-             else {
-                spacingElement = " &nbsp;&nbsp;|&nbsp;&nbsp; ";
-            }
-
-            newListRow = 
-            '<li class="list-group-item">' +
-                '<div class="match-info d-flex justify-content-between">' + 
-                    '<div><b class="match-number">Match <span class="match-id">' + matches[i]['matchId'] + '</span></b></div>' +
-                    '<div>' +
-                        '<div class="d-sm-flex justify-content-center">' +
-                        '<div><span class="match-player-1">' + matches[i]['players'][0] + '</span> <span class="match-player-1-bagde badge badge-placement-'+player1BagdeValue+'">' + player1BagdeValue + '</span>' + spacingElement + '</div>' +
-                        '<div><span class="match-player-2">' + matches[i]['players'][1] + '</span> <span class="match-player-2-bagde badge badge-placement-'+player2BagdeValue+'">' + player2BagdeValue + '</span>' + spacingElement + '</div>' + 
-                        '<div><span class="match-player-3">' + matches[i]['players'][2] + '</span> <span class="match-player-3-bagde badge badge-placement-'+player3BagdeValue+'">' + player3BagdeValue + '</span>' + spacingElement + '</div>' +  
-                        '<div><span class="match-player-4">' + matches[i]['players'][3] + '</span> <span class="match-player-4-bagde badge badge-placement-'+player4BagdeValue+'">' + player4BagdeValue + '</span> </div>' + 
-                        '</div>' +
-                    '</div>' +
-                    '<div><button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#matchResultModal"><i class="fas fa-edit"></i></button></div>' + 
-                '</div>' +
-            '</li>'
-        $('div[id="'+ gameId +'"]').find('.list-group').append(newListRow);
+            let matchesListRowElement = getMatchesListRowElement(gameId, matchId, player1, player2, player3, player4, isMatchPlayedBool);
+            $('div[id="'+ gameId +'"]').find('.matches-list').append(matchesListRowElement);            
         }
 
         //adds onClick event on edit buttons again (since all "old" match list items are removed in the beginning of this function)
