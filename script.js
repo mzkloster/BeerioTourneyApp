@@ -221,9 +221,9 @@ function updateViewForAllGames(){
         createGamesView();
 
         let allGamesIds = getAllGameIds();
-        for (let i=0; i<allGamesIds.length; i++){        
-            updateGameTableDisplay(allGamesIds[i]);
-            updateMatchesList(allGamesIds[i]);
+        for (const gameId of allGamesIds){        
+            updateGameTableDisplay(gameId);
+            updateMatchesList(gameId);
         }
     
         //adding on-click slideToggle for games
@@ -522,7 +522,7 @@ function exportGameJson(ev, buttonClicked) {
 
     let gameId = $(buttonClicked).closest('.game-content').attr('id');
     let parsedGameObj = getParsedGameObj(gameId);
-    let gameName = parsedGameObj['gameName'];
+    let gameName = parsedGameObj.gameName;
     let gameNameSlugified = convertToSlug(gameName);
 
     let data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(parsedGameObj));
@@ -626,7 +626,7 @@ function deleteGameFromDeleteGameModal(ev){
 function getGameName(gameId){
     try {
         let parsedGameObj = getParsedGameObj(gameId);
-        let gameName = parsedGameObj['gameName'];
+        let gameName = parsedGameObj.gameName;
 
         return gameName;
     }
@@ -648,14 +648,14 @@ function getAllGameIds(){
 
     let unsortedgameObjects = [];
 
-    for (let i=0; i<allKeys.length; i++){
+    for (const key of allKeys){
         try {
-            let parsedGameObj = getParsedGameObj(allKeys[i]);
+            let parsedGameObj = getParsedGameObj(key);
             // let gameName = parsedGameObj['gameName'];
-            let createdDate = parsedGameObj['createdDate'];
+            let createdDate = parsedGameObj.createdDate;
             
             let newObject = {
-                gameId: allKeys[i],
+                gameId: key,
                 date: new Date(createdDate)
             }  
             unsortedgameObjects.push(newObject);
@@ -668,8 +668,8 @@ function getAllGameIds(){
 
     let sortedgameObjects = unsortedgameObjects.slice().sort((a,b) => b.date - a.date)
 
-    for (let i=0; i<sortedgameObjects.length; i++){
-        allGamesIdsSorted.push(sortedgameObjects[i].gameId);
+    for (const gameObject of sortedgameObjects){
+        allGamesIdsSorted.push(gameObject.gameId);
     }
 
     return allGamesIdsSorted;  
@@ -682,8 +682,8 @@ function getAllGameNames(){
         let allGameNames = [];
         let allGameIds = getAllGameIds();
 
-        for (let i = 0; i<allGameIds.length; i++){
-            allGameNames.push(getGameName(allGameIds[i]));
+        for (const gameId of allGameIds){
+            allGameNames.push(getGameName(gameId));
         }
         return allGameNames;
     }
@@ -702,7 +702,7 @@ function getAllGameNames(){
 function getNumberOfMatchesInGame(gameId){
     try {
         let parsedGameObj = getParsedGameObj(gameId);
-        let numberOfMatches = parsedGameObj['matches'].length;
+        let numberOfMatches = parsedGameObj.matches.length;
         return numberOfMatches;
     }
     catch(err) {
@@ -736,7 +736,7 @@ function getGameProgress(gameId){
 function getGameRounds(gameId){
     try {
         let parsedGameObj = getParsedGameObj(gameId);
-        let gameRounds = parsedGameObj['rounds'];
+        let gameRounds = parsedGameObj.rounds;
 
         return gameRounds;
     }
@@ -754,11 +754,11 @@ function getGameRounds(gameId){
 function getNumberOfCompletedMatchesInGame(gameId){
     try {
         let parsedGameObj = getParsedGameObj(gameId);
-        let matches = parsedGameObj['matches'];
+        let matches = parsedGameObj.matches;
         let numberOfCompletedMatches = 0;
 
-        for (let i=0; i<matches.length; i++){
-            if (isMatchPlayed(gameId, matches[i].matchId)){
+        for (const match of matches){
+            if (isMatchPlayed(gameId, match.matchId)){
                 numberOfCompletedMatches += 1;
             }
         }
@@ -779,11 +779,11 @@ function getNumberOfCompletedMatchesInGame(gameId){
 function getPlayerPoints(gameId, playerName) {
     try {
         let parsedGameObj = getParsedGameObj(gameId);
-        let players = parsedGameObj['players'];
+        let players = parsedGameObj.players;
 
-        for (let i=0; i<players.length; i++) {
-            if (players[i].playerName === playerName) {
-                let playerPoints = players[i].points;
+        for (const player of players) {
+            if (player.playerName === playerName) {
+                let playerPoints = player.points;
                 return playerPoints;           
             }
         }
@@ -803,15 +803,15 @@ function getPlayerPoints(gameId, playerName) {
 function setPlayerPoints(gameId, playerName, points) {
     try {
         let parsedGameObj = getParsedGameObj(gameId);
-        let players = parsedGameObj['players'];
+        let players = parsedGameObj.players;
 
-        for (let i=0; i<players.length; i++) {
-            if (players[i].playerName === playerName) {
-                players[i].points = points;
+        for (const player of players) {
+            if (player.playerName === playerName) {
+                player.points = points;
                 break;
             }
         }
-        parsedGameObj['players'] = players;
+        parsedGameObj.players = players;
         localStorage.setItem(gameId, JSON.stringify(parsedGameObj));
     }
     catch(err) {
@@ -829,11 +829,11 @@ function setPlayerPoints(gameId, playerName, points) {
 function getPlayerMatchesPlayed(gameId, playerName) {
     try {
         let parsedGameObj = getParsedGameObj(gameId);
-        let players = parsedGameObj['players'];
+        let players = parsedGameObj.players;
 
-        for (let i=0; i<players.length; i++) {
-            if (players[i].playerName === playerName) {
-                let matchesPlayed = players[i].matchesPlayed;
+        for (const player of players) {
+            if (player.playerName === playerName) {
+                let matchesPlayed = player.matchesPlayed;
                 return matchesPlayed;
             }
         }
@@ -853,15 +853,16 @@ function getPlayerMatchesPlayed(gameId, playerName) {
 function setPlayerMatchesPlayed(gameId, playerName, matchesPlayed) {
     try {
         let parsedGameObj = getParsedGameObj(gameId);
-        let players = parsedGameObj['players'];
+        let players = parsedGameObj.players;
 
-        for (let i=0; i<players.length; i++) {
-            if (players[i].playerName === playerName) {
-                players[i].matchesPlayed = matchesPlayed;
+        for (const player of players) {
+            if (player.playerName === playerName) {
+                player.matchesPlayed = matchesPlayed;
                 break;
             }
         }
-        parsedGameObj['players'] = players;
+
+        parsedGameObj.players = players;
         localStorage.setItem(gameId, JSON.stringify(parsedGameObj));
     }
     catch(err) {
@@ -878,7 +879,7 @@ function setPlayerMatchesPlayed(gameId, playerName, matchesPlayed) {
 function getNumberOfPlayers(gameId){
     try {
         let parsedGameObj = getParsedGameObj(gameId);
-        let numberOfPlayers = parsedGameObj['players'].length;
+        let numberOfPlayers = parsedGameObj.players.length;
         return numberOfPlayers;
     }
     catch(err) {
@@ -897,13 +898,13 @@ function getNumberOfPlayers(gameId){
 function getPlayerPlacementInMatch(gameId, playerName, matchId){
     try {
         let parsedGameObj = getParsedGameObj(gameId);
-        let matches = parsedGameObj['matches'];
+        let matches = parsedGameObj.matches;
 
         if (isMatchPlayed(gameId, matchId)){
-            for (let i=0; i<matches.length; i++) {
-                if (matches[i].matchId === matchId) { 
-                    if (matches[i]['result'].includes(playerName)){
-                        let playerPlacementIndex = matches[i]['result'].indexOf(playerName);
+            for (const match of matches) {
+                if (match.matchId === matchId) { 
+                    if (match.result.includes(playerName)){
+                        let playerPlacementIndex = match.result.indexOf(playerName);
                         let playerPlacementInt = 1 + parseInt(playerPlacementIndex);
                         let playerPlacement = playerPlacementInt.toString();
                         return playerPlacement;
@@ -911,6 +912,7 @@ function getPlayerPlacementInMatch(gameId, playerName, matchId){
                 }
             }
         }
+
     }
     catch(err) {
       console.log("Error from getPlayerPlacementInMatch: " + err.message);
@@ -927,17 +929,17 @@ function getPlayerPlacementInMatch(gameId, playerName, matchId){
  function setMatchResult(gameId, matchId, result){
     try {
         let parsedGameObj = getParsedGameObj(gameId);        
-        let matches = parsedGameObj['matches'];
+        let matches = parsedGameObj.matches;
 
-        for (let i=0; i<matches.length; i++) {
-            if (matches[i].matchId === matchId) {
-                matches[i].result = result;
+        for (const match of matches) {
+            if (match.matchId === matchId) {
+                match.result = result;
                 break;
             }
         }
 
         //Update localstorage with results
-        parsedGameObj['matches'] = matches;
+        parsedGameObj.matches = matches;
         localStorage.setItem(gameId, JSON.stringify(parsedGameObj));
     }
     catch(err) {
@@ -1033,12 +1035,12 @@ function isGameComplete(gameId) {
 function isMatchPlayed(gameId, matchId) {
     try {
         let parsedGameObj = getParsedGameObj(gameId);   
-        let matches = parsedGameObj['matches'];
+        let matches = parsedGameObj.matches;
         let isMatchPlayed = false;
     
-        for (let i=0; i<matches.length; i++) {
-            if (matches[i].matchId === matchId) {
-                if (matches[i].result.length > 0){
+        for (const match of matches) {
+            if (match.matchId === matchId) {
+                if (match.result.length > 0){
                     isMatchPlayed = true;
                 }            
             }
@@ -1090,7 +1092,7 @@ function isMatchResultFormValid(playerPlacements){
 
 
 /**
- * TODO!! Checks i newGameForm is valid. No empty input fields.
+ * Checks if newGameForm is valid. No empty input fields.
  * @param {string[]} playerNameList 
  * @param {number} numberOfNewPlayerInputFields 
  * @param {string} newGameName 
