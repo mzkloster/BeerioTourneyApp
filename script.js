@@ -64,7 +64,7 @@ function generateGame(ev){
     try {
         let parsedGameObj = getParsedGameObj(gameId);
         let matches = [];
-        let players = parsedGameObj['players'];
+        let players = parsedGameObj.players;
         let numberOfPlayers = players.length;
         numberOfMatches = (numberOfPlayers*gameRounds)/4; //each player will have number of matches equal to gameRounds. Number of matches is therefor numberOfPlayers*gameRounds/4, since 4 players play pr match
     
@@ -109,7 +109,7 @@ function generateGame(ev){
         }
         
         //add matches to gameObj
-        parsedGameObj['matches'] = matches;
+        parsedGameObj.matches = matches;
         localStorage.setItem(gameId, JSON.stringify(parsedGameObj));
 
         updateMatchesList(gameId);
@@ -337,24 +337,24 @@ function updateGameTableDisplay(gameId){
  function updatePlayerPointsAndMatchesPlayedFromAllMatchResults(gameId) {
     try {
         let parsedGameObj = getParsedGameObj(gameId);
-        let players = parsedGameObj['players'];
-        let matches = parsedGameObj['matches'];
+        let players = parsedGameObj.players;
+        let matches = parsedGameObj.matches;
     
         //loop though all players
-        for (let i=0; i<players.length; i++){
-            let playerName = players[i].playerName;
+        for (const player of players){
+            let playerName = player.playerName;
             let playerPoints = 0;
             let playerPlayedGames = 0;
     
-            //loop though all games
-            for (let j=0; j<matches.length; j++){
-                if (matches[j].result.length > 0){ //check that match has been played (then the result list is not empty)
-                    if (matches[j].players.includes(playerName)){ //check if player played in this match
+            //loop though all matches
+            for (const match of matches){
+                if (match.result.length > 0){ //check that match has been played (then the result list is not empty)
+                    if (match.players.includes(playerName)){ //check if player played in this match
                         playerPlayedGames += 1;
     
                         //checking placement, and adding points
                         for (let k=0; k<4; k++) {
-                            if (matches[j].result[k] === playerName){
+                            if (match.result[k] === playerName){
                                 playerPoints += (3-k);
                                 break;
                             }
