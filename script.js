@@ -64,7 +64,7 @@ function generateGame(ev){
     try {
         let parsedGameObj = getParsedGameObj(gameId);
         let matches = [];
-        let players = parsedGameObj['players'];
+        let players = parsedGameObj.players;
         let numberOfPlayers = players.length;
         numberOfMatches = (numberOfPlayers*gameRounds)/4; //each player will have number of matches equal to gameRounds. Number of matches is therefor numberOfPlayers*gameRounds/4, since 4 players play pr match
     
@@ -109,7 +109,7 @@ function generateGame(ev){
         }
         
         //add matches to gameObj
-        parsedGameObj['matches'] = matches;
+        parsedGameObj.matches = matches;
         localStorage.setItem(gameId, JSON.stringify(parsedGameObj));
 
         updateMatchesList(gameId);
@@ -189,95 +189,21 @@ function createGamesView(){
             showNoExistingGamesAlert()
             return;
         }
-        
-        let positionTableHeader;
-        let matchesPlayedTableHeader;
-        if ($(window).width() > 575) {
-            positionTableHeader = 'Position';
-            matchesPlayedTableHeader = 'Matches played';
-        }else {
-            positionTableHeader = 'Pos';
-            matchesPlayedTableHeader = 'Matches';
-        }
+
+        const positionTableHeader = $(window).width() > 575 ? 'Position' : 'Pos';
+        const matchesPlayedTableHeader = $(window).width() > 575 ? 'Matches played' : 'Matches';
 
         //adding game-content for all games    
         for (let i=0; i<allGamesIds.length; i++){
             let gameId = allGamesIds[i];
             let gameName = getGameName(gameId);
             let gameProgress = getGameProgress(gameId);
-            let gameProgressIconClass = "fas fa-star-half-alt";
             let gameCreatedDate = getCreatedDateToString(gameId);
             let gameNumberOfPlayers = getNumberOfPlayers(gameId);
             let gameRounds = getGameRounds(gameId);
-    
-    
-            $('.games-overview').append(
-                '<div class="game-content shadow" id="' + gameId + '">' + 
-                    '<div class="game-header d-sm-flex justify-content-between">' +
-                        '<div class="game-header-left"> ' +
-                            '<div class=""><i class="far fa-calendar-alt"></i> '+ gameCreatedDate +'</div>' +
-                            '<div class="ps-4 invisible d-none-on-sm"><i class="fas fa-ellipsis-v"></i></div>' +
-                        '</div>' +
-                        '<div class="game-header-middle">' +
-                            '<div><h2>'+ gameName +'</h2></div>' +
-                            '<div>'+
-                                '<span>'+ gameNumberOfPlayers +' <i class="fas fa-users" data-toggle="tooltip" title="Players"></i></span>'+
-                                '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+
-                                '<span>'+ gameRounds +' <i class="fas fa-circle" data-toggle="tooltip" title="Rounds"></i></span>'+
-                                '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+
-                                '<span class="game-progress">'+ gameProgress +'</span> <i class="fas fa-flag-checkered" data-toggle="tooltip" title="Matches, progress"></i>'+
-                            '</div>' +
-                        '</div>' +
-                        '<div class="game-header-right">' +
-                            '<div class="d-inline invisible">'+ gameCreatedDate +'</div>' +
-                            '<div class="d-inline"><i class="fas fa-chevron-down"></i></div>' +
-                            '<div class="dropdown d-inline ps-3">' +
-                                '<a  type="button" id="dropdownMenuGameHeader" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></a>' +
-                                '<div class="dropdown-menu dropdown-primary">' +
-                                    '<a class="dropdown-item export-game" role="button" tabindex="0"><i class="fas fa-download"></i>&nbsp;&nbsp;Download</a>' +
-                                    '<a class="dropdown-item delete-game" role="button" tabindex="0" data-bs-toggle="modal" data-bs-target="#deleteGameModal"><i class="fas fa-trash-alt"></i>&nbsp;&nbsp;Delete</a>' +
-                                '</div>' +
-                            '</div>' +
-                        '</div>' +
-                    '</div>' + 
-                    '<hr class="hr-game-content">'+
-                    '<div class="game-body">' +
-                        '<h3 ="table-header">Table</h3>' +
-                        '<div class="table-responsive">' +
-                            '<table class="game-table table table-striped center">' +
-                                '<thead>' +
-                                    '<tr>' +
-                                        '<th>'+positionTableHeader+'</th>' +
-                                        '<th>Name</th>' +
-                                        '<th>'+matchesPlayedTableHeader+'</th>' +
-                                        '<th>Points</th>' +
-                                        '<th class="final-letter-th">Final</th>' +
-                                    '</tr>' +
-                                '</thead>' +
-                                '<tbody class="game-table-body">' +
-                                    '<!-- table rows are generated here -->' +
-                                '</tbody>' +
-                            '</table>' +
-                        '</div>' +   
-                        
-                        '<h3 class="matches-header">Matches</h3>' +
-                        '<ul class="list-group list-group-flush matches-list">' +
-                            '<!-- list rows with matches are generated here. Example: -->' +
-                        '</ul>' +
-                        '<div class="mobile-game-footer">' +
-                            '<hr class="mt-4">' +
-                            '<div class="mt-4">' +
-                                '<div class="d-inline float-start invisible"><a class="dropdownMenuGameFooter ms-1" type="button" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></a></div>' +
-                                '<div class="d-inline game-footer-toggle"><i class="fas fa-chevron-up"></i></div>' +
-                                '<div class="dropdown d-inline float-end">' +
-                                '<a class="dropdownMenuGameFooter me-1" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></a>' +
-                                '<div class="dropdown-menu dropdown-primary">' +
-                                    '<a class="dropdown-item delete-game" role="button" tabindex="0" data-bs-toggle="modal" data-bs-target="#deleteGameModal"><i class="fas fa-trash-alt"></i>&nbsp;&nbsp;Delete</a>' +
-                                '</div>' +
-                            '</div>' +
-                        '</div>' +
-                    '</div>' +
-                '</div>');
+
+            let gameContentElement = getGameContentElement(gameId, gameCreatedDate, gameName, gameNumberOfPlayers, gameRounds, gameProgress, positionTableHeader, matchesPlayedTableHeader);
+            $('.games-overview').append(gameContentElement);
         }
     }
     catch(err) {
@@ -295,9 +221,9 @@ function updateViewForAllGames(){
         createGamesView();
 
         let allGamesIds = getAllGameIds();
-        for (let i=0; i<allGamesIds.length; i++){        
-            updateGameTableDisplay(allGamesIds[i]);
-            updateMatchesList(allGamesIds[i]);
+        for (const gameId of allGamesIds){        
+            updateGameTableDisplay(gameId);
+            updateMatchesList(gameId);
         }
     
         //adding on-click slideToggle for games
@@ -336,7 +262,7 @@ function updateViewForAllGames(){
 function showNoExistingGamesAlert(){
     let alertContent = '<button class="btn disabled"><i class="fas fa-info-circle"></i></button>You have no existing tournaments. Click the "Create Tournament" button above to create you first Beerio Kart Tournement!';
     $('.games-overview').append(
-        '<div class="alert alert-primary" role="alert">'+ alertContent +'</div>'
+        `<div class="alert alert-primary" role="alert">${alertContent}</div>`
     );
 }
 
@@ -347,16 +273,8 @@ function showNoExistingGamesAlert(){
  */
  function updateGameProgress(gameId){
     try {
-        let gameName = getGameName(gameId)
-        let gameProgress = getGameProgress(gameId);
-        let gameProgressIconClass = "fas fa-star-half-alt";
-    
+        let gameProgress = getGameProgress(gameId);    
         $('.game-content[id="'+gameId+'"]').find('.game-progress').text(gameProgress);
-    
-        if(isGameComplete(gameId)) {
-            gameProgressIconClass = "fas fa-star";        
-        }
-        $('.game-content[id="'+gameId+'"]').find('.game-progress-icon').find('i').removeClass().addClass(gameProgressIconClass);
     }
     catch(err) {
         console.log("Error from updateGameProgress: " + err.message);
@@ -396,7 +314,8 @@ function updateGameTableDisplay(gameId){
                 finalCounter -= 1;
             }
 
-            newTableRow = '<tr class="'+trClass+'"><td>'+position +'</td><td>' + playerNameValue + '</td><td>' + matchesPlayedValue + '</td><td>' + playerPointsValue + '</td><td class="final-letter-td">'+finalLetters[finalCounter]+'</td></tr>';
+            // newTableRow = '<tr class="'+trClass+'"><td>'+position +'</td><td>' + playerNameValue + '</td><td>' + matchesPlayedValue + '</td><td>' + playerPointsValue + '</td><td class="final-letter-td">'+finalLetters[finalCounter]+'</td></tr>';
+            newTableRow = `<tr class="${trClass}"><td>${position}</td><td>${playerNameValue}</td><td>${matchesPlayedValue}</td><td>${playerPointsValue}</td><td class="final-letter-td">${finalLetters[finalCounter]}</td></tr>`;
             $('div[id="'+ gameId +'"]').find('.game-table-body').append(newTableRow);
 
 
@@ -418,24 +337,24 @@ function updateGameTableDisplay(gameId){
  function updatePlayerPointsAndMatchesPlayedFromAllMatchResults(gameId) {
     try {
         let parsedGameObj = getParsedGameObj(gameId);
-        let players = parsedGameObj['players'];
-        let matches = parsedGameObj['matches'];
+        let players = parsedGameObj.players;
+        let matches = parsedGameObj.matches;
     
         //loop though all players
-        for (let i=0; i<players.length; i++){
-            let playerName = players[i].playerName;
+        for (const player of players){
+            let playerName = player.playerName;
             let playerPoints = 0;
             let playerPlayedGames = 0;
     
-            //loop though all games
-            for (let j=0; j<matches.length; j++){
-                if (matches[j].result.length > 0){ //check that match has been played (then the result list is not empty)
-                    if (matches[j].players.includes(playerName)){ //check if player played in this match
+            //loop though all matches
+            for (const match of matches){
+                if (match.result.length > 0){ //check that match has been played (then the result list is not empty)
+                    if (match.players.includes(playerName)){ //check if player played in this match
                         playerPlayedGames += 1;
     
                         //checking placement, and adding points
                         for (let k=0; k<4; k++) {
-                            if (matches[j].result[k] === playerName){
+                            if (match.result[k] === playerName){
                                 playerPoints += (3-k);
                                 break;
                             }
@@ -464,62 +383,16 @@ function updateMatchesList(gameId) {
         $('div[id="'+ gameId +'"]').find('.matches-list').empty();
 
         //loop through matches and create new updated match list items
-        let parsedGameObj = getParsedGameObj(gameId);
-        let matches = parsedGameObj['matches'];
+        let gameObj = getParsedGameObj(gameId);
+        let matches = gameObj.matches;
 
-        for (let i=0; i<matches.length; i++){
-            player1BagdeValue = "";
-            player2BagdeValue = "";
-            player3BagdeValue = "";
-            player4BagdeValue = "";
-            
-            //if match is played: loop through players in that match, find player placement, and set bagdeValue
-            if (isMatchPlayed(gameId, matches[i]['matchId'])){            
-                for (let j=0; j<4; j++){
-                    let playerName = matches[i]['players'][j];
-                    let playerPlacement = getPlayerPlacementInMatch(gameId, playerName, matches[i]['matchId']);
+        for (const match of matches){
+            const matchId = match.matchId;
+            const player1 = match.players[0], player2 = match.players[1], player3 = match.players[2], player4 = match.players[3];
+            const isMatchPlayedBool = isMatchPlayed(gameId, matchId);
 
-                    switch(j) {
-                        case 0:
-                            player1BagdeValue = playerPlacement;
-                            break;
-                        case 1:
-                            player2BagdeValue = playerPlacement;
-                            break;
-                        case 2:
-                            player3BagdeValue = playerPlacement;
-                            break;
-                        case 3:
-                            player4BagdeValue = playerPlacement;
-                            break;                      
-                    }
-                }
-            }
-            
-            let spacingElement;
-            if ($(window).width() < 576) {
-                spacingElement = "";
-             }
-             else {
-                spacingElement = " &nbsp;&nbsp;|&nbsp;&nbsp; ";
-            }
-
-            newListRow = 
-            '<li class="list-group-item">' +
-                '<div class="match-info d-flex justify-content-between">' + 
-                    '<div><b class="match-number">Match <span class="match-id">' + matches[i]['matchId'] + '</span></b></div>' +
-                    '<div>' +
-                        '<div class="d-sm-flex justify-content-center">' +
-                        '<div><span class="match-player-1">' + matches[i]['players'][0] + '</span> <span class="match-player-1-bagde badge badge-placement-'+player1BagdeValue+'">' + player1BagdeValue + '</span>' + spacingElement + '</div>' +
-                        '<div><span class="match-player-2">' + matches[i]['players'][1] + '</span> <span class="match-player-2-bagde badge badge-placement-'+player2BagdeValue+'">' + player2BagdeValue + '</span>' + spacingElement + '</div>' + 
-                        '<div><span class="match-player-3">' + matches[i]['players'][2] + '</span> <span class="match-player-3-bagde badge badge-placement-'+player3BagdeValue+'">' + player3BagdeValue + '</span>' + spacingElement + '</div>' +  
-                        '<div><span class="match-player-4">' + matches[i]['players'][3] + '</span> <span class="match-player-4-bagde badge badge-placement-'+player4BagdeValue+'">' + player4BagdeValue + '</span> </div>' + 
-                        '</div>' +
-                    '</div>' +
-                    '<div><button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#matchResultModal"><i class="fas fa-edit"></i></button></div>' + 
-                '</div>' +
-            '</li>'
-        $('div[id="'+ gameId +'"]').find('.list-group').append(newListRow);
+            let matchesListRowElement = getMatchesListRowElement(gameId, matchId, player1, player2, player3, player4, isMatchPlayedBool);
+            $('div[id="'+ gameId +'"]').find('.matches-list').append(matchesListRowElement);            
         }
 
         //adds onClick event on edit buttons again (since all "old" match list items are removed in the beginning of this function)
@@ -649,7 +522,7 @@ function exportGameJson(ev, buttonClicked) {
 
     let gameId = $(buttonClicked).closest('.game-content').attr('id');
     let parsedGameObj = getParsedGameObj(gameId);
-    let gameName = parsedGameObj['gameName'];
+    let gameName = parsedGameObj.gameName;
     let gameNameSlugified = convertToSlug(gameName);
 
     let data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(parsedGameObj));
@@ -753,7 +626,7 @@ function deleteGameFromDeleteGameModal(ev){
 function getGameName(gameId){
     try {
         let parsedGameObj = getParsedGameObj(gameId);
-        let gameName = parsedGameObj['gameName'];
+        let gameName = parsedGameObj.gameName;
 
         return gameName;
     }
@@ -775,14 +648,14 @@ function getAllGameIds(){
 
     let unsortedgameObjects = [];
 
-    for (let i=0; i<allKeys.length; i++){
+    for (const key of allKeys){
         try {
-            let parsedGameObj = getParsedGameObj(allKeys[i]);
+            let parsedGameObj = getParsedGameObj(key);
             // let gameName = parsedGameObj['gameName'];
-            let createdDate = parsedGameObj['createdDate'];
+            let createdDate = parsedGameObj.createdDate;
             
             let newObject = {
-                gameId: allKeys[i],
+                gameId: key,
                 date: new Date(createdDate)
             }  
             unsortedgameObjects.push(newObject);
@@ -795,8 +668,8 @@ function getAllGameIds(){
 
     let sortedgameObjects = unsortedgameObjects.slice().sort((a,b) => b.date - a.date)
 
-    for (let i=0; i<sortedgameObjects.length; i++){
-        allGamesIdsSorted.push(sortedgameObjects[i].gameId);
+    for (const gameObject of sortedgameObjects){
+        allGamesIdsSorted.push(gameObject.gameId);
     }
 
     return allGamesIdsSorted;  
@@ -809,8 +682,8 @@ function getAllGameNames(){
         let allGameNames = [];
         let allGameIds = getAllGameIds();
 
-        for (let i = 0; i<allGameIds.length; i++){
-            allGameNames.push(getGameName(allGameIds[i]));
+        for (const gameId of allGameIds){
+            allGameNames.push(getGameName(gameId));
         }
         return allGameNames;
     }
@@ -829,7 +702,7 @@ function getAllGameNames(){
 function getNumberOfMatchesInGame(gameId){
     try {
         let parsedGameObj = getParsedGameObj(gameId);
-        let numberOfMatches = parsedGameObj['matches'].length;
+        let numberOfMatches = parsedGameObj.matches.length;
         return numberOfMatches;
     }
     catch(err) {
@@ -863,7 +736,7 @@ function getGameProgress(gameId){
 function getGameRounds(gameId){
     try {
         let parsedGameObj = getParsedGameObj(gameId);
-        let gameRounds = parsedGameObj['rounds'];
+        let gameRounds = parsedGameObj.rounds;
 
         return gameRounds;
     }
@@ -881,11 +754,11 @@ function getGameRounds(gameId){
 function getNumberOfCompletedMatchesInGame(gameId){
     try {
         let parsedGameObj = getParsedGameObj(gameId);
-        let matches = parsedGameObj['matches'];
+        let matches = parsedGameObj.matches;
         let numberOfCompletedMatches = 0;
 
-        for (let i=0; i<matches.length; i++){
-            if (isMatchPlayed(gameId, matches[i].matchId)){
+        for (const match of matches){
+            if (isMatchPlayed(gameId, match.matchId)){
                 numberOfCompletedMatches += 1;
             }
         }
@@ -906,11 +779,11 @@ function getNumberOfCompletedMatchesInGame(gameId){
 function getPlayerPoints(gameId, playerName) {
     try {
         let parsedGameObj = getParsedGameObj(gameId);
-        let players = parsedGameObj['players'];
+        let players = parsedGameObj.players;
 
-        for (let i=0; i<players.length; i++) {
-            if (players[i].playerName === playerName) {
-                let playerPoints = players[i].points;
+        for (const player of players) {
+            if (player.playerName === playerName) {
+                let playerPoints = player.points;
                 return playerPoints;           
             }
         }
@@ -930,15 +803,15 @@ function getPlayerPoints(gameId, playerName) {
 function setPlayerPoints(gameId, playerName, points) {
     try {
         let parsedGameObj = getParsedGameObj(gameId);
-        let players = parsedGameObj['players'];
+        let players = parsedGameObj.players;
 
-        for (let i=0; i<players.length; i++) {
-            if (players[i].playerName === playerName) {
-                players[i].points = points;
+        for (const player of players) {
+            if (player.playerName === playerName) {
+                player.points = points;
                 break;
             }
         }
-        parsedGameObj['players'] = players;
+        parsedGameObj.players = players;
         localStorage.setItem(gameId, JSON.stringify(parsedGameObj));
     }
     catch(err) {
@@ -956,11 +829,11 @@ function setPlayerPoints(gameId, playerName, points) {
 function getPlayerMatchesPlayed(gameId, playerName) {
     try {
         let parsedGameObj = getParsedGameObj(gameId);
-        let players = parsedGameObj['players'];
+        let players = parsedGameObj.players;
 
-        for (let i=0; i<players.length; i++) {
-            if (players[i].playerName === playerName) {
-                let matchesPlayed = players[i].matchesPlayed;
+        for (const player of players) {
+            if (player.playerName === playerName) {
+                let matchesPlayed = player.matchesPlayed;
                 return matchesPlayed;
             }
         }
@@ -980,15 +853,16 @@ function getPlayerMatchesPlayed(gameId, playerName) {
 function setPlayerMatchesPlayed(gameId, playerName, matchesPlayed) {
     try {
         let parsedGameObj = getParsedGameObj(gameId);
-        let players = parsedGameObj['players'];
+        let players = parsedGameObj.players;
 
-        for (let i=0; i<players.length; i++) {
-            if (players[i].playerName === playerName) {
-                players[i].matchesPlayed = matchesPlayed;
+        for (const player of players) {
+            if (player.playerName === playerName) {
+                player.matchesPlayed = matchesPlayed;
                 break;
             }
         }
-        parsedGameObj['players'] = players;
+
+        parsedGameObj.players = players;
         localStorage.setItem(gameId, JSON.stringify(parsedGameObj));
     }
     catch(err) {
@@ -1005,7 +879,7 @@ function setPlayerMatchesPlayed(gameId, playerName, matchesPlayed) {
 function getNumberOfPlayers(gameId){
     try {
         let parsedGameObj = getParsedGameObj(gameId);
-        let numberOfPlayers = parsedGameObj['players'].length;
+        let numberOfPlayers = parsedGameObj.players.length;
         return numberOfPlayers;
     }
     catch(err) {
@@ -1024,13 +898,13 @@ function getNumberOfPlayers(gameId){
 function getPlayerPlacementInMatch(gameId, playerName, matchId){
     try {
         let parsedGameObj = getParsedGameObj(gameId);
-        let matches = parsedGameObj['matches'];
+        let matches = parsedGameObj.matches;
 
         if (isMatchPlayed(gameId, matchId)){
-            for (let i=0; i<matches.length; i++) {
-                if (matches[i].matchId === matchId) { 
-                    if (matches[i]['result'].includes(playerName)){
-                        let playerPlacementIndex = matches[i]['result'].indexOf(playerName);
+            for (const match of matches) {
+                if (match.matchId === matchId) { 
+                    if (match.result.includes(playerName)){
+                        let playerPlacementIndex = match.result.indexOf(playerName);
                         let playerPlacementInt = 1 + parseInt(playerPlacementIndex);
                         let playerPlacement = playerPlacementInt.toString();
                         return playerPlacement;
@@ -1038,6 +912,7 @@ function getPlayerPlacementInMatch(gameId, playerName, matchId){
                 }
             }
         }
+
     }
     catch(err) {
       console.log("Error from getPlayerPlacementInMatch: " + err.message);
@@ -1054,23 +929,49 @@ function getPlayerPlacementInMatch(gameId, playerName, matchId){
  function setMatchResult(gameId, matchId, result){
     try {
         let parsedGameObj = getParsedGameObj(gameId);        
-        let matches = parsedGameObj['matches'];
+        let matches = parsedGameObj.matches;
 
-        for (let i=0; i<matches.length; i++) {
-            if (matches[i].matchId === matchId) {
-                matches[i].result = result;
+        for (const match of matches) {
+            if (match.matchId === matchId) {
+                match.result = result;
                 break;
             }
         }
 
         //Update localstorage with results
-        parsedGameObj['matches'] = matches;
+        parsedGameObj.matches = matches;
         localStorage.setItem(gameId, JSON.stringify(parsedGameObj));
     }
     catch(err) {
       console.log("Error from setMatchResult: " + err.message);
     }    
 }
+
+
+/**
+ * Returns createdDate for game in string format "5. januar 2021"
+ * @param {string} gameId 
+ * @returns string
+ */
+function getCreatedDateToString(gameId){
+    let day, monthValue, month, year, dateString;
+    const parsedGameObj = getParsedGameObj(gameId);
+    const createdDate = new Date(parsedGameObj['createdDate']);
+    day = createdDate.getDate();
+    monthValue = createdDate.getMonth();
+    year = createdDate.getFullYear();
+
+    const monthList = ["januar","februar","mars","april","mai","juni","juli","august","september","oktober","november","desember"];
+    month = monthList[monthValue];
+
+    if(isMobileView()){
+        month = month.slice(0,3);
+    }
+
+    dateString = day + '. ' + month + ' ' + year;
+    return dateString;
+}
+
 
 /**
  * Returns a sorted list of playerNames base on points
@@ -1160,12 +1061,12 @@ function isGameComplete(gameId) {
 function isMatchPlayed(gameId, matchId) {
     try {
         let parsedGameObj = getParsedGameObj(gameId);   
-        let matches = parsedGameObj['matches'];
+        let matches = parsedGameObj.matches;
         let isMatchPlayed = false;
     
-        for (let i=0; i<matches.length; i++) {
-            if (matches[i].matchId === matchId) {
-                if (matches[i].result.length > 0){
+        for (const match of matches) {
+            if (match.matchId === matchId) {
+                if (match.result.length > 0){
                     isMatchPlayed = true;
                 }            
             }
@@ -1176,6 +1077,12 @@ function isMatchPlayed(gameId, matchId) {
     catch(err) {
         console.log("Error from isMatchPlayed: " + err.message);        
     }
+}
+
+
+function isMobileView(){
+    const screenWidth = 768;
+    return $(window).width() < screenWidth 
 }
 
 
@@ -1217,7 +1124,7 @@ function isMatchResultFormValid(playerPlacements){
 
 
 /**
- * TODO!! Checks i newGameForm is valid. No empty input fields.
+ * Checks if newGameForm is valid. No empty input fields.
  * @param {string[]} playerNameList 
  * @param {number} numberOfNewPlayerInputFields 
  * @param {string} newGameName 

@@ -16,7 +16,7 @@ body {
 .fas, .fa, .far {
     cursor: pointer;
 }
-h2{
+#gamesOverviewHeader{
     color:green;
 }
 .game-body {
@@ -28,9 +28,7 @@ h2{
     margin: 1rem;
     border-radius: 5px;
 }
-.game-content h2{
-    color: #212529;
-}
+
 .game-header{
     padding: 1rem;
     cursor: pointer;
